@@ -1,0 +1,11 @@
+{
+  "name": "kitap-test-cikartici",
+  "version": "1.0.0",
+  "description": "Türk sınav kitaplarından test listesi çıkarma aracı",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
+  }
+}
