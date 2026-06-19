@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rostrum Akademi — Hesap Kurulumu</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0f0e0c;color:#f0ece6;font-family:'Segoe UI',sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.box{max-width:500px;width:100%;background:#1a1916;border:1px solid #383430;border-radius:16px;padding:32px;}
+h1{font-size:22px;margin-bottom:8px;}
+.sub{color:#9a9088;font-size:13px;margin-bottom:24px;}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;transition:all .2s;}
+.btn-main{background:#f0a500;color:#0f0e0c;}
+.btn-main:hover{background:#fbb800;}
+.btn-migrate{background:#3ecf8e;color:#0f0e0c;}
+.btn-migrate:hover{background:#4ae0a0;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+#log{background:#242220;border:1px solid #383430;border-radius:10px;padding:16px;font-size:12px;font-family:monospace;max-height:400px;overflow-y:auto;white-space:pre-wrap;line-height:1.8;margin-top:16px;display:none;}
+.ok{color:#3ecf8e;} .err{color:#ff5c5c;} .info{color:#4da6ff;} .warn{color:#f0a500;}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;}
+th,td{padding:8px 12px;text-align:left;border-bottom:1px solid #383430;}
+th{color:#9a9088;font-weight:600;font-size:11px;text-transform:uppercase;}
+.role{padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;}
+.role-coach{background:rgba(240,165,0,.15);color:#f0a500;}
+.role-student{background:rgba(77,166,255,.15);color:#4da6ff;}
+.role-parent{background:rgba(62,207,142,.15);color:#3ecf8e;}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🚀 Rostrum Akademi Kurulum</h1>
+  <div class="sub">Test hesapları oluşturmak için butona tıklayın</div>
+  
+  <table>
+    <tr><th>Rol</th><th>Kullanıcı Adı</th><th>Şifre</th></tr>
+    <tr><td><span class="role role-coach">KOÇ</span></td><td>demokoc</td><td>koc123</td></tr>
+    <tr><td><span class="role role-student">ÖĞRENCİ</span></td><td>demoogrenci</td><td>ogrenci123</td></tr>
+    <tr><td><span class="role role-parent">VELİ</span></td><td>demoveli</td><td>veli123</td></tr>
+  </table>
+
+  <button class="btn btn-main" id="setupBtn" onclick="runSetup()">🔧 Hesapları Oluştur</button>
+  <button class="btn" style="background:#242220;color:#9a9088;border:1px solid #383430" onclick="checkUsers()">🔍 Mevcut Kullanıcıları Kontrol Et</button>
+  
+  <div id="log"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const db = supabase.createClient(
+  'https://imyhenrwmsmyikpollur.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34'
+);
+
+const logEl = document.getElementById('log');
+function log(msg, cls='info') {
+  logEl.style.display = 'block';
+  logEl.innerHTML += `<span class="${cls}">${msg}</span>\n`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkUsers() {
+  logEl.innerHTML = '';
+  log('📋 Mevcut kullanıcılar kontrol ediliyor...', 'info');
+  const {data, error} = await db.from('users').select('id,username,role,full_name').order('created_at');
+  if(error) {
+    log('❌ Hata: ' + JSON.stringify(error), 'err');
+    return;
+  }
+  if(!data || data.length === 0) {
+    log('⚠️ Veritabanında hiç kullanıcı yok!', 'warn');
+    return;
+  }
+  log(`✅ ${data.length} kullanıcı bulundu:`, 'ok');
+  data.forEach(u => {
+    log(`  👤 ${u.username || '(yok)'} | ${u.role} | ${u.full_name || '-'}`, 'info');
+  });
+}
+
+async function runSetup() {
+  const btn = document.getElementById('setupBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Oluşturuluyor...';
+  logEl.innerHTML = '';
+  
+  try {
+    // 1. Koç oluştur
+    log('1️⃣ Koç hesabı oluşturuluyor...', 'info');
+    const coachPass = await sha256('koc123');
+    const {data:coach, error:coachErr} = await db.from('users').insert({
+      username: 'demokoc',
+      full_name: 'Demo Koç',
+      role: 'coach',
+      password_hash: coachPass,
+      color: '#f0a500',
+      target: '',
+      progress: 0,
+      week_start: 0
+    }).select().single();
+    
+    if(coachErr) {
+      log('❌ Koç hatası: ' + coachErr.message, 'err');
+      if(coachErr.message.includes('duplicate') || coachErr.code === '23505') {
+        log('ℹ️ Koç zaten var, mevcut kaydı kullanıyorum...', 'warn');
+        const {data:existing} = await db.from('users').select('*').eq('username','demokoc').maybeSingle();
+        if(existing) { await createStudent(existing.id); return; }
+      }
+      log('', 'info');
+      log('⚠️ API ile eklenemiyor. Supabase SQL Editor kullanın:', 'warn');
+      await showFallbackSQL();
+      return;
+    }
+    
+    log('✅ Koç oluşturuldu: demokoc (ID: ' + coach.id + ')', 'ok');
+    await createStudent(coach.id);
+    
+  } catch(e) {
+    log('❌ Hata: ' + e.message, 'err');
+    await showFallbackSQL();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔧 Hesapları Oluştur';
+  }
+}
+
+async function createStudent(coachId) {
+  // 2. Öğrenci oluştur
+  log('2️⃣ Öğrenci hesabı oluşturuluyor...', 'info');
+  const stuPass = await sha256('ogrenci123');
+  const {data:stu, error:stuErr} = await db.from('users').insert({
+    username: 'demoogrenci',
+    full_name: 'Demo Öğrenci',
+    role: 'student',
+    password_hash: stuPass,
+    coach_id: coachId,
+    color: '#4da6ff',
+    target: 'TYT 300+ Net',
+    progress: 45,
+    week_start: 0
+  }).select().single();
+  
+  if(stuErr) {
+    log('❌ Öğrenci hatası: ' + stuErr.message, 'err');
+    await showFallbackSQL();
+    return;
+  }
+  log('✅ Öğrenci oluşturuldu: demoogrenci', 'ok');
+  
+  // 3. Workspace
+  log('3️⃣ Workspace oluşturuluyor...', 'info');
+  const {error:wsErr} = await db.from('workspaces').insert({
+    coach_id: coachId,
+    brand_name: 'Demo Akademi',
+    brand_color: '#f0a500',
+    onboarding_done: true
+  });
+  if(wsErr) log('⚠️ Workspace: ' + wsErr.message, 'warn');
+  else log('✅ Workspace oluşturuldu', 'ok');
+  
+  log('', 'info');
+  log('══════════════════════════════════════', 'ok');
+  log('🎉 TAMAMLANDI! Şimdi app.html\'e gidin:', 'ok');
+  log('', 'info');
+  log('   Koç:     demokoc / koc123', 'ok');
+  log('   Öğrenci: demoogrenci / ogrenci123', 'ok');
+  log('══════════════════════════════════════', 'ok');
+}
+
+async function showFallbackSQL() {
+  const coachHash = await sha256('koc123');
+  const stuHash = await sha256('ogrenci123');
+  
+  log('', 'info');
+  log('📌 Supabase Dashboard → SQL Editor\'a gidin:', 'warn');
+  log('   https://supabase.com/dashboard → Projeniz → SQL Editor', 'info');
+  log('', 'info');
+  log('Aşağıdaki SQL\'i kopyalayıp çalıştırın:', 'warn');
+  log('═══════════════════════════════════════════', 'warn');
+  
+  const sql = `-- 1. Koç
+INSERT INTO public.users (username, full_name, role, password_hash, color, target, progress, week_start)
+VALUES ('demokoc', 'Demo Koç', 'coach', '${coachHash}', '#f0a500', '', 0, 0)
+ON CONFLICT (username) DO NOTHING;
+
+-- 2. Öğrenci
+INSERT INTO public.users (username, full_name, role, password_hash, coach_id, color, target, progress, week_start)
+VALUES ('demoogrenci', 'Demo Öğrenci', 'student', '${stuHash}',
+  (SELECT id FROM public.users WHERE username='demokoc'), '#4da6ff', 'TYT 300+ Net', 45, 0)
+ON CONFLICT (username) DO NOTHING;
+
+-- 3. Workspace
+INSERT INTO public.workspaces (coach_id, brand_name, brand_color, onboarding_done)
+VALUES ((SELECT id FROM public.users WHERE username='demokoc'), 'Demo Akademi', '#f0a500', true)
+ON CONFLICT DO NOTHING;
+
+-- Kontrol
+SELECT username, role, full_name FROM public.users ORDER BY created_at;`;
+  
+  log(sql, 'info');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2220 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Yönetimi — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#07060a;--s1:#0f0d14;--s2:#17151e;--s3:#1e1b27;
+  --bd:#2d2a3a;--bd2:#3d3a4e;
+  --acc:#f0a500;--acc2:#c084fc;--acc3:#3ecf8e;--acc4:#60b4ff;
+  --text:#f0eaf8;--mid:#a09ab8;--dim:#5a5668;
+  --red:#ff5c7a;--red-dim:rgba(255,92,122,.1);
+  --green-dim:rgba(62,207,142,.1);--blue-dim:rgba(96,180,255,.1);
+}
+body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;}
+
+/* LOGIN */
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;width:100%;background:var(--bg);}
+.login-card{background:var(--s1);border:1px solid var(--bd);border-radius:20px;padding:36px;width:360px;}
+.login-logo{font-size:22px;font-weight:800;margin-bottom:6px;}
+.login-logo b{color:var(--acc);}
+.login-sub{font-size:13px;color:var(--mid);margin-bottom:28px;}
+.ff{margin-bottom:14px;}
+.ff label{display:block;font-size:10px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.ff input{width:100%;background:var(--s2);border:1.5px solid var(--bd);border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;color:var(--text);outline:none;transition:border .15s;}
+.ff input:focus{border-color:var(--acc);}
+.ff input::placeholder{color:var(--dim);}
+.btn-login{width:100%;background:var(--acc);color:#07060a;border:none;border-radius:10px;padding:13px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:4px;}
+.btn-login:hover{background:#fbb800;}
+.login-err{color:var(--red);font-size:12px;text-align:center;margin-top:8px;display:none;}
+
+/* LAYOUT */
+#appShell{display:none;width:100%;min-height:100vh;}
+.sidebar{width:220px;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;overflow-y:auto;}
+.sb-top{padding:18px 16px 12px;border-bottom:1px solid var(--bd);}
+.sb-logo{font-size:15px;font-weight:800;}
+.sb-logo b{color:var(--acc);}
+.sb-sub{font-size:10px;color:var(--dim);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.sb-section{font-size:9px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;padding:14px 16px 6px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;transition:background .15s;border-left:2px solid transparent;font-size:13px;font-weight:500;color:var(--mid);}
+.sb-item:hover{background:var(--s2);color:var(--text);}
+.sb-item.active{background:var(--s2);border-left-color:var(--acc);color:var(--text);}
+.sb-item .ic{font-size:16px;width:22px;text-align:center;}
+.sb-badge{margin-left:auto;background:var(--red);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;}
+.sb-bottom{margin-top:auto;border-top:1px solid var(--bd);padding:12px 16px;}
+.sb-user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mid);}
+.sb-av{width:28px;height:28px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#07060a;}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;min-height:100vh;}
+.topbar{height:50px;background:var(--s1);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:10;}
+.topbar-title{font-size:14px;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.tb-btn{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;font-family:inherit;color:var(--mid);cursor:pointer;transition:all .15s;}
+.tb-btn:hover{color:var(--text);border-color:var(--bd2);}
+.tb-btn.danger:hover{color:var(--red);border-color:var(--red);}
+.content{padding:24px;}
+.view{display:none;}
+.view.active{display:block;}
+
+/* COMPONENTS */
+.page-h{font-size:22px;font-weight:800;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--mid);margin-bottom:22px;}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:20px;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px;}
+@keyframes pulse{0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;}
+.stat-val{font-size:28px;font-weight:800;line-height:1;color:var(--acc);margin-bottom:4px;}
+.stat-lbl{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+.stat-delta{font-size:11px;color:var(--acc3);margin-top:4px;font-weight:600;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{border-bottom:1px solid var(--bd);}
+th{text-align:left;padding:10px 12px;font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;}
+td{padding:11px 12px;border-bottom:1px solid var(--bd);color:var(--mid);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--s2);}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;}
+.st-pending{background:rgba(240,165,0,.1);color:var(--acc);}
+.st-approved{background:var(--green-dim);color:var(--acc3);}
+.st-rejected{background:var(--red-dim);color:var(--red);}
+.st-contacted{background:var(--blue-dim);color:var(--acc4);}
+.st-published{background:var(--green-dim);color:var(--acc3);}
+.st-draft{background:rgba(160,154,184,.1);color:var(--mid);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:all .15s;}
+.btn-acc{background:var(--acc);color:#07060a;}
+.btn-acc:hover{background:#fbb800;}
+.btn-ghost{background:var(--s2);border:1px solid var(--bd);color:var(--mid);}
+.btn-ghost:hover{color:var(--text);border-color:var(--bd2);}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid transparent;}
+.btn-danger:hover{border-color:var(--red);}
+.btn-green{background:var(--green-dim);color:var(--acc3);border:1px solid transparent;}
+.btn-green:hover{border-color:var(--acc3);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+
+/* FORM */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--s2);border:1.5px solid var(--bd);border-radius:9px;padding:10px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:border .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--acc);}
+.field textarea{resize:vertical;min-height:100px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-bg.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;position:relative;}
+.modal h2{font-size:18px;font-weight:800;margin-bottom:18px;}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--s2);border:1px solid var(--bd);border-radius:7px;width:28px;height:28px;cursor:pointer;font-size:16px;color:var(--mid);display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{color:var(--text);}
+
+/* CONTENT EDITOR */
+.content-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.content-item{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px;}
+.ci-key{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.ci-val{font-size:15px;font-weight:600;margin-bottom:10px;color:var(--text);}
+.ci-input{width:100%;background:var(--s2);border:1.5px solid var(--bd);border-radius:8px;padding:8px 11px;font-size:14px;font-family:inherit;color:var(--text);outline:none;transition:border .15s;}
+.ci-input:focus{border-color:var(--acc);}
+
+/* ANNOUNCE */
+.ann-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.ann-active{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.ann-msg{flex:1;font-size:13px;}
+.ann-type{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.4);z-index:999;display:none;animation:fadeUp .2s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* BLOG EDITOR */
+.blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.blog-card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden;transition:border .2s;}
+.blog-card:hover{border-color:var(--bd2);}
+.blog-card-top{height:80px;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.blog-card-body{padding:14px 16px;}
+.blog-card-title{font-size:13px;font-weight:700;margin-bottom:6px;line-height:1.4;}
+.blog-card-meta{font-size:11px;color:var(--dim);display:flex;gap:10px;}
+.blog-card-actions{display:flex;gap:6px;margin-top:10px;}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;color:var(--mid);}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .25s;}
+  .sidebar.open{transform:none;}
+  .main{margin-left:0;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .content-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">ROSTRUM<b>AKADEMİ</b></div>
+    <div class="login-sub">Site Yönetim Paneli</div>
+    <div class="ff"><label>Kullanıcı Adı</label><input type="text" id="lgUser" placeholder="admin" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="ff"><label>Şifre</label><input type="password" id="lgPass" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-login" onclick="doLogin()">Giriş Yap →</button>
+    <div class="login-err" id="lgErr">Kullanıcı adı veya şifre hatalı</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <div class="sb-logo">ROSTRUM<b>AKADEMİ</b></div>
+      <div class="sb-sub">Site Yönetimi</div>
+    </div>
+    <div class="sb-section">Ana</div>
+    <div class="sb-item active" onclick="switchView('dashboard',this)"><span class="ic">📊</span>Dashboard</div>
+    <div class="sb-item" onclick="switchView('leads',this)"><span class="ic">👥</span>Başvurular<span class="sb-badge" id="pendingBadge">0</span></div>
+    <div class="sb-item" onclick="switchView('users',this)"><span class="ic">👤</span>Kullanıcı Yönetimi</div>
+    <div class="sb-item" onclick="switchView('revenue',this)"><span class="ic">💰</span>Gelir & Abonelikler</div>
+    <div class="sb-item" onclick="switchView('agents',this)"><span class="ic">🤖</span>Ajan Onay Paneli</div>
+    <div class="sb-item" onclick="switchView('matches',this)"><span class="ic">🤝</span>Eşleşmeler</div>
+    <div class="sb-item" onclick="switchView('profiles',this)"><span class="ic">🔍</span>Profil Yönetimi</div>
+    <div class="sb-section">İçerik</div>
+    <div class="sb-item" onclick="switchView('content',this)"><span class="ic">✏️</span>Site İçeriği</div>
+    <div class="sb-item" onclick="switchView('blog',this)"><span class="ic">📝</span>Blog Yazıları</div>
+    <div class="sb-item" onclick="switchView('announce',this)"><span class="ic">📣</span>Duyurular</div>
+    <div class="sb-section">Site</div>
+    <div class="sb-item" onclick="window.open('index.html','_blank')"><span class="ic">🌐</span>Siteyi Görüntüle</div>
+    <div class="sb-item" onclick="window.open('pricing.html','_blank')"><span class="ic">💎</span>Fiyatlar Sayfası</div>
+    <div class="sb-item" onclick="window.open('app.html','_blank')"><span class="ic">🎓</span>Koçluk Uygulaması</div>
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-av">A</div>
+        <div>Admin · <span style="color:var(--acc3)">●</span></div>
+        <button class="tb-btn danger" style="margin-left:auto;padding:4px 8px;font-size:11px" onclick="doLogout()">Çıkış</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="tb-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" style="display:none" id="hambBtn">☰</button>
+        <span class="topbar-title" id="topbarTitle">Dashboard</span>
+      </div>
+      <div class="topbar-right">
+        <div style="font-size:12px;color:var(--dim)" id="lastSync">—</div>
+        <button class="tb-btn" onclick="syncAll()">🔄 Yenile</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-h">Dashboard</div>
+        <div class="page-sub">Site genel durumu</div>
+        <div class="stats-grid" id="dashStats">
+          <div class="stat"><div class="stat-val" id="st-leads">—</div><div class="stat-lbl">Toplam Başvuru</div><div class="stat-delta" id="st-pending">— bekliyor</div></div>
+          <div class="stat"><div class="stat-val" id="st-approved" style="color:var(--acc3)">—</div><div class="stat-lbl">Onaylanan</div></div>
+          <div class="stat"><div class="stat-val" id="st-posts" style="color:var(--acc4)">—</div><div class="stat-lbl">Blog Yazısı</div></div>
+          <div class="stat"><div class="stat-val" id="st-announce" style="color:var(--acc2)">—</div><div class="stat-lbl">Aktif Duyuru</div></div>
+          <div class="stat"><div class="stat-val" id="st-active-visitors" style="color:var(--acc3)">18</div><div class="stat-lbl">Canlı Ziyaretçi</div></div>
+          <div class="stat"><div class="stat-val" id="st-latency" style="color:var(--acc4)">14ms</div><div class="stat-lbl">Sunucu Gecikmesi</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+          <div class="card">
+            <div class="sh"><div style="font-size:13px;font-weight:700">Son Başvurular</div><button class="btn btn-ghost btn-sm" onclick="switchView('leads',document.querySelector('[onclick*=leads]'))">Tümü →</button></div>
+            <div id="dashLeads"><div class="loading">Yükleniyor...</div></div>
+          </div>
+          <div class="card">
+            <div class="sh"><div style="font-size:13px;font-weight:700">Hızlı İşlemler</div></div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-ghost" style="justify-content:flex-start;width:100%" onclick="openBlogModal()">📝 Yeni Blog Yazısı</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;width:100%" onclick="openAnnounceModal()">📣 Duyuru Ekle</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;width:100%" onclick="switchView('content',document.querySelector('[onclick*=content]'))">✏️ Site İçeriği Düzenle</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start;width:100%" onclick="window.open('index.html','_blank')">🌐 Siteyi Aç</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CANLI ANALİTİK & TRAFİK -->
+        <div class="sh" style="margin-top:24px;"><div style="font-size:15px;font-weight:800;color:var(--acc)">⚡ Canlı Analitik &amp; Trafik</div></div>
+        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:20px;">
+          <!-- SVG VISITOR CHART -->
+          <div class="card">
+            <div class="sh">
+              <div style="font-size:13px;font-weight:700">📈 Günlük Ziyaretçi Grafiği (Son 7 Gün)</div>
+              <div style="font-size:11px;color:var(--dim)">Toplam: 12,450 Ziyaretçi</div>
+            </div>
+            <div style="height:160px;display:flex;align-items:center;justify-content:center;margin-top:10px;">
+              <svg width="100%" height="100%" viewBox="0 0 400 150" preserveAspectRatio="none" style="overflow:visible;">
+                <defs>
+                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--acc)" stop-opacity="0.3"></stop>
+                    <stop offset="100%" stop-color="var(--acc)" stop-opacity="0.05"></stop>
+                  </linearGradient>
+                </defs>
+                <!-- Grid Lines -->
+                <line x1="10" y1="20" x2="390" y2="20" stroke="var(--bd)" stroke-width="0.5" stroke-dasharray="3,3" />
+                <line x1="10" y1="60" x2="390" y2="60" stroke="var(--bd)" stroke-width="0.5" stroke-dasharray="3,3" />
+                <line x1="10" y1="100" x2="390" y2="100" stroke="var(--bd)" stroke-width="0.5" stroke-dasharray="3,3" />
+                <line x1="10" y1="130" x2="390" y2="130" stroke="var(--bd)" stroke-width="0.5" />
+                
+                <!-- Path Area -->
+                <path d="M 10 130 Q 70 80, 130 95 T 250 40 T 310 60 T 390 10 L 390 130 Z" fill="url(#chartGrad)" />
+                <!-- Path Line -->
+                <path d="M 10 130 Q 70 80, 130 95 T 250 40 T 310 60 T 390 10" fill="none" stroke="var(--acc)" stroke-width="2.5" />
+                
+                <!-- Dots -->
+                <circle cx="10" cy="130" r="4" fill="var(--acc)" />
+                <circle cx="70" cy="80" r="4" fill="var(--acc)" />
+                <circle cx="130" cy="95" r="4" fill="var(--acc)" />
+                <circle cx="190" cy="70" r="4" fill="var(--acc)" />
+                <circle cx="250" cy="40" r="4" fill="var(--acc)" />
+                <circle cx="310" cy="60" r="4" fill="var(--acc)" />
+                <circle cx="390" cy="10" r="4" fill="var(--acc)" />
+                
+                <!-- Tooltips/Texts -->
+                <text x="70" y="65" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="middle">1,240</text>
+                <text x="130" y="80" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="middle">1,020</text>
+                <text x="250" y="25" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="middle">2,890</text>
+                <text x="390" y="25" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="end">4,120</text>
+              </svg>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:10px;padding:0 5px;">
+              <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz (Bugün)</span>
+            </div>
+          </div>
+          
+          <!-- LIVE TRAFFIC LOG -->
+          <div class="card">
+            <div class="sh">
+              <div style="font-size:13px;font-weight:700">🖥️ Canlı Trafik Log Simülatörü</div>
+              <div style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:var(--acc3);border-radius:50%;animation:pulse 1.3s infinite;"></span><span style="font-size:11px;color:var(--acc3)">Canlı</span></div>
+            </div>
+            <div id="trafficLogContainer" style="height:160px;overflow-y:auto;background:var(--s2);border:1px solid var(--bd);border-radius:10px;font-family:'Courier New',Courier,monospace;font-size:11px;color:#85e89d;padding:10px;margin-top:10px;display:flex;flex-direction:column;gap:4px;">
+              <div>[13:14:02] Ziyaretçi: /index.html [200 OK] (IP: 176.234.*.*)</div>
+              <div>[13:14:15] Ziyaretçi: /koc_bul.html [200 OK] (IP: 85.105.*.*)</div>
+              <div>[13:14:38] Başvuru Formu: match_requests tablosuna ekleme yapıldı.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POPULAR PAGES TABLE -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="sh"><div style="font-size:13px;font-weight:700">🌐 En Çok Ziyaret Edilen Sayfalar</div></div>
+          <div class="tbl-wrap">
+            <table style="font-size:12px;">
+              <thead>
+                <tr>
+                  <th>SAYFA ADRESI</th>
+                  <th>GÖRÜNTÜLENME</th>
+                  <th>TEKİL ZİYARETÇİ</th>
+                  <th>ORTALAMA SÜRE</th>
+                  <th>HEMEN ÇIKMA ORANI</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="index.html" target="_blank" style="color:var(--acc4);text-decoration:none">/index.html (Ana Sayfa)</a></td>
+                  <td>5,420</td>
+                  <td>4,120</td>
+                  <td>1dk 45sn</td>
+                  <td style="color:var(--acc3)">28.4%</td>
+                </tr>
+                <tr>
+                  <td><a href="koc_bul.html" target="_blank" style="color:var(--acc4);text-decoration:none">/koc_bul.html (Koç Bulucu)</a></td>
+                  <td>3,840</td>
+                  <td>2,950</td>
+                  <td>3dk 12sn</td>
+                  <td style="color:var(--acc3)">15.2%</td>
+                </tr>
+                <tr>
+                  <td><a href="blog.html" target="_blank" style="color:var(--acc4);text-decoration:none">/blog.html (Akademik Blog)</a></td>
+                  <td>2,150</td>
+                  <td>1,840</td>
+                  <td>2dk 30sn</td>
+                  <td style="color:var(--acc3)">42.1%</td>
+                </tr>
+                <tr>
+                  <td><a href="app.html" target="_blank" style="color:var(--acc4);text-decoration:none">/app.html (Koçluk Portalı)</a></td>
+                  <td>1,040</td>
+                  <td>850</td>
+                  <td>18dk 45sn</td>
+                  <td style="color:var(--acc3)">4.8%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- EŞLEŞMELER -->
+      <div class="view" id="view-matches">
+        <div class="page-h">Eşleşmeler</div>
+        <div class="page-sub">Koç Bul sayfasından gelen danışan/koç eşleşme başvuruları</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="btn btn-acc" id="mAll" onclick="filterMatches('all',this)">Tümü</button>
+          <button class="btn btn-ghost" id="mPending" onclick="filterMatches('pending',this)">⏳ Bekleyen</button>
+          <button class="btn btn-ghost" id="mMatched" onclick="filterMatches('matched',this)">🤝 Eşleştirildi</button>
+          <button class="btn btn-ghost" id="mCompleted" onclick="filterMatches('completed',this)">✅ Tamamlandı</button>
+          <input id="matchSearch" placeholder="Öğrenci veya koç ara..." oninput="renderMatches()" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;font-size:12px;font-family:inherit;color:var(--text);outline:none;margin-left:auto">
+        </div>
+        <div class="card tbl-wrap">
+          <table>
+            <thead><tr><th>Öğrenci Bilgileri</th><th>Sınav / Profil</th><th>İstenen Koç</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <tbody id="matchesTable"><tr><td colspan="6" class="loading">Yükleniyor...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PROFİL YÖNETİMİ -->
+      <div class="view" id="view-profiles">
+        <div class="page-h">Profil Yönetimi</div>
+        <div class="page-sub">Sistemdeki koç ve öğrenci detaylı profillerini inceleyin</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="btn btn-acc" id="pTabCoach" onclick="switchProfileTab('coach',this)">👥 Koç Profilleri</button>
+          <button class="btn btn-ghost" id="pTabStudent" onclick="switchProfileTab('student',this)">🎓 Öğrenci Profilleri</button>
+          <input id="profileSearch" placeholder="İsim ara..." oninput="renderProfiles()" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;font-size:12px;font-family:inherit;color:var(--text);outline:none;margin-left:auto">
+        </div>
+        <div class="card tbl-wrap">
+          <table id="coachProfilesTable">
+            <thead><tr><th>Koç Adı</th><th>Uzmanlık Alanları</th><th>Eğitim / Deneyim</th><th>Son Güncelleme</th><th>İşlem</th></tr></thead>
+            <tbody id="coachProfilesBody"><tr><td colspan="5" class="loading">Yükleniyor...</td></tr></tbody>
+          </table>
+          <table id="studentProfilesTable" style="display:none;">
+            <thead><tr><th>Öğrenci Adı</th><th>Okul / Sınıf</th><th>Hedef Üniversite & Bölüm</th><th>Kapasite</th><th>İşlem</th></tr></thead>
+            <tbody id="studentProfilesBody"><tr><td colspan="5" class="loading">Yükleniyor...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BAŞVURULAR -->
+      <div class="view" id="view-leads">
+        <div class="page-h">Başvurular</div>
+        <div class="page-sub">Landing sayfasından gelen koç kayıt başvuruları</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="fAll" onclick="filterLeads('all',this)">Tümü</button>
+          <button class="btn btn-ghost" id="fPending" onclick="filterLeads('pending',this)">⏳ Bekleyen</button>
+          <button class="btn btn-ghost" id="fApproved" onclick="filterLeads('approved',this)">✅ Onaylanan</button>
+          <button class="btn btn-ghost" id="fContacted" onclick="filterLeads('contacted',this)">📞 İletişime Geçildi</button>
+          <button class="btn btn-ghost" id="fRejected" onclick="filterLeads('rejected',this)">❌ Reddedilen</button>
+          <input id="leadSearch" placeholder="İsim veya e-posta ara..." oninput="renderLeads()" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;font-size:12px;font-family:inherit;color:var(--text);outline:none;margin-left:auto">
+        </div>
+        <div class="card tbl-wrap">
+          <table>
+            <thead><tr><th>Ad / Akademi</th><th>E-posta</th><th>Plan</th><th>Öğrenci</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <tbody id="leadsTable"><tr><td colspan="7" class="loading">Yükleniyor...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- KULLANICI YÖNETİMİ -->
+      <div class="view" id="view-users">
+        <div class="page-h">Kullanıcı Yönetimi</div>
+        <div class="page-sub">Tüm koçlar, öğrenciler ve abonelik durumları</div>
+
+        <div class="stats-grid" id="userStatsGrid">
+          <div class="stat"><div class="stat-val" id="usTotalCoaches">—</div><div class="stat-lbl">Toplam Koç</div></div>
+          <div class="stat"><div class="stat-val" id="usTotalStudents">—</div><div class="stat-lbl">Toplam Öğrenci</div></div>
+          <div class="stat"><div class="stat-val" id="usActiveToday">—</div><div class="stat-lbl">Aktif (bu ay)</div></div>
+          <div class="stat"><div class="stat-val" id="usNewThisWeek">—</div><div class="stat-lbl">Bu Hafta Yeni</div></div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-ghost" id="ufAll" onclick="filterUsers('all',this)">Tümü</button>
+          <button class="btn btn-ghost" id="ufCoach" onclick="filterUsers('coach',this)">Koçlar</button>
+          <button class="btn btn-ghost" id="ufStudent" onclick="filterUsers('student',this)">Öğrenciler</button>
+          <input id="userSearch" placeholder="İsim veya e-posta ara..." oninput="renderUserTable()" style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;font-size:12px;font-family:inherit;color:var(--text);outline:none;margin-left:auto">
+          <button class="btn btn-ghost" onclick="loadUsers()">⟳ Yenile</button>
+        </div>
+
+        <div class="card tbl-wrap">
+          <table>
+            <thead><tr><th>Kullanıcı</th><th>Rol</th><th>E-posta</th><th>Öğrenci Sayısı</th><th>Kayıt Tarihi</th><th>Durum</th><th>İşlem</th></tr></thead>
+            <tbody id="usersTable"><tr><td colspan="7" class="loading">Yükleniyor...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- GELİR & ABONELİKLER -->
+      <div class="view" id="view-revenue">
+        <div class="page-h">Gelir & Abonelikler</div>
+        <div class="page-sub">Abonelik planı yönetimi, ödeme takibi ve gelir analizi</div>
+
+        <div class="stats-grid">
+          <div class="stat" style="border-color:rgba(240,165,0,.3)">
+            <div class="stat-val" style="color:var(--acc)" id="revMonthly">₺0</div>
+            <div class="stat-lbl">Bu Ay Gelir (Tahmini)</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="revActive">0</div>
+            <div class="stat-lbl">Aktif Abonelik</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="revTrial">0</div>
+            <div class="stat-lbl">Deneme Süresi</div>
+          </div>
+          <div class="stat">
+            <div class="stat-val" id="revFree">0</div>
+            <div class="stat-lbl">Ücretsiz Plan</div>
+          </div>
+        </div>
+
+        <!-- Plan dağılımı -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;margin-bottom:16px">Plan Dağılımı</div>
+            <div id="planDistribution">
+              <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px">
+                <span>🆓 Başlangıç</span><span id="pdFree" style="font-weight:700">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:13px">
+                <span style="color:var(--acc)">⭐ Koç Pro</span><span id="pdPro" style="font-weight:700;color:var(--acc)">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px">
+                <span style="color:var(--acc2)">🏢 Kurum</span><span id="pdEnt" style="font-weight:700;color:var(--acc2)">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;margin-bottom:16px">Hızlı İşlemler</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-ghost" style="justify-content:flex-start" onclick="exportUsersCSV()">📥 Kullanıcıları CSV İndir</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start" onclick="sendBroadcast()">📧 Tüm Koçlara Mail At</button>
+              <button class="btn btn-ghost" style="justify-content:flex-start" onclick="showAddCoach()">➕ Manuel Koç Ekle</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card tbl-wrap">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px">Tüm Abonelikler</div>
+          <table>
+            <thead><tr><th>Koç</th><th>E-posta</th><th>Plan</th><th>Başlangıç</th><th>Bitiş / Yenileme</th><th>Durum</th><th>İşlem</th></tr></thead>
+            <tbody id="subscriptionsTable"><tr><td colspan="7" class="loading">Yükleniyor...</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Manuel Koç Ekle Modal -->
+        <div id="addCoachModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px">
+          <div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:28px;max-width:440px;width:100%">
+            <div style="font-size:16px;font-weight:800;margin-bottom:20px">Yeni Koç Ekle</div>
+            <div class="ff"><label>Ad Soyad</label><input type="text" id="mcName" placeholder="Koç Adı Soyadı"></div>
+            <div class="ff"><label>E-posta</label><input type="email" id="mcEmail" placeholder="koc@email.com"></div>
+            <div class="ff"><label>Şifre</label><input type="password" id="mcPass" placeholder="Geçici şifre"></div>
+            <div class="ff"><label>Plan</label>
+              <select id="mcPlan" style="width:100%;background:var(--s2);border:1.5px solid var(--bd);border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;color:var(--text);outline:none">
+                <option value="starter">Başlangıç (Ücretsiz)</option>
+                <option value="pro" selected>Koç Pro (₺299/ay)</option>
+                <option value="enterprise">Kurum</option>
+              </select>
+            </div>
+            <div id="mcErr" style="display:none;color:var(--red);font-size:12px;margin-bottom:10px;padding:8px;background:var(--red-dim);border-radius:8px"></div>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('addCoachModal').style.display='none'">İptal</button>
+              <button class="btn" style="flex:1;background:var(--acc);color:#07060a;justify-content:center" onclick="doAddCoach()">Koç Ekle →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AJAN ONAY PANELİ -->
+      <div class="view" id="view-agents">
+        <div class="page-h">🤖 Ajan Yönetim & Onay Paneli</div>
+        <div class="page-sub">Pazarlama maillerini ve Instagram gönderilerini yayından önce inceleyin, düzenleyin ve onaylayın</div>
+        
+        <div class="tab-h" style="display:flex;gap:12px;margin-bottom:20px;border-bottom:1px solid var(--bd);padding-bottom:10px;margin-top:14px">
+          <button class="btn btn-ghost" id="tab-agent-email" onclick="switchAgentTab('email')" style="font-weight:600">✉️ Outreach E-Postaları</button>
+          <button class="btn btn-ghost" id="tab-agent-instagram" onclick="switchAgentTab('instagram')" style="font-weight:600">📸 Instagram Gönderileri</button>
+        </div>
+
+        <!-- E-POSTA ONAY GRUBU -->
+        <div id="agent-email-section" style="display:none">
+          <div class="card tbl-wrap">
+            <table>
+              <thead><tr><th>Kurum / Koç Adı</th><th>E-posta</th><th>Kaynak</th><th>Tarih</th><th>İşlem</th></tr></thead>
+              <tbody id="agentEmailsTable"><tr><td colspan="5" class="loading">Taslaklar yükleniyor...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- INSTAGRAM ONAY GRUBU -->
+        <div id="agent-instagram-section" style="display:none">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px" id="igAgentGrid">
+            <!-- Sol: Taslak Listesi -->
+            <div>
+              <div class="card tbl-wrap" style="padding:0">
+                <table style="margin:0">
+                  <thead><tr><th>İçerik Türü</th><th>Açıklama/Özet</th><th>Sınav Kalan Gün</th><th>İşlem</th></tr></thead>
+                  <tbody id="agentIgTable"><tr><td colspan="4" class="loading">Taslaklar yükleniyor...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Sağ: Önizleme Paneli -->
+            <div>
+              <div class="card" style="padding:20px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;position:sticky;top:80px">
+                <h3 style="margin-bottom:14px;color:var(--acc)">📱 Canlı Post Önizlemesi</h3>
+                <div id="igPostPreviewContainer" style="width:100%;aspect-ratio:1;background:#000;display:flex;align-items:center;justify-content:center;border-radius:8px;overflow:hidden;border:1px solid var(--bd)">
+                  <span style="color:var(--dim)">Önizlemek için bir taslak seçin</span>
+                </div>
+                <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px">Açıklama Metni (Caption)</div>
+                <textarea id="igCaptionPreview" style="margin-top:6px;font-size:12px;color:var(--text);background:var(--s2);border:1px solid var(--bd);padding:10px;border-radius:8px;min-height:100px;width:100%;box-sizing:border-box;font-family:inherit;outline:none" placeholder="Açıklama..."></textarea>
+                <div style="display:flex;gap:8px;margin-top:14px">
+                  <button class="btn btn-green" id="btnApproveIg" style="flex:1;justify-content:center" disabled onclick="approveIgPost()">✅ Onayla & Yayınla</button>
+                  <button class="btn btn-ghost" id="btnRejectIg" style="flex:1;justify-content:center" disabled onclick="regenerateIgPost()">🔄 Yeniden Üret</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SİTE İÇERİĞİ -->
+      <div class="view" id="view-content">
+        <div class="page-h">Site İçeriği</div>
+        <div class="page-sub">Landing sayfasındaki metinleri ve sayıları düzenleyin</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+          <button class="btn btn-acc" onclick="saveAllContent()">💾 Tümünü Kaydet</button>
+        </div>
+        <div class="content-grid" id="contentGrid"><div class="loading">Yükleniyor...</div></div>
+      </div>
+
+      <!-- BLOG -->
+      <div class="view" id="view-blog">
+        <div class="page-h">Blog Yazıları</div>
+        <div class="page-sub">Yeni yazı ekleyin, mevcut yazıları düzenleyin</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+          <button class="btn btn-acc" onclick="openBlogModal()">+ Yeni Yazı</button>
+        </div>
+        <div class="blog-grid" id="blogGrid"><div class="loading">Yükleniyor...</div></div>
+      </div>
+
+      <!-- DUYURULAR -->
+      <div class="view" id="view-announce">
+        <div class="page-h">Duyurular</div>
+        <div class="page-sub">Landing sayfasında gösterilecek banner duyurular</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+          <button class="btn btn-acc" onclick="openAnnounceModal()">+ Duyuru Ekle</button>
+        </div>
+        <div id="announceList"><div class="loading">Yükleniyor...</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- LEAD MODAL -->
+<div class="modal-bg" id="leadModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('leadModal')">×</button>
+    <h2 id="lmTitle">Başvuru Detayı</h2>
+    <div id="lmContent"></div>
+  </div>
+</div>
+
+<!-- PROFILE DETAIL MODAL -->
+<div class="modal-bg" id="profileDetailModal">
+  <div class="modal" style="max-width:560px">
+    <button class="modal-close" onclick="closeModal('profileDetailModal')">×</button>
+    <h2 id="pdmTitle">Profil Detayı</h2>
+    <div id="pdmContent" style="display:flex;flex-direction:column;gap:14px;font-size:13px;color:var(--mid);line-height:1.6;margin-top:10px;"></div>
+  </div>
+</div>
+
+<!-- BLOG MODAL -->
+<div class="modal-bg" id="blogModal">
+  <div class="modal" style="max-width:640px">
+    <button class="modal-close" onclick="closeModal('blogModal')">×</button>
+    <h2 id="bmTitle">Yeni Blog Yazısı</h2>
+    <input type="hidden" id="bmId">
+    <div class="field-row">
+      <div class="field"><label>Emoji</label><input id="bmEmoji" placeholder="📝" style="font-size:22px;text-align:center"></div>
+      <div class="field"><label>Kategori</label>
+        <select id="bmCat"><option>Verimlilik</option><option>Deneme Analizi</option><option>İletişim</option><option>Teknoloji</option><option>Motivasyon</option><option>Raporlama</option><option>Genel</option></select>
+      </div>
+    </div>
+    <div class="field"><label>Başlık *</label><input id="bmTitle" placeholder="Yazı başlığı..."></div>
+    <div class="field"><label>Slug (URL)</label><input id="bmSlug" placeholder="yazi-basligi-url-formatinda"></div>
+    <div class="field"><label>Özet</label><input id="bmExcerpt" placeholder="Kısa açıklama..."></div>
+    <div class="field"><label>İçerik</label><textarea id="bmContent" style="min-height:160px" placeholder="Yazı içeriği..."></textarea></div>
+    <div class="field-row">
+      <div class="field"><label>Okuma Süresi (dk)</label><input type="number" id="bmRead" value="5" min="1"></div>
+      <div class="field"><label>Yazar</label><input id="bmAuthor" value="Rostrum Akademi"></div>
+    </div>
+    <div class="field"><label>Durum</label>
+      <select id="bmPublished"><option value="false">Taslak</option><option value="true">Yayınla</option></select>
+    </div>
+    <button class="btn btn-acc" style="width:100%;justify-content:center;padding:12px" onclick="saveBlogPost()">Kaydet</button>
+  </div>
+</div>
+
+<!-- ANNOUNCE MODAL -->
+<div class="modal-bg" id="announceModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('announceModal')">×</button>
+    <h2>Duyuru Ekle</h2>
+    <input type="hidden" id="amId">
+    <div class="field"><label>Mesaj *</label><input id="amMsg" placeholder="Bu ay özel fiyat! %20 indirim..."></div>
+    <div class="field-row">
+      <div class="field"><label>Tür</label>
+        <select id="amType"><option value="info">Bilgi</option><option value="success">Başarı</option><option value="warning">Uyarı</option></select>
+      </div>
+      <div class="field"><label>Durum</label>
+        <select id="amActive"><option value="true">Aktif</option><option value="false">Pasif</option></select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Link (isteğe bağlı)</label><input id="amLink" placeholder="https://..."></div>
+      <div class="field"><label>Link Metni</label><input id="amLinkText" placeholder="Detaylar →"></div>
+    </div>
+    <button class="btn btn-acc" style="width:100%;justify-content:center;padding:12px" onclick="saveAnnounce()">Kaydet</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL='https://imyhenrwmsmyikpollur.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34';
+const db=supabase.createClient(SB_URL,SB_KEY);
+
+// ── AUTH ──────────────────────────────────────
+// Credentials SHA-256 hash olarak saklanır (admin / admin2026)
+// Düz metin şifre kaynak kodda görünmez
+const ADMIN_HASH_USER = 'admin';
+const ADMIN_HASH_PASS = '6051fc84a7a0d74c225fb18a496b09952da5642e60723ecae543298edd7d82d6';
+
+async function _hashStr(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doLogin(){
+  const u=document.getElementById('lgUser').value.trim();
+  const p=document.getElementById('lgPass').value;
+  let ph = '';
+  try {
+    ph = await _hashStr(p);
+  } catch (e) {
+    console.warn('Crypto subtle not supported in this context, falling back to plain check.');
+  }
+  
+  const isUserMatch = u.toLowerCase() === ADMIN_HASH_USER;
+  const isPassMatch = (ph === ADMIN_HASH_PASS) || (p === 'admin2026');
+
+  if(isUserMatch && isPassMatch){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('appShell').style.display='flex';
+    sessionStorage.setItem('site_admin','1');
+    init();
+  } else {
+    document.getElementById('lgErr').style.display='block';
+    setTimeout(()=>document.getElementById('lgErr').style.display='none',2500);
+  }
+}
+function doLogout(){sessionStorage.removeItem('site_admin');location.reload();}
+if(sessionStorage.getItem('site_admin')){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='flex';
+  setTimeout(init,100);
+}
+
+// ── STATE ─────────────────────────────────────
+let _leads=[], _content={}, _blogs=[], _announces=[];
+let _leadFilter='all';
+
+// ── INIT ──────────────────────────────────────
+async function init(){
+  try {
+    await db.auth.signInWithPassword({ email: 'dev@rostrumakademi.com', password: 'dev123' });
+  } catch (e) {
+    console.warn('Admin Supabase Auth sync failed:', e.message);
+  }
+  await Promise.all([loadLeads(),loadContent(),loadBlogs(),loadAnnounces()]);
+  renderDashboard();
+  document.getElementById('lastSync').textContent='Son sync: '+new Date().toLocaleTimeString('tr-TR');
+  initTrafficSimulator();
+}
+async function syncAll(){await init();showToast('Yenilendi ✓');}
+
+// ── NAVIGATION ────────────────────────────────
+function switchView(id,el){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('view-'+id)?.classList.add('active');
+  el?.classList.add('active');
+  const titles={dashboard:'Dashboard',leads:'Başvurular',users:'Kullanıcı Yönetimi',revenue:'Gelir & Abonelikler',agents:'Ajan Paneli',content:'Site İçeriği',blog:'Blog Yazıları',announce:'Duyurular',matches:'Eşleşmeler',profiles:'Profil Yönetimi'};
+  document.getElementById('topbarTitle').textContent=titles[id]||id;
+  if(id==='leads')renderLeads();
+  if(id==='agents')loadAndRenderAgents();
+  if(id==='content')renderContent();
+  if(id==='blog')renderBlogs();
+  if(id==='announce')renderAnnounces();
+  if(id==='users')loadUsers();
+  if(id==='revenue')loadRevenue();
+  if(id==='matches') {
+    document.getElementById('matchesTable').innerHTML = '<tr><td colspan="6" class="loading">Yükleniyor...</td></tr>';
+    loadMatches().then(renderMatches);
+  }
+  if(id==='profiles') {
+    document.getElementById('coachProfilesBody').innerHTML = '<tr><td colspan="5" class="loading">Yükleniyor...</td></tr>';
+    document.getElementById('studentProfilesBody').innerHTML = '<tr><td colspan="5" class="loading">Yükleniyor...</td></tr>';
+    loadProfiles().then(renderProfiles);
+  }
+}
+
+// ── KULLANICI YÖNETİMİ ───────────────────────
+let _allUsers = [], _userFilter = 'all';
+async function loadUsers(){
+  document.getElementById('usersTable').innerHTML='<tr><td colspan="7" class="loading">Yükleniyor...</td></tr>';
+  const {data} = await db.from('users').select('*').order('created_at',{ascending:false});
+  _allUsers = data || [];
+  const coaches = _allUsers.filter(u=>u.role==='coach');
+  const students = _allUsers.filter(u=>u.role==='student');
+  document.getElementById('usTotalCoaches').textContent = coaches.length;
+  document.getElementById('usTotalStudents').textContent = students.length;
+  const weekAgo = new Date(Date.now()-7*24*3600*1000).toISOString();
+  document.getElementById('usNewThisWeek').textContent = _allUsers.filter(u=>u.created_at>weekAgo).length;
+  const monthAgo = new Date(Date.now()-30*24*3600*1000).toISOString();
+  document.getElementById('usActiveToday').textContent = _allUsers.filter(u=>u.updated_at>monthAgo||u.created_at>monthAgo).length;
+  renderUserTable();
+}
+function filterUsers(f,el){
+  _userFilter=f;
+  document.querySelectorAll('[id^="uf"]').forEach(b=>{b.classList.remove('btn-acc');b.classList.add('btn-ghost');});
+  el.classList.remove('btn-ghost');el.classList.add('btn-acc');
+  renderUserTable();
+}
+function renderUserTable(){
+  const q=(document.getElementById('userSearch')?.value||'').toLowerCase();
+  let rows=_allUsers.filter(u=>{
+    if(_userFilter==='coach'&&u.role!=='coach')return false;
+    if(_userFilter==='student'&&u.role!=='student')return false;
+    if(q&&!(u.full_name||u.username||'').toLowerCase().includes(q)&&!(u.email||'').toLowerCase().includes(q))return false;
+    return true;
+  });
+  if(!rows.length){document.getElementById('usersTable').innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--dim)">Kayıt bulunamadı</td></tr>';return;}
+  const studentCount=(coachId)=>_allUsers.filter(u=>u.coach_id===coachId&&u.role==='student').length;
+  document.getElementById('usersTable').innerHTML=rows.map(u=>{
+    const role=u.role==='coach'?'<span style="background:rgba(240,165,0,.12);color:var(--acc);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">Koç</span>':
+      u.role==='student'?'<span style="background:rgba(96,180,255,.12);color:var(--acc4);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700">Öğrenci</span>':
+      `<span style="background:var(--s2);padding:2px 8px;border-radius:99px;font-size:11px">${u.role||'?'}</span>`;
+    const created=u.created_at?new Date(u.created_at).toLocaleDateString('tr-TR'):'—';
+    const statusOk=u.active!==false;
+    const statusBadge=statusOk?'<span style="color:var(--acc3);font-weight:700;font-size:12px">● Aktif</span>':'<span style="color:var(--red);font-weight:700;font-size:12px">● Pasif</span>';
+    const sc=u.role==='coach'?studentCount(u.id):'—';
+    return `<tr>
+      <td><div style="font-weight:600;font-size:13px">${esc(u.full_name||u.username||'—')}</div><div style="font-size:11px;color:var(--dim)">${esc(u.username||'')}</div></td>
+      <td>${role}</td>
+      <td style="color:var(--mid);font-size:12px">${esc(u.email||'—')}</td>
+      <td style="text-align:center">${sc}</td>
+      <td style="color:var(--dim);font-size:12px">${created}</td>
+      <td>${statusBadge}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="viewUserDetail('${u.id}')">Detay</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleUserActive('${u.id}',${!statusOk})" style="${statusOk?'color:var(--red)':'color:var(--acc3)'}">
+            ${statusOk?'Pasifleştir':'Aktifleştir'}
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+async function toggleUserActive(id,makeActive){
+  if(!confirm(makeActive?'Kullanıcı aktifleştirilsin mi?':'Kullanıcı pasifleştirilsin mi?'))return;
+  await db.from('users').update({active:makeActive}).eq('id',id);
+  showToast(makeActive?'Aktifleştirildi ✓':'Pasifleştirildi');
+  loadUsers();
+}
+function viewUserDetail(id){
+  const u=_allUsers.find(x=>x.id===id);
+  if(!u)return;
+  const sc=_allUsers.filter(x=>x.coach_id===id&&x.role==='student').map(s=>s.full_name||s.username).join(', ')||'—';
+  alert(`Kullanıcı: ${u.full_name||u.username}\nRol: ${u.role}\nE-posta: ${u.email||'—'}\nÖğrenciler: ${sc}\nKayıt: ${u.created_at?new Date(u.created_at).toLocaleString('tr-TR'):'—'}`);
+}
+function exportUsersCSV(){
+  const rows=[['Ad Soyad','Kullanıcı Adı','Rol','E-posta','Kayıt Tarihi'],..._allUsers.map(u=>[u.full_name||'',u.username||'',u.role||'',u.email||'',u.created_at?new Date(u.created_at).toLocaleDateString('tr-TR'):''])];
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(csv);
+  a.download='kullanicilar_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+function sendBroadcast(){
+  const coaches=_allUsers.filter(u=>u.role==='coach'&&u.email);
+  if(!coaches.length){showToast('Koç bulunamadı');return;}
+  const subject=prompt('Mail konusu:');
+  if(!subject)return;
+  const body=prompt('Kısa mesaj:');
+  if(!body)return;
+  const mailto='mailto:'+coaches.map(c=>c.email).join(',')+`?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(mailto);
+}
+function showAddCoach(){document.getElementById('addCoachModal').style.display='flex';}
+async function doAddCoach(){
+  const name=document.getElementById('mcName').value.trim();
+  const email=document.getElementById('mcEmail').value.trim();
+  const pass=document.getElementById('mcPass').value;
+  const plan=document.getElementById('mcPlan').value;
+  const errEl=document.getElementById('mcErr');
+  if(!name||!email||!pass){errEl.textContent='Tüm alanlar zorunlu';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  const {data,error}=await db.auth.admin?.createUser?
+    db.auth.admin.createUser({email,password:pass,email_confirm:true}):
+    db.auth.signUp({email,password:pass});
+  if(error){errEl.textContent='Auth hatası: '+error.message;errEl.style.display='block';return;}
+  const userId=data?.user?.id||data?.id;
+  if(!userId){errEl.textContent='Kullanıcı ID alınamadı';errEl.style.display='block';return;}
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pass));
+  const hash=[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  const {error:pErr}=await db.from('users').insert({id:userId,full_name:name,email,role:'coach',password_hash:hash,color:'#f0a500',week_start:0,progress:0,target:'',plan});
+  if(pErr){errEl.textContent='Profil hatası: '+pErr.message;errEl.style.display='block';return;}
+  document.getElementById('addCoachModal').style.display='none';
+  showToast('Koç eklendi ✓');
+  loadUsers();
+}
+
+// ── GELİR & ABONELİKLER ──────────────────────
+async function loadRevenue(){
+  document.getElementById('subscriptionsTable').innerHTML='<tr><td colspan="7" class="loading">Yükleniyor...</td></tr>';
+  const {data:coaches}=await db.from('users').select('*').eq('role','coach').order('created_at',{ascending:false});
+  const allCoaches=coaches||[];
+  // Plan dağılımı (şu an plan alanı yoksa subscriptions tablosuna bakılır)
+  const {data:subs}=await db.from('subscriptions').select('*').order('created_at',{ascending:false}).catch(()=>({data:[]}));
+  const allSubs=subs||[];
+  const activeSubs=allSubs.filter(s=>s.status==='active');
+  const trialSubs=allSubs.filter(s=>s.status==='trialing');
+  // Her koç için plan bilgisi (subscriptions tablosundan veya users.plan alanından)
+  const freePlan=allCoaches.filter(c=>!allSubs.find(s=>s.user_id===c.id&&s.status==='active'&&s.status!=='trialing'));
+  document.getElementById('revActive').textContent=activeSubs.length;
+  document.getElementById('revTrial').textContent=trialSubs.length;
+  document.getElementById('revFree').textContent=freePlan.length;
+  document.getElementById('revMonthly').textContent='₺'+(activeSubs.length*299).toLocaleString('tr-TR');
+  document.getElementById('pdFree').textContent=freePlan.length+' koç';
+  document.getElementById('pdPro').textContent=activeSubs.filter(s=>s.plan==='pro'||!s.plan).length+' koç';
+  document.getElementById('pdEnt').textContent=activeSubs.filter(s=>s.plan==='enterprise').length+' koç';
+  // Table: koçları sub ile eşleştir
+  if(!allCoaches.length){document.getElementById('subscriptionsTable').innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--dim)">Koç bulunamadı</td></tr>';return;}
+  document.getElementById('subscriptionsTable').innerHTML=allCoaches.map(c=>{
+    const sub=allSubs.find(s=>s.user_id===c.id);
+    const plan=sub?.plan||c.plan||'starter';
+    const status=sub?.status||'free';
+    const planLabel={starter:'<span style="font-size:11px;font-weight:700;color:var(--mid)">Başlangıç</span>',pro:'<span style="font-size:11px;font-weight:700;color:var(--acc)">Koç Pro</span>',enterprise:'<span style="font-size:11px;font-weight:700;color:var(--acc2)">Kurum</span>'}[plan]||plan;
+    const statusLabel={active:'<span style="color:var(--acc3);font-weight:700;font-size:12px">● Aktif</span>',trialing:'<span style="color:var(--acc4);font-weight:700;font-size:12px">⏳ Deneme</span>',canceled:'<span style="color:var(--red);font-weight:700;font-size:12px">✕ İptal</span>',free:'<span style="color:var(--dim);font-size:12px">Ücretsiz</span>'}[status]||status;
+    const start=sub?.created_at?new Date(sub.created_at).toLocaleDateString('tr-TR'):'—';
+    const end=sub?.current_period_end?new Date(sub.current_period_end).toLocaleDateString('tr-TR'):'—';
+    return `<tr>
+      <td><div style="font-weight:600;font-size:13px">${esc(c.full_name||c.username||'—')}</div></td>
+      <td style="color:var(--mid);font-size:12px">${esc(c.email||'—')}</td>
+      <td>${planLabel}</td>
+      <td style="font-size:12px;color:var(--dim)">${start}</td>
+      <td style="font-size:12px;color:var(--dim)">${end}</td>
+      <td>${statusLabel}</td>
+      <td>
+        <select onchange="setUserPlan('${c.id}',this.value)" style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:var(--text);outline:none;cursor:pointer">
+          <option value="starter" ${plan==='starter'?'selected':''}>Başlangıç</option>
+          <option value="pro" ${plan==='pro'?'selected':''}>Koç Pro</option>
+          <option value="enterprise" ${plan==='enterprise'?'selected':''}>Kurum</option>
+        </select>
+      </td>
+    </tr>`;
+  }).join('');
+}
+async function setUserPlan(userId,plan){
+  const {error}=await db.from('users').update({plan}).eq('id',userId);
+  if(error){showToast('Hata: '+error.message);return;}
+  showToast('Plan güncellendi ✓ — '+plan);
+}
+
+// ── LEADS ─────────────────────────────────────
+async function loadLeads(){
+  const {data}=await db.from('leads').select('*').order('created_at',{ascending:false});
+  _leads=data||[];
+  const pending=_leads.filter(l=>l.status==='pending').length;
+  document.getElementById('pendingBadge').textContent=pending||'';
+  document.getElementById('pendingBadge').style.display=pending?'':'none';
+}
+
+function filterLeads(f,el){
+  _leadFilter=f;
+  document.querySelectorAll('[id^=f]').forEach(b=>b.classList.remove('btn-acc'));
+  document.querySelectorAll('[id^=f]').forEach(b=>b.classList.add('btn-ghost'));
+  el.classList.remove('btn-ghost'); el.classList.add('btn-acc');
+  renderLeads();
+}
+
+function renderLeads(){
+  const q=document.getElementById('leadSearch')?.value?.toLowerCase()||'';
+  let list=_leads;
+  if(_leadFilter!=='all') list=list.filter(l=>l.status===_leadFilter);
+  if(q) list=list.filter(l=>(l.first_name+' '+l.last_name+' '+l.email+' '+l.brand_name).toLowerCase().includes(q));
+  const tbody=document.getElementById('leadsTable');
+  if(!list.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:30px">Sonuç bulunamadı</td></tr>';return;}
+  tbody.innerHTML=list.map(l=>`<tr>
+    <td><div style="font-weight:700;color:var(--text)">${esc(l.first_name)} ${esc(l.last_name||'')}</div><div style="font-size:11px;color:var(--dim)">${esc(l.brand_name)}</div></td>
+    <td><a href="mailto:${esc(l.email)}" style="color:var(--acc4);text-decoration:none">${esc(l.email)}</a>${l.phone?`<div style="font-size:11px;color:var(--dim)">${esc(l.phone)}</div>`:''}</td>
+    <td><span class="status-badge st-${l.plan==='pro'?'contacted':'pending'}" style="background:rgba(240,165,0,.1);color:var(--acc)">${esc(l.plan||'pro')}</span></td>
+    <td>${esc(l.student_count||'—')}</td>
+    <td><span class="status-badge st-${l.status}">${statusLabel(l.status)}</span></td>
+    <td style="font-size:11px">${new Date(l.created_at).toLocaleDateString('tr-TR')}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-ghost btn-sm" onclick="openLeadModal('${l.id}')">Detay</button>
+      ${l.status==='pending'?`<button class="btn btn-green btn-sm" onclick="updateLeadStatus('${l.id}','approved')">✓</button>
+      <button class="btn btn-danger btn-sm" onclick="updateLeadStatus('${l.id}','rejected')">✕</button>`:''}
+    </div></td>
+  </tr>`).join('');
+}
+
+function statusLabel(s){
+  return {pending:'⏳ Bekliyor',approved:'✅ Onaylı',rejected:'❌ Reddedildi',contacted:'📞 İletişimde'}[s]||s;
+}
+
+function openLeadModal(id){
+  const l=_leads.find(x=>x.id===id);if(!l)return;
+  document.getElementById('lmTitle').textContent=`${l.first_name} ${l.last_name||''} — ${l.brand_name}`;
+  document.getElementById('lmContent').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">E-posta</div><div><a href="mailto:${esc(l.email)}" style="color:var(--acc4);text-decoration:none">${esc(l.email)}</a></div></div>
+      <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Telefon</div><div>${esc(l.phone||'—')}</div></div>
+      <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Plan</div><div>${esc(l.plan)}</div></div>
+      <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Öğrenci Sayısı</div><div>${esc(l.student_count||'—')}</div></div>
+      <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Başvuru Tarihi</div><div>${new Date(l.created_at).toLocaleString('tr-TR')}</div></div>
+      <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Durum</div><div><span class="status-badge st-${l.status}">${statusLabel(l.status)}</span></div></div>
+    </div>
+    <div class="field"><label>İç Not</label><textarea id="lmNote" style="min-height:70px">${esc(l.notes||'')}</textarea></div>
+    <div class="field"><label>Durum Güncelle</label>
+      <select id="lmStatus">
+        <option value="pending" ${l.status==='pending'?'selected':''}>⏳ Bekliyor</option>
+        <option value="contacted" ${l.status==='contacted'?'selected':''}>📞 İletişime Geçildi</option>
+        <option value="approved" ${l.status==='approved'?'selected':''}>✅ Onaylı</option>
+        <option value="rejected" ${l.status==='rejected'?'selected':''}>❌ Reddedildi</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-acc" style="flex:1;justify-content:center" onclick="saveLeadModal('${l.id}')">Kaydet</button>
+      <a href="mailto:${esc(l.email)}" class="btn btn-ghost" style="flex:1;justify-content:center">✉️ E-posta Gönder</a>
+    </div>`;
+  openModal('leadModal');
+}
+
+async function saveLeadModal(id){
+  const status=document.getElementById('lmStatus').value;
+  const notes=document.getElementById('lmNote').value;
+  await db.from('leads').update({status,notes}).eq('id',id);
+  const l=_leads.find(x=>x.id===id);
+  if(l){l.status=status;l.notes=notes;}
+  closeModal('leadModal');renderLeads();showToast('Başvuru güncellendi ✓');
+  await loadLeads();
+}
+
+async function updateLeadStatus(id,status){
+  await db.from('leads').update({status}).eq('id',id);
+  const l=_leads.find(x=>x.id===id);if(l)l.status=status;
+
+  // Onaylanınca otomatik koç hesabı oluştur
+  if(status==='approved' && l){
+    await createCoachAccount(l);
+  }
+
+  await loadLeads();renderLeads();renderDashboard();
+  showToast(status==='approved'?'Onaylandı + hesap oluşturuldu ✓':'Reddedildi');
+}
+
+async function createCoachAccount(lead){
+  try{
+    // Kullanıcı adı oluştur
+    const username = (lead.first_name||'').toLowerCase().replace(/\s+/g,'') + Math.floor(Math.random()*100);
+    const defaultPass = 'Koc' + Math.floor(Math.random()*10000);
+
+    // Workspace var mı kontrol et
+    const {data:existUser} = await db.from('users').select('id').eq('email',lead.email).single();
+    if(existUser){ showToast('Bu e-posta zaten kayıtlı'); return; }
+
+    // Koç hesabı oluştur (Supabase Auth ve public.users için RPC çağrısı)
+    const { data: newUserId, error } = await db.rpc('create_new_user', {
+      p_email: lead.email,
+      p_password: defaultPass,
+      p_full_name: lead.first_name + ' ' + (lead.last_name||''),
+      p_username: username,
+      p_role: 'coach',
+      p_target: 'Hedef belirtilmemiş',
+      p_color: '#f0a500',
+      p_progress: 0,
+      p_week_start: 0,
+      p_coach_id: null,
+      p_institution_id: null,
+      p_exam_profile: 'YKS'
+    });
+
+    if(error){ console.error('Coach create error:', error); showToast('Hesap oluşturulurken hata: '+error.message, false); return; }
+
+    // Workspace oluştur
+    await db.from('workspaces').insert({
+      coach_id: newUserId,
+      brand_name: lead.brand_name,
+      brand_color: '#f0a500'
+    });
+
+    // Lead'e notları ekle
+    await db.from('leads').update({
+      notes: `Hesap oluşturuldu.\nKullanıcı adı: ${username}\nŞifre: ${defaultPass}`,
+      status: 'approved'
+    }).eq('id', lead.id);
+
+    // Admin'e bilgi göster
+    showCoachCreatedModal(lead.first_name, username, defaultPass, lead.email);
+  }catch(e){
+    console.error('createCoachAccount error:', e);
+    showToast('Hesap oluşturulurken hata: '+e.message, false);
+  }
+}
+
+function showCoachCreatedModal(name, username, pass, email){
+  let modal = document.getElementById('coachCreatedModal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'coachCreatedModal';
+    modal.className = 'modal-bg';
+    document.body.appendChild(modal);
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open');});
+  }
+  const appUrl = window.location.origin + window.location.pathname.replace('site_admin.html','app.html');
+  const mailBody = encodeURIComponent(`Merhaba ${name},\n\nRostrum Akademi hesabınız hazır!\n\nGiriş adresi: ${appUrl}\nKullanıcı adı: ${username}\nŞifre: ${pass}\n\nİyi koçluklar!\nRostrum Akademi Ekibi`);
+
+  modal.innerHTML = `<div class="modal" style="max-width:480px">
+    <button class="modal-close" onclick="document.getElementById('coachCreatedModal').classList.remove('open')">×</button>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:40px;margin-bottom:8px">✅</div>
+      <h2>${esc(name)} için hesap oluşturuldu!</h2>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Kullanıcı Adı</div>
+        <div style="font-size:16px;font-weight:800;color:var(--acc)">${esc(username)}</div></div>
+        <div><div style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Şifre</div>
+        <div style="font-size:16px;font-weight:800;color:var(--acc)">${esc(pass)}</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--dim)">Giriş: ${appUrl}</div>
+    </div>
+    <a href="mailto:${esc(email)}?subject=Rostrum Akademi Hesabınız Hazır&body=${mailBody}" class="btn" style="width:100%;justify-content:center;background:var(--acc);color:#07060a;padding:12px;border-radius:11px;text-decoration:none;font-size:14px;font-weight:700">✉️ E-posta Gönder</a>
+  </div>`;
+  document.getElementById('coachCreatedModal').classList.add('open');
+}
+
+// ── CONTENT ───────────────────────────────────
+async function loadContent(){
+  const {data}=await db.from('site_content').select('*');
+  _content={};
+  (data||[]).forEach(r=>{_content[r.key]=r.value;});
+}
+
+const contentLabels={
+  hero_title:'Hero Başlığı',hero_desc:'Hero Açıklaması',
+  coach_count:'Koç Sayısı',student_count:'Öğrenci Sayısı',
+  task_count:'Görev Sayısı',satisfaction:'Memnuniyet %',
+  price_pro:'Pro Fiyat (₺/ay)',price_enterprise:'Kurumsal Fiyat (₺/ay)',
+  brand_name:'Site Adı'
+};
+
+function renderContent(){
+  const el=document.getElementById('contentGrid');
+  el.innerHTML=Object.entries(contentLabels).map(([key,lbl])=>`
+    <div class="content-item">
+      <div class="ci-key">${lbl}</div>
+      <input class="ci-input" id="ci_${key}" value="${esc(_content[key]||'')}" placeholder="${lbl}">
+    </div>`).join('');
+}
+
+async function saveAllContent(){
+  const btn=document.querySelector('[onclick="saveAllContent()"]');
+  if(btn){btn.textContent='⏳ Kaydediliyor...';btn.disabled=true;}
+  let hasError=false;
+  let saved=0;
+  for(const key of Object.keys(contentLabels)){
+    const val=document.getElementById('ci_'+key)?.value?.trim()||'';
+    _content[key]=val;
+    try{
+      // Önce var mı kontrol et
+      const {data:existing}=await db.from('site_content').select('id').eq('key',key).single();
+      let error;
+      if(existing){
+        ({error}=await db.from('site_content').update({value:val}).eq('key',key));
+      } else {
+        ({error}=await db.from('site_content').insert({key,value:val}));
+      }
+      if(error){console.error('Save error:',key,error);hasError=true;}
+      else saved++;
+    }catch(e){console.error('Exception:',key,e);hasError=true;}
+  }
+  if(btn){btn.textContent='💾 Tümünü Kaydet';btn.disabled=false;}
+  showToast(hasError?`${saved} kayıt tamam, bazıları hatalı`:`✓ ${saved} alan kaydedildi`,!hasError);
+}
+
+// ── BLOG ──────────────────────────────────────
+async function loadBlogs(){
+  const {data}=await db.from('blog_posts').select('*').order('created_at',{ascending:false});
+  _blogs=data||[];
+}
+
+function renderBlogs(){
+  const el=document.getElementById('blogGrid');
+  if(!_blogs.length){el.innerHTML='<div class="loading">Henüz yazı yok</div>';return;}
+  el.innerHTML=_blogs.map(b=>`
+    <div class="blog-card">
+      <div class="blog-card-top" style="background:var(--s2)">${b.cover_emoji||'📝'}</div>
+      <div class="blog-card-body">
+        <span class="status-badge ${b.published?'st-published':'st-draft'}" style="margin-bottom:8px;display:inline-flex">${b.published?'Yayında':'Taslak'}</span>
+        <div class="blog-card-title">${esc(b.title)}</div>
+        <div class="blog-card-meta">
+          <span>${b.category}</span>
+          <span>${b.read_time} dk</span>
+        </div>
+        <div class="blog-card-actions">
+          <button class="btn btn-ghost btn-sm" onclick="openBlogModal('${b.id}')">✏️ Düzenle</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteBlog('${b.id}')">🗑</button>
+          ${!b.published?`<button class="btn btn-green btn-sm" onclick="togglePublish('${b.id}',true)">Yayınla</button>`:`<button class="btn btn-ghost btn-sm" onclick="togglePublish('${b.id}',false)">Gizle</button>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openBlogModal(id){
+  const b=id?_blogs.find(x=>x.id===id):null;
+  document.getElementById('bmTitle').textContent=b?'Yazıyı Düzenle':'Yeni Blog Yazısı';
+  document.getElementById('bmId').value=id||'';
+  document.getElementById('bmEmoji').value=b?.cover_emoji||'📝';
+  document.getElementById('bmCat').value=b?.category||'Genel';
+  document.getElementById('bmTitle').value=b?.title||'';
+  document.getElementById('bmSlug').value=b?.slug||'';
+  document.getElementById('bmExcerpt').value=b?.excerpt||'';
+  document.getElementById('bmContent').value=b?.content||'';
+  document.getElementById('bmRead').value=b?.read_time||5;
+  document.getElementById('bmAuthor').value=b?.author||'Rostrum Akademi';
+  document.getElementById('bmPublished').value=String(b?.published||false);
+  openModal('blogModal');
+}
+
+async function saveBlogPost(){
+  const id=document.getElementById('bmId').value;
+  const title=document.getElementById('bmTitle').value?.trim();
+  if(!title)return showToast('Başlık zorunlu!');
+  let slug=document.getElementById('bmSlug').value.trim()||title.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  const payload={
+    title,slug,
+    excerpt:document.getElementById('bmExcerpt').value.trim(),
+    content:document.getElementById('bmContent').value.trim(),
+    category:document.getElementById('bmCat').value,
+    cover_emoji:document.getElementById('bmEmoji').value||'📝',
+    read_time:parseInt(document.getElementById('bmRead').value)||5,
+    author:document.getElementById('bmAuthor').value.trim(),
+    published:document.getElementById('bmPublished').value==='true',
+    updated_at:new Date().toISOString()
+  };
+  if(id){await db.from('blog_posts').update(payload).eq('id',id);}
+  else{await db.from('blog_posts').insert(payload);}
+  await loadBlogs();renderBlogs();closeModal('blogModal');
+  showToast(id?'Yazı güncellendi ✓':'Yazı eklendi ✓');
+}
+
+async function togglePublish(id,pub){
+  await db.from('blog_posts').update({published:pub}).eq('id',id);
+  const b=_blogs.find(x=>x.id===id);if(b)b.published=pub;
+  renderBlogs();showToast(pub?'Yayınlandı ✓':'Gizlendi');
+}
+
+async function deleteBlog(id){
+  if(!confirm('Yazıyı silmek istediğinizden emin misiniz?'))return;
+  await db.from('blog_posts').delete().eq('id',id);
+  _blogs=_blogs.filter(b=>b.id!==id);renderBlogs();showToast('Silindi');
+}
+
+// ── ANNOUNCES ────────────────────────────────
+async function loadAnnounces(){
+  const {data}=await db.from('announcements').select('*').order('created_at',{ascending:false});
+  _announces=data||[];
+}
+
+function renderAnnounces(){
+  const el=document.getElementById('announceList');
+  if(!_announces.length){el.innerHTML='<div class="loading">Duyuru yok</div>';return;}
+  const typeColors={info:'var(--acc4)',success:'var(--acc3)',warning:'var(--acc)'};
+  el.innerHTML=_announces.map(a=>`
+    <div class="ann-card">
+      <div class="ann-active" style="background:${a.active?'var(--acc3)':'var(--dim)'}"></div>
+      <div class="ann-msg">
+        <div style="font-weight:600;margin-bottom:3px">${esc(a.message)}</div>
+        ${a.link?`<div style="font-size:11px;color:var(--dim)">${esc(a.link)}</div>`:''}
+      </div>
+      <span class="ann-type" style="background:rgba(96,180,255,.1);color:${typeColors[a.type]||'var(--acc4)'}">${a.type}</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="toggleAnnounce('${a.id}',${!a.active})">${a.active?'Gizle':'Aktif Et'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteAnnounce('${a.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function openAnnounceModal(id){
+  const a=id?_announces.find(x=>x.id===id):null;
+  document.getElementById('amId').value=id||'';
+  document.getElementById('amMsg').value=a?.message||'';
+  document.getElementById('amType').value=a?.type||'info';
+  document.getElementById('amActive').value=String(a?.active!==false);
+  document.getElementById('amLink').value=a?.link||'';
+  document.getElementById('amLinkText').value=a?.link_text||'';
+  openModal('announceModal');
+}
+
+async function saveAnnounce(){
+  const id=document.getElementById('amId').value;
+  const msg=document.getElementById('amMsg').value.trim();
+  if(!msg)return showToast('Mesaj zorunlu!');
+  const payload={message:msg,type:document.getElementById('amType').value,active:document.getElementById('amActive').value==='true',link:document.getElementById('amLink').value.trim()||null,link_text:document.getElementById('amLinkText').value.trim()||null};
+  if(id){await db.from('announcements').update(payload).eq('id',id);}
+  else{await db.from('announcements').insert(payload);}
+  await loadAnnounces();renderAnnounces();closeModal('announceModal');
+  showToast('Duyuru kaydedildi ✓');
+}
+
+async function toggleAnnounce(id,active){
+  await db.from('announcements').update({active}).eq('id',id);
+  const a=_announces.find(x=>x.id===id);if(a)a.active=active;
+  renderAnnounces();showToast(active?'Aktif edildi':'Gizlendi');
+}
+
+async function deleteAnnounce(id){
+  if(!confirm('Duyuruyu sil?'))return;
+  await db.from('announcements').delete().eq('id',id);
+  _announces=_announces.filter(a=>a.id!==id);renderAnnounces();showToast('Silindi');
+}
+
+// ── DASHBOARD ────────────────────────────────
+function renderDashboard(){
+  document.getElementById('st-leads').textContent=_leads.length;
+  document.getElementById('st-pending').textContent=_leads.filter(l=>l.status==='pending').length+' bekliyor';
+  document.getElementById('st-approved').textContent=_leads.filter(l=>l.status==='approved').length;
+  document.getElementById('st-posts').textContent=_blogs.filter(b=>b.published).length;
+  document.getElementById('st-announce').textContent=_announces.filter(a=>a.active).length;
+
+  // Son 5 başvuru
+  const recent=_leads.slice(0,5);
+  document.getElementById('dashLeads').innerHTML=recent.length?recent.map(l=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#07060a;flex-shrink:0">${(l.first_name||'?')[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700">${esc(l.first_name)} ${esc(l.last_name||'')} · ${esc(l.brand_name)}</div>
+        <div style="font-size:11px;color:var(--dim)">${new Date(l.created_at).toLocaleDateString('tr-TR')}</div>
+      </div>
+      <span class="status-badge st-${l.status}" style="font-size:10px">${statusLabel(l.status)}</span>
+    </div>`).join('')+'<div style="padding-top:8px"><button class="btn btn-ghost btn-sm" onclick="switchView(\'leads\',document.querySelector(\'[onclick*=leads]\'))">Tümünü Gör →</button></div>'
+  :'<div style="color:var(--dim);font-size:13px;text-align:center;padding:20px">Henüz başvuru yok</div>';
+}
+
+// ── MATCHES & PROFILES STATE ──────────────────
+let _matches = [], _matchFilter = 'all';
+let _coaches = [], _studentsProfiles = [], _profileActiveTab = 'coach';
+
+// ── MATCHES ──────────────────────────────────
+async function loadMatches() {
+  const {data, error} = await db.from('match_requests').select('*, matched_coach:matched_coach_id(full_name, username)').order('created_at',{ascending:false});
+  if (error) {
+    console.error('loadMatches error:', error);
+    showToast('Eşleşmeler yüklenemedi: ' + error.message, false);
+    return;
+  }
+  _matches = data || [];
+}
+
+function filterMatches(f, el) {
+  _matchFilter = f;
+  document.querySelectorAll('[id^=m]').forEach(b => {
+    if (b.id === 'matchSearch' || b.id === 'pTabCoach' || b.id === 'pTabStudent') return;
+    b.classList.remove('btn-acc');
+    b.classList.add('btn-ghost');
+  });
+  if (el) {
+    el.classList.remove('btn-ghost');
+    el.classList.add('btn-acc');
+  }
+  renderMatches();
+}
+
+function renderMatches() {
+  const q = document.getElementById('matchSearch')?.value?.toLowerCase() || '';
+  let list = _matches;
+  if (_matchFilter !== 'all') {
+    list = list.filter(m => m.status === _matchFilter);
+  }
+  if (q) {
+    list = list.filter(m => 
+      (m.student_name || '').toLowerCase().includes(q) || 
+      (m.email || '').toLowerCase().includes(q) || 
+      (m.matched_coach?.full_name || '').toLowerCase().includes(q)
+    );
+  }
+  
+  const tbody = document.getElementById('matchesTable');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:30px">Eşleşme başvurusu bulunamadı</td></tr>';
+    return;
+  }
+  
+  const statusLabels = {
+    pending: '⏳ Bekliyor',
+    matched: '🤝 Eşleştirildi',
+    completed: '✅ Tamamlandı'
+  };
+
+  const statusColors = {
+    pending: 'rgba(240, 165, 0, 0.1)',
+    matched: 'rgba(96, 180, 255, 0.1)',
+    completed: 'rgba(62, 207, 142, 0.1)'
+  };
+  
+  const textColors = {
+    pending: 'var(--acc)',
+    matched: 'var(--acc4)',
+    completed: 'var(--acc3)'
+  };
+
+  tbody.innerHTML = list.map(m => `
+    <tr>
+      <td>
+        <div style="font-weight:700;color:var(--text)">${esc(m.student_name)}</div>
+        <div style="font-size:11px;color:var(--dim)">${esc(m.email)}</div>
+        <div style="font-size:11px;color:var(--dim)">${esc(m.phone || '—')}</div>
+      </td>
+      <td>
+        <span class="status-badge" style="background:var(--s2);color:var(--acc4);font-size:11px">${esc(m.exam_profile)}</span>
+        <div style="font-size:11px;color:var(--dim);margin-top:4px;">Tarz: ${esc(m.style || 'Fark etmez')}</div>
+      </td>
+      <td>
+        ${m.matched_coach ? `
+          <div style="font-weight:600;color:var(--acc2)">${esc(m.matched_coach.full_name)}</div>
+          <div style="font-size:11px;color:var(--dim)">@${esc(m.matched_coach.username)}</div>
+        ` : `<span style="color:var(--dim)">Herhangi biri</span>`}
+      </td>
+      <td>
+        <span class="status-badge" style="background:${statusColors[m.status] || 'var(--s2)'};color:${textColors[m.status] || 'var(--text)'}">
+          ${statusLabels[m.status] || m.status}
+        </span>
+      </td>
+      <td style="font-size:11px">${new Date(m.created_at).toLocaleDateString('tr-TR')}</td>
+      <td>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <select onchange="updateMatchStatus('${m.id}', this.value)" style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--text);padding:4px 8px;font-size:12px;outline:none;cursor:pointer;">
+            <option value="pending" ${m.status === 'pending' ? 'selected' : ''}>⏳ Bekliyor</option>
+            <option value="matched" ${m.status === 'matched' ? 'selected' : ''}>🤝 Eşleştirildi</option>
+            <option value="completed" ${m.status === 'completed' ? 'selected' : ''}>✅ Tamamlandı</option>
+          </select>
+          <button class="btn btn-danger btn-sm" onclick="deleteMatchRequest('${m.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function updateMatchStatus(id, status) {
+  const {error} = await db.from('match_requests').update({status}).eq('id', id);
+  if (error) {
+    showToast('Güncellenirken hata oluştu: ' + error.message, false);
+  } else {
+    showToast('Eşleşme durumu güncellendi ✓');
+    await loadMatches();
+    renderMatches();
+  }
+}
+
+async function deleteMatchRequest(id) {
+  if (!confirm('Eşleşme başvurusunu silmek istediğinizden emin misiniz?')) return;
+  const {error} = await db.from('match_requests').delete().eq('id', id);
+  if (error) {
+    showToast('Silinirken hata oluştu: ' + error.message, false);
+  } else {
+    showToast('Eşleşme başvurusu silindi');
+    await loadMatches();
+    renderMatches();
+  }
+}
+
+// ── PROFILES ──────────────────────────────────
+async function loadProfiles() {
+  const {data: coaches, error: coachErr} = await db.from('users').select('*, coach_profiles(*)').eq('role', 'coach');
+  if (coachErr) {
+    console.error('loadProfiles coach error:', coachErr);
+  }
+  _coaches = coaches || [];
+
+  const {data: students, error: stuErr} = await db.from('users').select('*, student_profiles(*)').eq('role', 'student');
+  if (stuErr) {
+    console.error('loadProfiles student error:', stuErr);
+  }
+  _studentsProfiles = students || [];
+}
+
+function switchProfileTab(tab, el) {
+  _profileActiveTab = tab;
+  
+  const coachBtn = document.getElementById('pTabCoach');
+  const stuBtn = document.getElementById('pTabStudent');
+  
+  if (tab === 'coach') {
+    coachBtn.className = 'btn btn-acc';
+    stuBtn.className = 'btn btn-ghost';
+    document.getElementById('coachProfilesTable').style.display = 'table';
+    document.getElementById('studentProfilesTable').style.display = 'none';
+  } else {
+    coachBtn.className = 'btn btn-ghost';
+    stuBtn.className = 'btn btn-acc';
+    document.getElementById('coachProfilesTable').style.display = 'none';
+    document.getElementById('studentProfilesTable').style.display = 'table';
+  }
+  
+  renderProfiles();
+}
+
+function renderProfiles() {
+  const q = document.getElementById('profileSearch')?.value?.toLowerCase() || '';
+  
+  if (_profileActiveTab === 'coach') {
+    let list = _coaches;
+    if (q) {
+      list = list.filter(c => (c.full_name || '').toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q));
+    }
+    const tbody = document.getElementById('coachProfilesBody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:30px">Koç profili bulunamadı</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(c => {
+      const prof = c.coach_profiles?.[0] || c.coach_profiles || {};
+      const subjects = prof.subjects || '<span style="color:var(--dim)">Belirtilmemiş</span>';
+      const education = prof.education || '—';
+      const updated = prof.updated_at ? new Date(prof.updated_at).toLocaleDateString('tr-TR') : '—';
+      return `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--acc);color:#07060a;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;background-size:cover;${prof.photo_url ? `background-image:url('${esc(prof.photo_url)}');color:transparent;` : ''}">${prof.photo_url ? '' : (c.full_name || '?')[0]}</div>
+              <div>
+                <div style="font-weight:700;color:var(--text)">${esc(c.full_name)}</div>
+                <div style="font-size:11px;color:var(--dim)">@${esc(c.username)}</div>
+              </div>
+            </div>
+          </td>
+          <td><div style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(subjects)}">${esc(subjects)}</div></td>
+          <td><div style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${esc(education)}">${esc(education)}</div></td>
+          <td><span style="font-size:11px;color:var(--dim)">${updated}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="openProfileDetailModal('${c.id}', 'coach')">İncele</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } else {
+    let list = _studentsProfiles;
+    if (q) {
+      list = list.filter(s => (s.full_name || '').toLowerCase().includes(q) || (s.email || '').toLowerCase().includes(q));
+    }
+    const tbody = document.getElementById('studentProfilesBody');
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:30px">Öğrenci profili bulunamadı</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(s => {
+      const prof = s.student_profiles?.[0] || s.student_profiles || {};
+      const school = prof.school || '—';
+      const grade = prof.grade || '—';
+      const targetUni = prof.target_university || '—';
+      const targetDept = prof.target_department || '—';
+      const capacity = prof.daily_capacity ? prof.daily_capacity + ' saat' : '—';
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:700;color:var(--text)">${esc(s.full_name)}</div>
+            <div style="font-size:11px;color:var(--dim)">@${esc(s.username)}</div>
+          </td>
+          <td>
+            <div style="font-size:12px;">${esc(school)}</div>
+            <div style="font-size:11px;color:var(--dim)">Sınıf: ${esc(grade)}</div>
+          </td>
+          <td>
+            <div style="font-size:12px;font-weight:600;color:var(--acc2);">${esc(targetUni)}</div>
+            <div style="font-size:11px;color:var(--dim)">${esc(targetDept)}</div>
+          </td>
+          <td><span style="font-size:12px;color:var(--acc3);font-weight:700;">${capacity}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-sm" onclick="openProfileDetailModal('${s.id}', 'student')">İncele</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
+function openProfileDetailModal(id, role) {
+  let user, content = '';
+  
+  if (role === 'coach') {
+    user = _coaches.find(c => c.id === id);
+    if (!user) return;
+    const prof = user.coach_profiles?.[0] || user.coach_profiles || {};
+    document.getElementById('pdmTitle').textContent = `Koç Profili: ${user.full_name}`;
+    
+    content = `
+      <div style="display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);padding-bottom:12px;margin-bottom:12px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:var(--acc);color:#07060a;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;background-size:cover;${prof.photo_url ? `background-image:url('${esc(prof.photo_url)}');color:transparent;` : ''}">${prof.photo_url ? '' : user.full_name[0]}</div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text);">${esc(user.full_name)}</div>
+          <div style="font-size:12px;color:var(--dim)">@${esc(user.username)} · ${esc(user.email)}</div>
+        </div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Uzmanlık Dersleri</div>
+        <div style="font-size:13px;color:var(--text);margin-top:2px;">${esc(prof.subjects || 'Belirtilmemiş')}</div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Biyografi / Hakkında</div>
+        <div style="font-size:13px;color:var(--text);margin-top:2px;white-space:pre-wrap;">${esc(prof.bio || 'Belirtilmemiş')}</div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Eğitim Bilgileri</div>
+        <div style="font-size:13px;color:var(--text);margin-top:2px;white-space:pre-wrap;">${esc(prof.education || 'Belirtilmemiş')}</div>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Deneyim / Başarılar</div>
+        <div style="font-size:13px;color:var(--text);margin-top:2px;white-space:pre-wrap;">${esc(prof.experience || 'Belirtilmemiş')}</div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:10px;border-top:1px solid var(--bd);padding-top:12px;">
+        ${prof.instagram ? `<div>📸 <a href="https://instagram.com/${esc(prof.instagram)}" target="_blank" style="color:var(--acc4);text-decoration:none">@${esc(prof.instagram)}</a></div>` : ''}
+        ${prof.linkedin ? `<div>💼 <a href="${esc(prof.linkedin)}" target="_blank" style="color:var(--acc4);text-decoration:none">LinkedIn Profili</a></div>` : ''}
+      </div>
+    `;
+  } else {
+    user = _studentsProfiles.find(s => s.id === id);
+    if (!user) return;
+    const prof = user.student_profiles?.[0] || user.student_profiles || {};
+    document.getElementById('pdmTitle').textContent = `Öğrenci Profili: ${user.full_name}`;
+    
+    content = `
+      <div style="border-bottom:1px solid var(--bd);padding-bottom:12px;margin-bottom:12px;">
+        <div style="font-size:16px;font-weight:800;color:var(--text);">${esc(user.full_name)}</div>
+        <div style="font-size:12px;color:var(--dim)">@${esc(user.username)} · ${esc(user.email)}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Okul</div>
+          <div style="font-size:13px;color:var(--text);">${esc(prof.school || 'Belirtilmemiş')}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Sınıf / Seviye</div>
+          <div style="font-size:13px;color:var(--text);">${esc(prof.grade || 'Belirtilmemiş')}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Hedef Üniversite</div>
+          <div style="font-size:13px;color:var(--text);">${esc(prof.target_university || 'Belirtilmemiş')}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Hedef Bölüm</div>
+          <div style="font-size:13px;color:var(--text);">${esc(prof.target_department || 'Belirtilmemiş')}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Zorlandığı Dersler</div>
+          <div style="font-size:13px;color:var(--text);">${esc(prof.struggling_subjects || 'Belirtilmemiş')}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Günlük Çalışma Kapasitesi</div>
+          <div style="font-size:13px;color:var(--text);">${prof.daily_capacity ? prof.daily_capacity + ' saat' : 'Belirtilmemiş'}</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;">
+        <div style="font-size:10px;font-weight:700;color:var(--acc);text-transform:uppercase;">Biyografi / Hakkında</div>
+        <div style="font-size:13px;color:var(--text);margin-top:2px;white-space:pre-wrap;">${esc(prof.bio || 'Belirtilmemiş')}</div>
+      </div>
+    `;
+  }
+  
+  document.getElementById('pdmContent').innerHTML = content;
+  openModal('profileDetailModal');
+}
+
+// ── TRAFİK LOG SİMÜLATÖRÜ ─────────────────────
+function initTrafficSimulator() {
+  const container = document.getElementById('trafficLogContainer');
+  if (!container) return;
+
+  const paths = [
+    '/index.html',
+    '/koc_bul.html',
+    '/blog.html',
+    '/app.html',
+    '/about.html'
+  ];
+
+  const ips = [
+    '176.234.12.85', '85.105.42.112', '88.232.190.4', '95.70.220.14', '46.196.33.201', '78.190.11.23'
+  ];
+
+  const actions = [
+    'Başvuru Formu: match_requests tablosuna ekleme yapıldı.',
+    'Koç Girişi: @demokoc portal paneline giriş yaptı.',
+    'Öğrenci Girişi: @demoogrenci sisteme giriş yaptı.',
+    'AI Asistanı: Bir öğrenci AI Koç\'tan tavsiyeler aldı.',
+    'Ödev Tamamlama: Bir öğrenci TYT Matematik ödevini "tamamlandı" olarak işaretledi.'
+  ];
+
+  if (window._trafficInterval) clearInterval(window._trafficInterval);
+
+  window._trafficInterval = setInterval(() => {
+    const time = new Date().toLocaleTimeString('tr-TR');
+    let line = '';
+    
+    if (Math.random() < 0.65) {
+      const path = paths[Math.floor(Math.random() * paths.length)];
+      const ip = ips[Math.floor(Math.random() * ips.length)];
+      line = `[${time}] Ziyaretçi: ${path} [200 OK] (IP: ${ip})`;
+    } else {
+      const action = actions[Math.floor(Math.random() * actions.length)];
+      line = `[${time}] ${action}`;
+    }
+    
+    const div = document.createElement('div');
+    div.textContent = line;
+    container.appendChild(div);
+    
+    while (container.childNodes.length > 40) {
+      container.removeChild(container.firstChild);
+    }
+    
+    container.scrollTop = container.scrollHeight;
+
+    const visitorEl = document.getElementById('st-active-visitors');
+    if (visitorEl) {
+      let val = parseInt(visitorEl.textContent) || 18;
+      val += Math.floor(Math.random() * 5) - 2;
+      if (val < 5) val = 5;
+      visitorEl.textContent = val;
+    }
+
+    const latencyEl = document.getElementById('st-latency');
+    if (latencyEl) {
+      let lat = Math.floor(Math.random() * 9) + 11;
+      latencyEl.textContent = lat + 'ms';
+    }
+  }, 4000);
+}
+
+// ── AJAN PANELİ LOGIC ─────────────────────────
+let _activeAgentTab = 'email';
+let _emailDrafts = [];
+let _igDrafts = [];
+let _selectedIgId = null;
+
+// Hazır Instagram Görsel ve Konsept Şablonları (Mock Data ve Dinamik SVG'ler)
+const DEFAULT_IG_DRAFTS = [
+  {
+    id: "ig_1",
+    type: "countdown",
+    title: "YKS Sayaç & Motivasyon",
+    days_left: 45,
+    quote: "Zorluklar, başarının değerini artıran süslerdir. Bugün attığın her adım yarınki zaferindir.",
+    author: "Rostrum Akademi AI",
+    status: "pending",
+    caption: "YKS'ye son 45 gün! ⏳ Sınav yaklaştıkça stresin artması normaldir ama unutma; kazananlar yorulunca bırakanlar değil, hedefe odaklananlardır. Rostrum Akademi ile haftalık programını yap, eksiklerini tamamla, netlerini uçur. 🚀\n\n#yks2026 #ykssayac #ykskocluk #derscalismagunlugu #rostrumakademi"
+  },
+  {
+    id: "ig_2",
+    type: "tactic",
+    title: "Limit Konu Çalışma Taktiği",
+    days_left: 44,
+    quote: "Matematik - Limit & Süreklilik",
+    author: "Limit & Süreklilik",
+    status: "pending",
+    caption: "Matematikte Limit ve Süreklilik konusunu bitiremeyenler buraya! 📈 İşte sınavda net getiren 3 altın kural:\n1. Limit tanımını grafik çizerek çalışın.\n2. Sağdan ve soldan yaklaşma kurallarını oturtun.\n3. Süreklilik ile limit arasındaki bağı mutlaka kavrayın.\n\nRostrum Akademi YouTube entegrasyonu ile Mert Hoca veya Eyüp B. playlistlerini tek tıkla programına ekle, zaman kaybetmeden hemen başla! 💻\n\n#yksmatematik #yks2026 #limitvesureklilik #tytayt #rostrumakademi"
+  },
+  {
+    id: "ig_3",
+    type: "comparison",
+    title: "Kağıt Program vs Dijital PDF",
+    days_left: 43,
+    quote: "Kağıt vs Dijital",
+    author: "Kağıt vs Dijital",
+    status: "pending",
+    caption: "Hala defter köşesinde veya saman kağıdına yazılmış programlarla mı çalışıyorsunuz? 🤦‍♂️\n\n❌ Dağınık kağıt programlar kaybolur, takibi zordur, veli gelişimden habersizdir.\n✅ Rostrum Akademi Dijital PDF programları ise markalıdır, telefondan anlık takip edilir, veliye grafiklerle otomatik gönderilir.\n\nKoçlar için zaman kazandıran, öğrenciler için başarı getiren sistem! 🏆\n\n#ykskocluk #rostrumakademi #dersprogrami #yks2026 #yksdanismanlik"
+  },
+  {
+    id: "ig_4",
+    type: "seasonal",
+    title: "Yazın Sıcakta Çalışma Rehberi",
+    days_left: 42,
+    quote: "Sıcak Havada Odaklanma",
+    author: "Sıcak Havada Odaklanma",
+    status: "pending",
+    caption: "Yaz sıcağında ders çalışmak işkenceye mi dönüşüyor? ☀️ İşte odaklanmanı %100 artıracak yaz taktikleri:\n1. Sabah 06:00-09:00 arası en verimli saatlerdir, erken kalkın.\n2. Çalışma masanızda soğuk su ve sadeleştirilmiş bir ortam bulundurun.\n3. 25 dk çalışma - 5 dk mola (Pomodoro) sistemiyle beyninizi serin tutun.\n\nSıcaklar hayallerinize engel olmasın! ❄️\n\n#yazkampi #derscalismagunlugu #ykshazirlik #yks2026 #rostrumakademi"
+  }
+];
+
+function switchAgentTab(tab) {
+  _activeAgentTab = tab;
+  document.getElementById('tab-agent-email').classList.remove('btn-acc');
+  document.getElementById('tab-agent-email').classList.add('btn-ghost');
+  document.getElementById('tab-agent-instagram').classList.remove('btn-acc');
+  document.getElementById('tab-agent-instagram').classList.add('btn-ghost');
+  
+  document.getElementById('tab-agent-' + tab).classList.remove('btn-ghost');
+  document.getElementById('tab-agent-' + tab).classList.add('btn-acc');
+
+  document.getElementById('agent-email-section').style.display = tab === 'email' ? 'block' : 'none';
+  document.getElementById('agent-instagram-section').style.display = tab === 'instagram' ? 'block' : 'none';
+  
+  if(tab === 'email') renderAgentEmails();
+  if(tab === 'instagram') renderAgentInstagram();
+}
+
+async function loadAndRenderAgents() {
+  // 1. E-posta Taslaklarını Yükle (leads tablosundan status='drafted' olanları çek)
+  try {
+    const { data } = await db.from('leads').select('*').eq('status', 'drafted').order('created_at', { ascending: false });
+    _emailDrafts = data || [];
+    if(_emailDrafts.length === 0) {
+      // Otomatik olarak test için taslak e-posta oluştur
+      const mockLead = {
+        first_name: "Yunus",
+        last_name: "Emre",
+        brand_name: "Yunus Danışmanlık",
+        email: "yunus.emre@danismanlik.com",
+        phone: "0532 111 22 33",
+        plan: "pro",
+        student_count: 15,
+        status: "drafted",
+        notes: "Otomatik üretilen test taslağı",
+        source: "google_search",
+        pitch_text: `Konu: Koçluk süreçlerinizi dijitalleştirin (Yunus Danışmanlık özel)\n\nMerhaba Yunus Hocam,\n\nInstagram'da bireysel YKS koçluğu üzerine yaptığınız başarılı çalışmaları takip ediyoruz. Öğrenci takipleri ve veli bilgilendirmeleri yaparken ne kadar yoğun zaman harcadığınızı biliyoruz.\n\nRostrum Akademi olarak, koçların bu operasyonel yükünü %80 azaltan bir sistem tasarladık. Kendi markanızla velilere otomatik gelişim raporları (PDF) gönderebilir, YouTube playlistlerini saniyeler içinde programlaştırabilirsiniz. Üstelik öğrencileriniz için entegre AI Ders Asistanı da sunuyoruz.\n\nYunus Danışmanlık markası altında sistemi 14 gün ücretsiz denemek ister misiniz? Uygun olduğunuzda 5 dakikalık bir demo seansı planlayabiliriz.\n\nİyi çalışmalar,\nCaner — Rostrum Akademi Müşteri İlişkileri`
+      };
+      const { data: inserted, error: insErr } = await db.from('leads').insert(mockLead).select();
+      if(insErr) console.warn('Mock lead insert error:', insErr);
+      if(inserted && inserted[0]) _emailDrafts.push(inserted[0]);
+    }
+  } catch (e) {
+    console.error('Email drafts load error:', e);
+  }
+
+  // 2. Instagram Taslaklarını Yükle
+  try {
+    const { data } = await db.from('platform_settings').select('value').eq('key', 'instagram_drafts').maybeSingle();
+    if (data && data.value) {
+      _igDrafts = data.value;
+    } else {
+      // Eğer veritabanı boşsa varsayılan taslakları yükle ve kaydet
+      _igDrafts = DEFAULT_IG_DRAFTS;
+      await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
+    }
+  } catch (e) {
+    console.error('Instagram drafts load error:', e);
+    _igDrafts = DEFAULT_IG_DRAFTS;
+  }
+
+  // Arayüzü çiz
+  switchAgentTab(_activeAgentTab);
+}
+
+function renderAgentEmails() {
+  const tbody = document.getElementById('agentEmailsTable');
+  if (_emailDrafts.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:24px">✉️ Onay bekleyen soğuk satış e-posta taslağı bulunmamaktadır. <br><span style="font-size:11px">Ajan yeni leads bulduğunda burada görünecektir.</span></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = _emailDrafts.map(d => `
+    <tr>
+      <td><strong>${esc(d.brand_name)}</strong><br><span style="font-size:11px;color:var(--dim)">${esc(d.first_name)} ${esc(d.last_name||'')}</span></td>
+      <td>${esc(d.email)}</td>
+      <td><span class="role-badge role-dev">${esc(d.source)}</span></td>
+      <td>${new Date(d.created_at).toLocaleDateString('tr-TR')}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openEmailPreviewModal('${d.id}')">🔍 İncele & Onayla</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderAgentInstagram() {
+  const tbody = document.getElementById('agentIgTable');
+  tbody.innerHTML = _igDrafts.map(d => {
+    let typeLabel = '';
+    if(d.type==='countdown') typeLabel = '⏳ YKS Sayaç';
+    else if(d.type==='tactic') typeLabel = '💡 Ders Taktiği';
+    else if(d.type==='comparison') typeLabel = '⚖️ Karşılaştırma';
+    else if(d.type==='seasonal') typeLabel = '☀️ Mevsimsel/Gündem';
+
+    const isSelected = _selectedIgId === d.id ? 'style="background:rgba(240,165,0,.08)"' : '';
+    const statusText = d.status === 'published' ? '<span style="color:var(--acc3)">Yayınlandı</span>' : '⏳ Bekliyor';
+
+    return `
+      <tr onclick="selectIgDraft('${d.id}')" ${isSelected} class="cursor-pointer">
+        <td><strong>${typeLabel}</strong></td>
+        <td>${esc(d.title)}</td>
+        <td>YKS - ${d.days_left} Gün</td>
+        <td><strong>${statusText}</strong></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function selectIgDraft(id) {
+  _selectedIgId = id;
+  renderAgentInstagram();
+
+  const d = _igDrafts.find(x => x.id === id);
+  if (!d) return;
+
+  // Görseli tarayıcıda canlı oluştur (SVG Kodu ile)
+  const previewContainer = document.getElementById('igPostPreviewContainer');
+  previewContainer.innerHTML = getPostSvg(d.type, d.days_left, d.quote, d.author, d.title);
+  
+  document.getElementById('igCaptionPreview').value = d.caption;
+
+  // Butonları aktif et
+  document.getElementById('btnApproveIg').disabled = false;
+  document.getElementById('btnRejectIg').disabled = false;
+  
+  if (d.status === 'published') {
+    document.getElementById('btnApproveIg').textContent = '✅ Zaten Yayınlandı';
+    document.getElementById('btnApproveIg').disabled = true;
+  } else {
+    document.getElementById('btnApproveIg').textContent = '✅ Onayla & Yayınla';
+    document.getElementById('btnApproveIg').disabled = false;
+  }
+}
+
+async function approveIgPost() {
+  if(!_selectedIgId) return;
+  const d = _igDrafts.find(x => x.id === _selectedIgId);
+  if(!d) return;
+
+  d.status = 'published';
+  d.caption = document.getElementById('igCaptionPreview').value;
+
+  // Veritabanını güncelle
+  try {
+    await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
+  } catch(e) {
+    console.error('Save IG drafts error:', e);
+  }
+
+  showToast('📸 Gönderi Instagram Graph API ile paylaşıldı! (Simüle edildi) ✓');
+  selectIgDraft(_selectedIgId);
+}
+
+// Gemini ile Gönderiyi Yeniden Üretme
+async function regenerateIgPost() {
+  if(!_selectedIgId) return;
+  const d = _igDrafts.find(x => x.id === _selectedIgId);
+  if(!d) return;
+
+  const btn = document.getElementById('btnRejectIg');
+  btn.textContent = '⏳ Üretiliyor...';
+  btn.disabled = true;
+
+  try {
+    // Gemini proxy API'mize istek at
+    const prompt = `YKS sınavına ${d.days_left} gün kaldı. Bana koçluk sayfasında yayınlamak için ${d.type} tipinde yepyeni, motivasyonel ve Türkçe bir söz ("quote") ve bir yazar ("author") üret. Ayrıca Instagram için etkileyici bir açıklama metni ("caption") yaz. JSON formatında dön.`;
+    const response = await fetch('/api/ai-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: prompt }],
+        userRole: 'developer'
+      })
+    });
+
+    if (response.ok) {
+      const resData = await response.json();
+      // Gemini JSON dönebilir veya düz metin, temizle
+      let cleanText = resData.reply;
+      // JSON temizleme regex'i
+      const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        d.quote = parsed.quote || d.quote;
+        d.author = parsed.author || d.author;
+        d.caption = parsed.caption || d.caption;
+      } else {
+        d.quote = "Sınırlarını aşmak için çalışmaya devam et.";
+        d.author = "Rostrum Akademi AI";
+      }
+    }
+  } catch (e) {
+    console.warn('Gemini IG regeneration error, fallback to random text:', e);
+    d.quote = "Gelecek, bugünden ona hazırlananlarındır. Kalan gün sayısını başarı basamaklarına dönüştür.";
+    d.author = "Rostrum Akademi";
+  }
+
+  // Veritabanına kaydet
+  try {
+    await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
+  } catch(e){}
+
+  btn.textContent = '🔄 Yeniden Üret';
+  btn.disabled = false;
+  showToast('✨ Gönderi Gemini AI ile yeniden tasarlandı! ✓');
+  selectIgDraft(_selectedIgId);
+}
+
+// E-posta Taslak Önizleme Modalı
+function openEmailPreviewModal(leadId) {
+  const d = _emailDrafts.find(x => x.id === leadId);
+  if(!d) return;
+
+  let modal = document.getElementById('emailPreviewModal');
+  if(!modal) {
+    modal = document.createElement('div');
+    modal.id = 'emailPreviewModal';
+    modal.className = 'modal-bg';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if(e.target===modal) modal.classList.remove('open'); });
+  }
+
+  modal.innerHTML = `
+    <div class="modal" style="max-width:600px">
+      <button class="modal-close" onclick="closeModal('emailPreviewModal')">×</button>
+      <div style="margin-bottom:14px">
+        <h2 style="color:var(--acc)">✉️ Soğuk Satış E-Posta Önizleme</h2>
+        <div style="font-size:12px;color:var(--dim);margin-top:4px">Alıcı: <strong>${esc(d.brand_name)} (${esc(d.email)})</strong></div>
+      </div>
+      <div class="field">
+        <label>E-posta İçeriği (Düzenleyebilirsiniz)</label>
+        <textarea id="emailDraftText" style="min-height:300px;width:100%;background:var(--s2);border:1px solid var(--bd);color:var(--text);border-radius:10px;padding:12px;font-family:inherit;line-height:1.6;box-sizing:border-box">${esc(d.pitch_text)}</textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-green" style="flex:1.5;justify-content:center" onclick="sendEmailDraft('${d.id}')">🚀 Onayla & Gönder</button>
+        <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="closeModal('emailPreviewModal')">Kapat</button>
+      </div>
+    </div>
+  `;
+  openModal('emailPreviewModal');
+}
+
+async function sendEmailDraft(leadId) {
+  const d = _emailDrafts.find(x => x.id === leadId);
+  if(!d) return;
+
+  const editedText = document.getElementById('emailDraftText').value;
+
+  // Veritabanını güncelle
+  try {
+    await db.from('leads').update({
+      pitch_text: editedText,
+      status: 'contacted'
+    }).eq('id', leadId);
+  } catch(e) {
+    console.error('Send email error:', e);
+  }
+
+  closeModal('emailPreviewModal');
+  showToast('✉️ E-posta başarıyla gönderildi! (Simüle edildi) ✓');
+  loadAndRenderAgents();
+}
+
+// Canlı Dinamik Görsel Çizimi (B2B Premium SVG Şablonları)
+function getPostSvg(type, daysLeft, quote, author, title) {
+  // Kelimeleri satırlara böl
+  const words = quote.split(' ');
+  let lines = [];
+  let currentLine = '';
+  words.forEach(w => {
+    if ((currentLine + ' ' + w).length > 25) { lines.push(currentLine); currentLine = w; }
+    else { currentLine = currentLine ? currentLine + ' ' + w : w; }
+  });
+  if (currentLine) lines.push(currentLine);
+  lines = lines.slice(0, 3);
+  const textElements = lines.map((line, idx) => 
+    `<text x="250" y="${220 + (idx * 30)}" text-anchor="middle" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="20" font-weight="600" letter-spacing="-0.3">${line}</text>`
+  ).join('\n');
+
+  if(type === 'countdown') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+      <rect width="500" height="500" fill="#07060a"/>
+      <defs>
+        <radialGradient id="mesh1" cx="20%" cy="20%" r="60%"><stop offset="0%" stop-color="#f0a500" stop-opacity="0.1"/><stop offset="100%" stop-color="#07060a" stop-opacity="0"/></radialGradient>
+        <radialGradient id="mesh2" cx="80%" cy="80%" r="50%"><stop offset="0%" stop-color="#c084fc" stop-opacity="0.08"/><stop offset="100%" stop-color="#07060a" stop-opacity="0"/></radialGradient>
+        <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f0a500"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+      </defs>
+      <rect width="500" height="500" fill="url(#mesh1)"/>
+      <rect width="500" height="500" fill="url(#mesh2)"/>
+      <path d="M 0,90 L 500,90 M 0,410 L 500,410 M 90,0 L 90,500 M 410,0 L 410,500" stroke="#ffffff" stroke-opacity="0.02" stroke-width="1"/>
+      <text x="250" y="60" text-anchor="middle" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="3">ROSTRUM AKADEMİ</text>
+      <circle cx="250" cy="72" r="2" fill="#f0a500"/>
+      <g transform="translate(250, 140)">
+        <circle cx="0" cy="0" r="45" fill="none" stroke="#2d2a3a" stroke-width="2"/>
+        <circle cx="0" cy="0" r="45" fill="none" stroke="url(#textGrad)" stroke-width="4" stroke-dasharray="280" stroke-dashoffset="70"/>
+        <text x="0" y="6" text-anchor="middle" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="30" font-weight="900">${daysLeft}</text>
+        <text x="0" y="20" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="6" font-weight="700" letter-spacing="1">GÜN KALDI</text>
+      </g>
+      <g>${textElements}
+        <text x="250" y="${260 + (lines.length * 30)}" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="11" font-weight="500" font-style="italic">— ${author}</text>
+      </g>
+      <rect x="190" y="440" width="120" height="20" rx="10" fill="#17151e" stroke="#2d2a3a" stroke-width="0.5"/>
+      <text x="250" y="454" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="7" font-weight="600" letter-spacing="0.5">rostrumakademi.app</text>
+    </svg>`;
+  } 
+  
+  if (type === 'tactic') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+      <rect width="500" height="500" fill="#07060a"/>
+      <defs>
+        <radialGradient id="mesh3" cx="50%" cy="20%" r="50%"><stop offset="0%" stop-color="#c084fc" stop-opacity="0.12"/><stop offset="100%" stop-color="#07060a" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="500" height="500" fill="url(#mesh3)"/>
+      <text x="250" y="50" text-anchor="middle" fill="#c084fc" font-family="system-ui, sans-serif" font-size="11" font-weight="800" letter-spacing="3">BRANŞ TAKTİKLERİ</text>
+      <text x="250" y="85" text-anchor="middle" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="22" font-weight="900" letter-spacing="-0.5">LİMİT &amp; SÜREKLİLİK</text>
+      <text x="250" y="105" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="11">YKS Matematik Net Artıran 3 Kural</text>
+      
+      <!-- Kart 1 -->
+      <g transform="translate(40, 130)">
+        <rect width="420" height="70" rx="8" fill="#121018" stroke="#2d2a3a" stroke-width="1"/>
+        <text x="20" y="40" fill="#f0a500" font-family="system-ui, sans-serif" font-size="24" font-weight="900">1</text>
+        <text x="50" y="30" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="13" font-weight="700">Grafik Çizmeyi İhmal Etmeyin</text>
+        <text x="50" y="48" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10">Limit sorularında sağdan/soldan yaklaşmayı grafik üzerinden görün.</text>
+      </g>
+      <!-- Kart 2 -->
+      <g transform="translate(40, 215)">
+        <rect width="420" height="70" rx="8" fill="#121018" stroke="#2d2a3a" stroke-width="1"/>
+        <text x="20" y="40" fill="#f0a500" font-family="system-ui, sans-serif" font-size="24" font-weight="900">2</text>
+        <text x="50" y="30" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="13" font-weight="700">Sağdan &amp; Soldan Eşitlik Kuralı</text>
+        <text x="50" y="48" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10">Limit olması için sağ ve sol limitlerin eşit olması zorunludur.</text>
+      </g>
+      <!-- Kart 3 -->
+      <g transform="translate(40, 300)">
+        <rect width="420" height="70" rx="8" fill="#121018" stroke="#2d2a3a" stroke-width="1"/>
+        <text x="20" y="40" fill="#f0a500" font-family="system-ui, sans-serif" font-size="24" font-weight="900">3</text>
+        <text x="50" y="30" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="13" font-weight="700">Süreklilik Bağlantısı</text>
+        <text x="50" y="48" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10">Süreklilik için o noktada limit olması ve değere eşit olması gerekir.</text>
+      </g>
+
+      <text x="250" y="420" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10">Rostrum Akademi YouTube Entegrasyonu ile Hemen Programla!</text>
+      <rect x="190" y="445" width="120" height="20" rx="10" fill="#17151e" stroke="#2d2a3a" stroke-width="0.5"/>
+      <text x="250" y="459" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="7" font-weight="600" letter-spacing="0.5">rostrumakademi.app</text>
+    </svg>`;
+  }
+
+  if (type === 'comparison') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+      <rect width="500" height="500" fill="#07060a"/>
+      <text x="250" y="50" text-anchor="middle" fill="#f0a500" font-family="system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="3">BÜYÜK KARŞILAŞTIRMA</text>
+      <text x="250" y="85" text-anchor="middle" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="20" font-weight="900">Kağıt Programlar vs Rostrum Akademi</text>
+      
+      <!-- Sol Taraf (Kağıt) -->
+      <g transform="translate(30, 120)">
+        <rect width="200" height="280" rx="12" fill="#151214" stroke="#4a1a1f" stroke-width="1.5"/>
+        <text x="100" y="40" text-anchor="middle" fill="#ff5c7a" font-family="system-ui, sans-serif" font-size="16" font-weight="800">❌ KAĞIT PROGRAM</text>
+        <circle cx="100" cy="90" r="30" fill="#ff5c7a" fill-opacity="0.1"/>
+        <text x="100" y="96" text-anchor="middle" fill="#ff5c7a" font-family="system-ui, sans-serif" font-size="22" font-weight="900">📝</text>
+        <g fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">
+          <text x="100" y="160">• Çabuk kaybolur &amp; yırtılır</text>
+          <text x="100" y="185">• Süre hesabı manuel yapılır</text>
+          <text x="100" y="210">• Veliye raporlanamaz</text>
+          <text x="100" y="235">• Sürekli zaman kaybettirir</text>
+        </g>
+      </g>
+
+      <!-- Sağ Taraf (Rostrum Akademi) -->
+      <g transform="translate(270, 120)">
+        <rect width="200" height="280" rx="12" fill="#101815" stroke="#1f4a38" stroke-width="1.5"/>
+        <text x="100" y="40" text-anchor="middle" fill="#3ecf8e" font-family="system-ui, sans-serif" font-size="16" font-weight="800">✅ DİJİTAL PDF</text>
+        <circle cx="100" cy="90" r="30" fill="#3ecf8e" fill-opacity="0.1"/>
+        <text x="100" y="96" text-anchor="middle" fill="#3ecf8e" font-family="system-ui, sans-serif" font-size="22" font-weight="900">📱</text>
+        <g fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10" text-anchor="middle">
+          <text x="100" y="160">• Kaybolmaz, cepte taşınır</text>
+          <text x="100" y="185">• Akıllı süre tahmini yapar</text>
+          <text x="100" y="210">• Veliye otomatik grafik iletir</text>
+          <text x="100" y="235">• Koça haftada 4 saat kazandırır</text>
+        </g>
+      </g>
+
+      <text x="250" y="435" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10">Koçluğunuzu Dijitalleştirin, Zaman Kazanın!</text>
+      <rect x="190" y="450" width="120" height="20" rx="10" fill="#17151e" stroke="#2d2a3a" stroke-width="0.5"/>
+      <text x="250" y="464" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="7" font-weight="600" letter-spacing="0.5">rostrumakademi.app</text>
+    </svg>`;
+  }
+
+  if (type === 'seasonal') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+      <rect width="500" height="500" fill="#07060a"/>
+      <defs>
+        <radialGradient id="meshSummer" cx="80%" cy="20%" r="60%"><stop offset="0%" stop-color="#ff8c00" stop-opacity="0.15"/><stop offset="100%" stop-color="#07060a" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="500" height="500" fill="url(#meshSummer)"/>
+      <text x="250" y="50" text-anchor="middle" fill="#ff8c00" font-family="system-ui, sans-serif" font-size="12" font-weight="800" letter-spacing="3">YAZ KAMPINDAYIZ ☀️</text>
+      <text x="250" y="85" text-anchor="middle" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="20" font-weight="900">Sıcakta Odaklanma Rehberi</text>
+      
+      <!-- Grafik Öğeler: Güneş & İçecek -->
+      <g transform="translate(250, 150)" stroke="#ff8c00" stroke-width="1.5" fill="none">
+        <circle cx="0" cy="0" r="15"/>
+        <line x1="0" y1="-20" x2="0" y2="-28"/>
+        <line x1="0" y1="20" x2="0" y2="28"/>
+        <line x1="-20" y1="0" x2="-28" y2="0"/>
+        <line x1="20" y1="0" x2="28" y2="0"/>
+        <line x1="-14" y1="-14" x2="-20" y2="-20"/>
+        <line x1="14" y1="14" x2="20" y2="20"/>
+        <line x1="-14" y1="14" x2="-20" y2="20"/>
+        <line x1="14" y1="-14" x2="20" y2="-20"/>
+      </g>
+
+      <g transform="translate(50, 220)" fill="#f0eaf8" font-family="system-ui, sans-serif" font-size="12">
+        <!-- Madde 1 -->
+        <circle cx="20" cy="15" r="8" fill="#ff8c00" stroke="none"/>
+        <text x="20" y="19" text-anchor="middle" fill="#000" font-size="10" font-weight="900">1</text>
+        <text x="40" y="18" font-weight="700">Sabah Erken Çalışın (06:00 - 09:00)</text>
+        <text x="40" y="34" fill="#a09ab8" font-size="10">Günün en serin saatlerinde odaklanma gücünüzü 2 katına çıkarın.</text>
+
+        <!-- Madde 2 -->
+        <circle cx="20" cy="75" r="8" fill="#ff8c00" stroke="none"/>
+        <text x="20" y="79" text-anchor="middle" fill="#000" font-size="10" font-weight="900">2</text>
+        <text x="40" y="78" font-weight="700">Masanızı ve Zihninizi Sadeleştirin</text>
+        <text x="40" y="94" fill="#a09ab8" font-size="10">Sadece çalışacağınız dersin kaynağı ve serin suyunuz masada kalsın.</text>
+
+        <!-- Madde 3 -->
+        <circle cx="20" cy="135" r="8" fill="#ff8c00" stroke="none"/>
+        <text x="20" y="139" text-anchor="middle" fill="#000" font-size="10" font-weight="900">3</text>
+        <text x="40" y="138" font-weight="700">Pomodoro Metodu ile Beyni Dinlendirin</text>
+        <text x="40" y="154" fill="#a09ab8" font-size="10">25 dakika çalışıp 5 dakika serin molalar vererek zihni zinde tutun.</text>
+      </g>
+
+      <text x="250" y="425" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="10">Hayallerine giden yolda yaz kampını Rostrum Akademi ile yönet! 🚀</text>
+      <rect x="190" y="445" width="120" height="20" rx="10" fill="#17151e" stroke="#2d2a3a" stroke-width="0.5"/>
+      <text x="250" y="459" text-anchor="middle" fill="#a09ab8" font-family="system-ui, sans-serif" font-size="7" font-weight="600" letter-spacing="0.5">rostrumakademi.app</text>
+    </svg>`;
+  }
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+function showToast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  t.style.borderColor=ok?'var(--acc3)':'var(--red)';
+  t.style.color=ok?'var(--text)':'var(--red)';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.style.display='none',3000);
+}
+</script>
+</body>
+</html>

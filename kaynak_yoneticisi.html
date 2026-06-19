@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rostrum Akademi — Kaynak Yöneticisi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0f0e0c;--surface:#1a1916;--surface2:#242220;--surface3:#2e2b28;
+  --border:#383430;--border2:#454038;
+  --accent:#f0a500;--accent-dim:rgba(240,165,0,.12);
+  --text:#f0ece6;--text-mid:#9a9088;--text-dim:#5a5450;
+  --green:#3ecf8e;--green-dim:rgba(62,207,142,.12);
+  --blue:#4da6ff;--blue-dim:rgba(77,166,255,.12);
+  --red:#ff5c5c;--red-dim:rgba(255,92,92,.12);
+  --r:12px;--shadow:0 4px 24px rgba(0,0,0,.4);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh;}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.main{padding:32px;overflow-y:auto;}
+
+/* SIDEBAR */
+.logo{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.logo-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--accent);}
+.logo-sub{font-size:11px;color:var(--text-dim);margin-top:3px;}
+.nav-section{font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;padding:0 20px;margin:16px 0 6px;}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;}
+.nav-btn:hover{background:var(--surface2);color:var(--text);}
+.nav-btn.active{background:var(--accent-dim);color:var(--accent);}
+.nav-btn .icon{font-size:16px;width:20px;text-align:center;}
+
+/* HEADER */
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.page-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.page-sub{font-size:13px;color:var(--text-mid);margin-top:3px;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;}
+.stat-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);}
+.stat-lbl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+
+/* FORMS */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none;transition:border .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:120px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;border:none;transition:all .15s;}
+.btn-accent{background:var(--accent);color:#0f0e0c;}
+.btn-accent:hover{background:#fbb800;}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid transparent;}
+.btn-danger:hover{background:var(--red);color:white;}
+.btn-sm{padding:6px 12px;font-size:12px;}
+.btn-xs{padding:4px 8px;font-size:11px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* TAGS */
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;}
+.tag-green{background:var(--green-dim);color:var(--green);}
+.tag-red{background:var(--red-dim);color:var(--red);}
+.tag-blue{background:var(--blue-dim);color:var(--blue);}
+.tag-accent{background:var(--accent-dim);color:var(--accent);}
+
+/* RESOURCE LIST */
+.resource-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:border .15s;}
+.resource-item:hover{border-color:var(--border2);}
+.resource-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+
+/* LOG */
+.log{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;max-height:250px;overflow-y:auto;font-size:12px;font-family:monospace;}
+.log-ok{color:var(--green);}
+.log-err{color:var(--red);}
+.log-info{color:var(--accent);}
+
+/* VIDEO LIST */
+.video-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border-bottom:1px solid var(--border);transition:background .1s;}
+.video-item:hover{background:var(--surface2);}
+.video-num{width:24px;height:24px;border-radius:6px;background:var(--surface3);color:var(--text-dim);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* TABS */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab-btn{padding:10px 16px;font-size:13px;font-weight:700;font-family:inherit;background:none;border:none;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp .25s ease;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:999;animation:fadeUp .2s ease;}
+</style>
+<style>
+/* ── LOGIN GATE ── */
+#kaynak-login{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.kl-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:100%;max-width:360px;}
+.kl-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--accent);margin-bottom:4px;}
+.kl-sub{font-size:12px;color:var(--text-dim);margin-bottom:28px;}
+.kl-label{display:block;font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.kl-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-size:14px;font-family:inherit;color:var(--text);outline:none;transition:border .15s;margin-bottom:14px;}
+.kl-input:focus{border-color:var(--accent);}
+.kl-btn{width:100%;background:var(--accent);color:#0f0e0c;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px;}
+.kl-err{font-size:12px;color:#ff5c5c;margin-top:10px;display:none;text-align:center;}
+</style>
+</head>
+<body>
+<!-- LOGIN GATE -->
+<div id="kaynak-login">
+  <div class="kl-card">
+    <div class="kl-logo">ROSTRUM<span style="color:var(--text)">AKADEMİ</span></div>
+    <div class="kl-sub">Kaynak Yöneticisi — Yetkili Giriş</div>
+    <label class="kl-label">Şifre</label>
+    <input class="kl-input" type="password" id="klPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')kaynakLogin()">
+    <button class="kl-btn" onclick="kaynakLogin()">Giriş →</button>
+    <div class="kl-err" id="klErr">Şifre hatalı</div>
+  </div>
+</div>
+
+<div class="app" id="kaynakApp" style="display:none">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-title">Rostrum Akademi</div>
+      <div class="logo-sub">Kaynak Yöneticisi</div>
+    </div>
+    <div class="nav-section">Araçlar</div>
+    <button class="nav-btn active" onclick="showPage('dashboard')" data-page="dashboard"><span class="icon">📊</span> Dashboard</button>
+    <button class="nav-btn" onclick="showPage('youtube')" data-page="youtube"><span class="icon">▶️</span> YouTube Import</button>
+    <button class="nav-btn" onclick="showPage('manuel')" data-page="manuel"><span class="icon">✏️</span> Manuel Giriş</button>
+    <button class="nav-btn" onclick="showPage('liste')" data-page="liste"><span class="icon">📚</span> Tüm Kaynaklar</button>
+    <div class="nav-section" style="margin-top:24px">Bağlantı</div>
+    <div style="padding:12px 20px">
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">Supabase</div>
+      <div id="connStatus" style="font-size:12px;color:var(--text-mid)">⏳ Bağlanıyor...</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="fade-up">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Kaynak veritabanı özeti</div>
+        </div>
+        <button class="btn btn-accent" onclick="loadStats()">🔄 Yenile</button>
+      </div>
+      <div class="stats" id="statsGrid">
+        <div class="stat"><div class="stat-val">—</div><div class="stat-lbl">Toplam Kaynak</div></div>
+        <div class="stat"><div class="stat-val">—</div><div class="stat-lbl">Soru Bankası</div></div>
+        <div class="stat"><div class="stat-val">—</div><div class="stat-lbl">Playlist</div></div>
+        <div class="stat"><div class="stat-val">—</div><div class="stat-lbl">Toplam Video</div></div>
+      </div>
+      <div class="card" id="subjectBreakdown"><div style="color:var(--text-dim);font-size:13px">Yükleniyor...</div></div>
+    </div>
+
+    <!-- YOUTUBE IMPORT -->
+    <div id="page-youtube" style="display:none" class="fade-up">
+      <div class="page-header">
+        <div>
+          <div class="page-title">▶️ YouTube Import</div>
+          <div class="page-sub">Playlist URL yapıştır, video listesi otomatik gelsin</div>
+        </div>
+      </div>
+
+      <!-- API Key -->
+      <div class="card" style="margin-bottom:20px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          🔑 YouTube API Key
+          <span id="apiKeyStatus" class="tag tag-red">Girilmedi</span>
+        </div>
+        <div class="field-row">
+          <div class="field" style="margin:0">
+            <input type="password" id="ytApiKey" placeholder="AIzaSy... (Google Cloud Console'dan alın)" oninput="checkApiKey()">
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <button class="btn btn-accent" onclick="saveApiKey()">💾 Kaydet</button>
+            <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" class="btn btn-ghost">API Al →</a>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:8px">Google Cloud Console → YouTube Data API v3 → Credentials → API Key</div>
+      </div>
+
+      <!-- Playlist URL -->
+      <div class="card" style="margin-bottom:20px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px">🔗 Playlist URL</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input id="ytUrl" placeholder="https://www.youtube.com/playlist?list=PL..." style="flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:10px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none">
+          <button class="btn btn-accent" onclick="fetchPlaylist()" id="fetchBtn">Çek →</button>
+        </div>
+        <div id="fetchStatus" style="font-size:12px;color:var(--text-mid)"></div>
+      </div>
+
+      <!-- Preview -->
+      <div id="previewSection" style="display:none">
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div style="font-size:14px;font-weight:700">📋 Önizleme</div>
+            <div id="previewCount" class="tag tag-green"></div>
+          </div>
+          <div id="videoPreview" style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:8px"></div>
+        </div>
+
+        <!-- Kaydet -->
+        <div class="card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px">💾 Kaynağı Kaydet</div>
+          <div class="field-row">
+            <div class="field"><label>Sınav</label>
+              <select id="ytExam">
+                <option value="TYT">TYT</option>
+                <option value="AYT-SAY">AYT Sayısal</option>
+                <option value="AYT-EA">AYT Eşit Ağırlık</option>
+                <option value="AYT-SOZ">AYT Sözel</option>
+              </select>
+            </div>
+            <div class="field"><label>Ders</label>
+              <select id="ytSubject">
+                <option>Matematik</option><option>Fizik</option><option>Kimya</option>
+                <option>Biyoloji</option><option>Geometri</option><option>Türkçe</option>
+                <option>Edebiyat</option><option>Tarih</option><option>Coğrafya</option>
+                <option>Felsefe</option><option>Din Kültürü</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Hoca / Kanal Adı</label>
+              <input id="ytPublisher" placeholder="Mert Hoca, Eyüp B...">
+            </div>
+            <div class="field"><label>Playlist Adı</label>
+              <input id="ytName" placeholder="AYT Matematik Kampı 2025">
+            </div>
+          </div>
+          <button class="btn btn-accent" style="width:100%;justify-content:center;padding:12px" onclick="saveYouTubePlaylist()">
+            ✅ Veritabanına Kaydet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANUEL GİRİŞ -->
+    <div id="page-manuel" style="display:none" class="fade-up">
+      <div class="page-header">
+        <div>
+          <div class="page-title">✏️ Manuel Giriş</div>
+          <div class="page-sub">Soru bankası veya playlist elle ekle</div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-soru', this)">📚 Soru Bankası</button>
+        <button class="tab-btn" onclick="switchTab('tab-playlist', this)">▶️ Playlist / Video</button>
+      </div>
+
+      <!-- SORU BANKASI -->
+      <div id="tab-soru" class="tab-pane active">
+        <div class="card">
+          <div class="field-row">
+            <div class="field"><label>Sınav Türü</label>
+              <select id="sb_exam">
+                <option value="TYT">TYT</option><option value="AYT-SAY">AYT Sayısal</option>
+                <option value="AYT-EA">AYT Eşit Ağırlık</option><option value="AYT-SOZ">AYT Sözel</option>
+              </select>
+            </div>
+            <div class="field"><label>Ders</label>
+              <select id="sb_subject">
+                <option>Matematik</option><option>Fizik</option><option>Kimya</option><option>Biyoloji</option>
+                <option>Geometri</option><option>Türkçe</option><option>Edebiyat</option><option>Tarih</option>
+                <option>Coğrafya</option><option>Felsefe</option><option>Din Kültürü</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Yayınevi</label>
+              <input id="sb_publisher" placeholder="Karekök, İşler Yayınları, Delta...">
+            </div>
+            <div class="field"><label>Kitap Adı</label>
+              <input id="sb_name" placeholder="TYT Matematik Soru Bankası">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Testler ve Soru Sayıları</label>
+            <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">
+              Her satıra: <code style="background:var(--surface3);padding:2px 6px;border-radius:4px">Test Adı | Soru Sayısı</code> &nbsp; Örnek: <code style="background:var(--surface3);padding:2px 6px;border-radius:4px">Sayılar - Test 1 | 14</code>
+            </div>
+            <textarea id="sb_tests" style="min-height:250px;font-size:12px;font-family:monospace;line-height:1.6"
+              placeholder="Sayılar - Test 1 | 14&#10;Sayılar - Test 2 | 16&#10;Sayılar - Test 3 | 18&#10;Asal Sayılar - Test 1 | 12&#10;Asal Sayılar - Test 2 | 14&#10;Tam Sayılar - Test 1 | 16"></textarea>
+            <div style="display:flex;justify-content:space-between;margin-top:6px">
+              <span id="sb_count" style="font-size:12px;color:var(--text-dim)">0 test</span>
+              <button class="btn btn-ghost btn-xs" onclick="parseSBTests()">Önizle</button>
+            </div>
+          </div>
+
+          <!-- Önizleme -->
+          <div id="sb_preview" style="display:none;margin-bottom:14px">
+            <div style="font-size:11px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Önizleme</div>
+            <div id="sb_preview_list" style="max-height:200px;overflow-y:auto;background:var(--surface2);border-radius:8px;border:1px solid var(--border)"></div>
+          </div>
+
+          <button class="btn btn-accent" style="width:100%;justify-content:center;padding:12px" onclick="saveSoruBankasi()">
+            💾 Soru Bankasını Kaydet
+          </button>
+        </div>
+      </div>
+
+      <!-- PLAYLİST -->
+      <div id="tab-playlist" class="tab-pane">
+        <div class="card">
+          <div class="field-row">
+            <div class="field"><label>Sınav</label>
+              <select id="pl_exam">
+                <option value="TYT">TYT</option><option value="AYT-SAY">AYT Sayısal</option>
+                <option value="AYT-EA">AYT Eşit Ağırlık</option><option value="AYT-SOZ">AYT Sözel</option>
+              </select>
+            </div>
+            <div class="field"><label>Ders</label>
+              <select id="pl_subject">
+                <option>Matematik</option><option>Fizik</option><option>Kimya</option><option>Biyoloji</option>
+                <option>Geometri</option><option>Türkçe</option><option>Edebiyat</option><option>Tarih</option>
+                <option>Coğrafya</option><option>Felsefe</option><option>Din Kültürü</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Hoca / Kanal</label>
+              <input id="pl_publisher" placeholder="Mert Hoca, Şükrü Akkoyun...">
+            </div>
+            <div class="field"><label>Playlist Adı</label>
+              <input id="pl_name" placeholder="TYT Matematik Kampı 2025">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Videolar</label>
+            <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">
+              Her satıra: <code style="background:var(--surface3);padding:2px 6px;border-radius:4px">Video Başlığı | YouTube Linki | Süre(dk)</code>
+            </div>
+            <textarea id="pl_videos" style="min-height:250px;font-size:12px;font-family:monospace;line-height:1.6"
+              placeholder="Ders 1 - Polinomlar | https://youtube.com/watch?v=xxx | 45&#10;Ders 2 - Türev | https://youtube.com/watch?v=yyy | 38&#10;Ders 3 - İntegral | https://youtube.com/watch?v=zzz | 52"></textarea>
+            <div style="display:flex;justify-content:space-between;margin-top:6px">
+              <span id="pl_count" style="font-size:12px;color:var(--text-dim)">0 video</span>
+            </div>
+          </div>
+
+          <button class="btn btn-accent" style="width:100%;justify-content:center;padding:12px" onclick="saveManuelPlaylist()">
+            💾 Playlist Kaydet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TÜM KAYNAKLAR -->
+    <div id="page-liste" style="display:none" class="fade-up">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📚 Tüm Kaynaklar</div>
+          <div class="page-sub">Veritabanındaki tüm kaynaklar</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <input id="searchInput" placeholder="Ara..." oninput="filterList()" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:8px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none;width:200px">
+          <select id="filterType" onchange="filterList()" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:8px 13px;font-size:13px;font-family:inherit;color:var(--text);outline:none">
+            <option value="">Tümü</option>
+            <option value="book">Soru Bankası</option>
+            <option value="playlist">Playlist</option>
+          </select>
+          <button class="btn btn-ghost" onclick="loadList()">🔄</button>
+        </div>
+      </div>
+      <div id="resourceList"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── CONFIG ──────────────────────────────────────
+const SB_URL = 'https://imyhenrwmsmyikpollur.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34';
+const db = supabase.createClient(SB_URL, SB_KEY);
+
+// ── LOGIN GATE ───────────────────────────────────
+const _KR_HASH = '07cf99a32383fa51aedb193252e8815d09cf3f36cd72b95b08e966f681af0ba8'; // kaynak2026
+
+async function kaynakLogin() {
+  const p = document.getElementById('klPass').value;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(p));
+  const hash = [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(hash === _KR_HASH) {
+    sessionStorage.setItem('kaynak_auth', '1');
+    document.getElementById('kaynak-login').style.display = 'none';
+    document.getElementById('kaynakApp').style.display = 'grid';
+    initKaynak();
+  } else {
+    const err = document.getElementById('klErr');
+    err.style.display = 'block';
+    setTimeout(() => err.style.display='none', 2500);
+  }
+}
+
+if(sessionStorage.getItem('kaynak_auth')) {
+  document.getElementById('kaynak-login').style.display = 'none';
+  document.getElementById('kaynakApp').style.display = 'grid';
+}
+let _allResources = [];
+let _fetchedVideos = [];
+
+// ── INIT ────────────────────────────────────────
+async function initKaynak() {
+  try {
+    const { data } = await db.from('resources').select('id').limit(1);
+    document.getElementById('connStatus').innerHTML = '<span style="color:var(--green)">✓ Bağlandı</span>';
+    loadStats();
+  } catch(e) {
+    document.getElementById('connStatus').innerHTML = '<span style="color:var(--red)">✗ Bağlantı hatası</span>';
+  }
+
+  // Kayıtlı API key
+  const key = localStorage.getItem('yt_api_key') || '';
+  if(key) {
+    document.getElementById('ytApiKey').value = key;
+    checkApiKey();
+  }
+
+  // Test sayacı
+  document.getElementById('sb_tests').addEventListener('input', () => {
+    const lines = document.getElementById('sb_tests').value.split('\n').filter(l=>l.trim());
+    document.getElementById('sb_count').textContent = lines.length + ' test';
+  });
+  document.getElementById('pl_videos').addEventListener('input', () => {
+    const lines = document.getElementById('pl_videos').value.split('\n').filter(l=>l.trim());
+    document.getElementById('pl_count').textContent = lines.length + ' video';
+  });
+}
+
+// Oturum açıksa otomatik init
+if(sessionStorage.getItem('kaynak_auth')) { initKaynak(); }
+
+// ── NAVIGATION ──────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById('page-' + page).style.display = 'block';
+  document.querySelector(`[data-page="${page}"]`)?.classList.add('active');
+  if(page === 'liste') loadList();
+}
+
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── TOAST ───────────────────────────────────────
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.borderColor = type === 'ok' ? 'var(--green)' : type === 'err' ? 'var(--red)' : 'var(--accent)';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── DASHBOARD ───────────────────────────────────
+async function loadStats() {
+  const { data } = await db.from('resources').select('*');
+  _allResources = data || [];
+  const books = _allResources.filter(r => r.resource_type !== 'playlist');
+  const playlists = _allResources.filter(r => r.resource_type === 'playlist');
+  const totalVideos = playlists.reduce((s, p) => s + (p.tests||[]).length, 0);
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat"><div class="stat-val">${_allResources.length}</div><div class="stat-lbl">Toplam Kaynak</div></div>
+    <div class="stat"><div class="stat-val">${books.length}</div><div class="stat-lbl">Soru Bankası</div></div>
+    <div class="stat"><div class="stat-val">${playlists.length}</div><div class="stat-lbl">Playlist</div></div>
+    <div class="stat"><div class="stat-val">${totalVideos}</div><div class="stat-lbl">Toplam Video</div></div>`;
+
+  // Ders dağılımı
+  const bySubject = {};
+  _allResources.forEach(r => {
+    const k = r.exam_type + ' · ' + r.subject;
+    if(!bySubject[k]) bySubject[k] = {book:0, playlist:0};
+    if(r.resource_type === 'playlist') bySubject[k].playlist++;
+    else bySubject[k].book++;
+  });
+  const sorted = Object.entries(bySubject).sort((a,b) => (b[1].book+b[1].playlist) - (a[1].book+a[1].playlist));
+
+  document.getElementById('subjectBreakdown').innerHTML = `
+    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:14px">Ders Dağılımı</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+      ${sorted.map(([k,v]) => `
+        <div style="background:var(--surface2);border-radius:9px;padding:10px 13px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:5px">${esc(k)}</div>
+          <div style="display:flex;gap:8px;font-size:11px;color:var(--text-dim)">
+            ${v.book > 0 ? `<span class="tag tag-accent">${v.book} kitap</span>` : ''}
+            ${v.playlist > 0 ? `<span class="tag tag-blue">${v.playlist} playlist</span>` : ''}
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ── YOUTUBE IMPORT ───────────────────────────────
+function checkApiKey() {
+  const key = document.getElementById('ytApiKey').value.trim();
+  const status = document.getElementById('apiKeyStatus');
+  if(key.startsWith('AIza') && key.length > 30) {
+    status.className = 'tag tag-green'; status.textContent = '✓ Geçerli format';
+  } else if(key) {
+    status.className = 'tag tag-accent'; status.textContent = '⚠ Format hatalı?';
+  } else {
+    status.className = 'tag tag-red'; status.textContent = 'Girilmedi';
+  }
+}
+
+function saveApiKey() {
+  const key = document.getElementById('ytApiKey').value.trim();
+  if(!key) return toast('API key girin!', 'err');
+  localStorage.setItem('yt_api_key', key);
+  toast('API Key kaydedildi ✓');
+  checkApiKey();
+}
+
+async function fetchPlaylist() {
+  const url = document.getElementById('ytUrl').value.trim();
+  const apiKey = document.getElementById('ytApiKey').value.trim() || localStorage.getItem('yt_api_key');
+  const statusEl = document.getElementById('fetchStatus');
+  const btn = document.getElementById('fetchBtn');
+
+  if(!apiKey) return statusEl.innerHTML = '<span style="color:var(--red)">⚠️ Önce API Key girin ve kaydedin</span>';
+  if(!url) return statusEl.innerHTML = '<span style="color:var(--red)">⚠️ Playlist URL girin</span>';
+
+  const match = url.match(/[?&]list=([^&\s]+)/);
+  if(!match) return statusEl.innerHTML = '<span style="color:var(--red)">⚠️ Geçersiz URL — "list=..." kısmı bulunamadı</span>';
+  const listId = match[1];
+
+  btn.disabled = true;
+  statusEl.innerHTML = '⏳ Videolar çekiliyor...';
+
+  try {
+    _fetchedVideos = [];
+    let nextPage = '';
+    let playlistTitle = '';
+
+    do {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${listId}&maxResults=50&pageToken=${nextPage}&key=${apiKey}`);
+      const data = await res.json();
+      if(data.error) throw new Error(data.error.message);
+      if(!playlistTitle && data.items?.[0]?.snippet?.channelTitle) {
+        playlistTitle = data.items[0].snippet.playlistId;
+      }
+
+      statusEl.innerHTML = `⏳ ${_fetchedVideos.length + data.items.length} video yükleniyor...`;
+
+      // Süreleri çek
+      const ids = data.items.map(i => i.snippet.resourceId.videoId).join(',');
+      const durRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${ids}&key=${apiKey}`);
+      const durData = await durRes.json();
+      const durMap = {};
+      (durData.items||[]).forEach(v => {
+        const iso = v.contentDetails.duration;
+        const h = parseInt(iso.match(/(\d+)H/)?.[1]||0);
+        const m = parseInt(iso.match(/(\d+)M/)?.[1]||0);
+        const s = parseInt(iso.match(/(\d+)S/)?.[1]||0);
+        durMap[v.id] = Math.ceil((h*3600+m*60+s)/60);
+      });
+
+      data.items.forEach(item => {
+        const vid = item.snippet.resourceId.videoId;
+        _fetchedVideos.push({
+          title: item.snippet.title,
+          url: `https://www.youtube.com/watch?v=${vid}`,
+          duration: durMap[vid] || 0
+        });
+      });
+
+      nextPage = data.nextPageToken || '';
+    } while(nextPage && _fetchedVideos.length < 200);
+
+    statusEl.innerHTML = `<span style="color:var(--green)">✓ ${_fetchedVideos.length} video başarıyla yüklendi!</span>`;
+
+    // Önizleme
+    document.getElementById('previewCount').textContent = _fetchedVideos.length + ' video';
+    document.getElementById('videoPreview').innerHTML = _fetchedVideos.map((v,i) => `
+      <div class="video-item">
+        <div class="video-num">${i+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.title)}</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:2px">${v.duration} dk</div>
+        </div>
+        <a href="${esc(v.url)}" target="_blank" style="font-size:10px;background:var(--red-dim);color:var(--red);padding:2px 8px;border-radius:99px;text-decoration:none;flex-shrink:0">▶</a>
+      </div>`).join('');
+    document.getElementById('previewSection').style.display = 'block';
+
+    // Playlist adı tahmin et
+    if(_fetchedVideos.length > 0 && !document.getElementById('ytName').value) {
+      const firstTitle = _fetchedVideos[0].title;
+      document.getElementById('ytName').value = firstTitle.split(' - ')[0] || firstTitle.slice(0,40);
+    }
+
+  } catch(e) {
+    statusEl.innerHTML = `<span style="color:var(--red)">⚠️ Hata: ${esc(e.message)}</span>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function saveYouTubePlaylist() {
+  const name = document.getElementById('ytName').value.trim();
+  const publisher = document.getElementById('ytPublisher').value.trim();
+  if(!name || !publisher) return toast('Hoca adı ve playlist adı zorunlu!', 'err');
+  if(!_fetchedVideos.length) return toast('Önce playlist çekin!', 'err');
+
+  const tests = _fetchedVideos.map(v => ({
+    label: v.title,
+    url: v.url,
+    topic: '',
+    soru: v.duration
+  }));
+
+  const { error } = await db.from('resources').insert({
+    exam_type: document.getElementById('ytExam').value,
+    subject: document.getElementById('ytSubject').value,
+    publisher, name,
+    year: new Date().getFullYear(),
+    tests, active: true,
+    resource_type: 'playlist'
+  });
+
+  if(error) return toast('Hata: ' + error.message, 'err');
+  toast(`✓ "${name}" kaydedildi — ${tests.length} video`);
+  document.getElementById('previewSection').style.display = 'none';
+  document.getElementById('ytUrl').value = '';
+  document.getElementById('ytName').value = '';
+  document.getElementById('ytPublisher').value = '';
+  _fetchedVideos = [];
+  loadStats();
+}
+
+// ── MANUEL GİRİŞ ────────────────────────────────
+function parseSBTests() {
+  const lines = document.getElementById('sb_tests').value.split('\n').map(l=>l.trim()).filter(Boolean);
+  const el = document.getElementById('sb_preview_list');
+  const preview = document.getElementById('sb_preview');
+  if(!lines.length) { preview.style.display='none'; return; }
+
+  el.innerHTML = lines.map(line => {
+    const parts = line.split('|').map(p=>p.trim());
+    const label = parts[0] || '';
+    const soru = parseInt(parts[1]) || 0;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-bottom:1px solid var(--border);font-size:12px">
+      <span style="font-weight:600">${esc(label)}</span>
+      ${soru > 0 ? `<span class="tag tag-accent">${soru} soru</span>` : '<span style="color:var(--text-dim)">soru sayısı yok</span>'}
+    </div>`;
+  }).join('');
+  preview.style.display = 'block';
+  document.getElementById('sb_count').textContent = lines.length + ' test';
+}
+
+async function saveSoruBankasi() {
+  const name = document.getElementById('sb_name').value.trim();
+  const publisher = document.getElementById('sb_publisher').value.trim();
+  const subject = document.getElementById('sb_subject').value;
+  if(!name || !publisher) return toast('Yayınevi ve kitap adı zorunlu!', 'err');
+
+  const lines = document.getElementById('sb_tests').value.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return toast('En az 1 test girin!', 'err');
+
+  const tests = lines.map(line => {
+    const parts = line.split('|').map(p=>p.trim());
+    return { label: parts[0]||'', soru: parseInt(parts[1])||0 };
+  }).filter(t => t.label);
+
+  const { error } = await db.from('resources').insert({
+    exam_type: document.getElementById('sb_exam').value,
+    subject, publisher, name,
+    year: new Date().getFullYear(),
+    tests, active: true,
+    resource_type: 'book'
+  });
+
+  if(error) return toast('Hata: ' + error.message, 'err');
+  toast(`✓ "${name}" kaydedildi — ${tests.length} test`);
+  document.getElementById('sb_name').value = '';
+  document.getElementById('sb_publisher').value = '';
+  document.getElementById('sb_tests').value = '';
+  document.getElementById('sb_preview').style.display = 'none';
+  document.getElementById('sb_count').textContent = '0 test';
+  loadStats();
+}
+
+async function saveManuelPlaylist() {
+  const name = document.getElementById('pl_name').value.trim();
+  const publisher = document.getElementById('pl_publisher').value.trim();
+  if(!name || !publisher) return toast('Hoca adı ve playlist adı zorunlu!', 'err');
+
+  const lines = document.getElementById('pl_videos').value.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return toast('En az 1 video girin!', 'err');
+
+  const tests = lines.map(line => {
+    const parts = line.split('|').map(p=>p.trim());
+    return { label:parts[0]||'', url:parts[1]||'', topic:'', soru:parseInt(parts[2])||0 };
+  }).filter(t => t.label);
+
+  const { error } = await db.from('resources').insert({
+    exam_type: document.getElementById('pl_exam').value,
+    subject: document.getElementById('pl_subject').value,
+    publisher, name,
+    year: new Date().getFullYear(),
+    tests, active: true,
+    resource_type: 'playlist'
+  });
+
+  if(error) return toast('Hata: ' + error.message, 'err');
+  toast(`✓ "${name}" kaydedildi — ${tests.length} video`);
+  document.getElementById('pl_name').value = '';
+  document.getElementById('pl_publisher').value = '';
+  document.getElementById('pl_videos').value = '';
+  document.getElementById('pl_count').textContent = '0 video';
+  loadStats();
+}
+
+// ── KAYNAK LİSTESİ ───────────────────────────────
+async function loadList() {
+  document.getElementById('resourceList').innerHTML = '<div style="color:var(--text-dim);padding:20px">Yükleniyor...</div>';
+  const { data } = await db.from('resources').select('*').order('resource_type,exam_type,subject,name');
+  _allResources = data || [];
+  renderList(_allResources);
+}
+
+function filterList() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const type = document.getElementById('filterType').value;
+  const filtered = _allResources.filter(r => {
+    const matchType = !type || r.resource_type === type;
+    const matchQ = !q || r.name.toLowerCase().includes(q) || r.publisher?.toLowerCase().includes(q) || r.subject?.toLowerCase().includes(q);
+    return matchType && matchQ;
+  });
+  renderList(filtered);
+}
+
+function renderList(items) {
+  const el = document.getElementById('resourceList');
+  if(!items.length) { el.innerHTML = '<div class="empty" style="padding:40px;text-align:center;color:var(--text-dim)">Kaynak bulunamadı</div>'; return; }
+
+  const grouped = {};
+  items.forEach(r => {
+    const k = r.resource_type === 'playlist' ? '▶ Playlist' : '📚 Soru Bankası';
+    if(!grouped[k]) grouped[k] = [];
+    grouped[k].push(r);
+  });
+
+  el.innerHTML = Object.entries(grouped).map(([group, resources]) => `
+    <div style="margin-bottom:24px">
+      <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:10px;color:var(--accent)">${group} <span style="font-size:12px;font-weight:400;color:var(--text-dim)">${resources.length} kaynak</span></div>
+      ${resources.map(r => `
+        <div class="resource-item">
+          <div class="resource-icon" style="background:${r.resource_type==='playlist'?'var(--blue-dim)':'var(--accent-dim)'}">
+            ${r.resource_type==='playlist'?'▶':'📚'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">${esc(r.publisher)} · ${r.exam_type} ${r.subject} · ${(r.tests||[]).length} ${r.resource_type==='playlist'?'video':'test'}</div>
+          </div>
+          <span class="tag ${r.active?'tag-green':'tag-red'}" style="flex-shrink:0">${r.active?'Aktif':'Pasif'}</span>
+          <button class="btn btn-danger btn-xs" onclick="deleteResource('${r.id}')" style="opacity:.4;flex-shrink:0" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.4">🗑</button>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+async function deleteResource(id) {
+  if(!confirm('Bu kaynağı silmek istediğinizden emin misiniz?')) return;
+  const { error } = await db.from('resources').delete().eq('id', id);
+  if(error) return toast('Hata: ' + error.message, 'err');
+  toast('Silindi ✓');
+  loadList();
+  loadStats();
+}
+</script>
+</body>
+</html>

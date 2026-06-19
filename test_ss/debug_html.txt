@@ -1,0 +1,25 @@
+
+
+<!-- LOGIN -->
+<div id="loginScreen" style="display: none;">
+  <div class="login-box">
+    <div class="login-logo">ROSTRUM<span>AKADEMİ</span></div>
+    <div class="login-sub" style="margin-bottom:28px">Öğrenci, Koç ve Kurum Portalı</div>
+    <div class="login-tabs" id="loginTabs">
+      <button class="login-tab" onclick="setLoginMode('email')">📧 E-posta</button>
+      <button class="login-tab active" onclick="setLoginMode('username')">👤 Kullanıcı Adı</button>
+    </div>
+    <div id="loginEmailField" class="lfield" style="display: none;"><label>E-posta Adresi</label><input type="email" id="loginEmail" placeholder="ornek@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()" style=""></div>
+    <div id="loginUserField" class="lfield" style="display: block;"><label>Kullanıcı Adı</label><input type="text" id="loginUser" placeholder="Kullanıcı adınız" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()" style=""></div>
+    <div class="lfield"><label>Şifre</label><input type="password" id="loginPass" placeholder="Şifreniz" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" style=""></div>
+    <div id="loginErr" style="display:none;color:var(--red);font-size:13px;margin-bottom:8px;padding:10px 14px;background:var(--red-dim);border-radius:8px"></div>
+    <button class="btn-login" onclick="doLogin()">Giriş Yap →</button>
+    <a class="login-forgot" onclick="showForgotPassword()">Şifremi Unuttum</a>
+  </div>
+</div>
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-bg" id="forgotPassModal">
+  <div class="modal" style="max-width:400px">
+    <button class="modal-close" onclick="cm('forgotPassModal')">×</button>
+    <div style="font-size:18px;font-weight:700;margin-bottom:12px">🔑 Şifre Sıfırlama</div>
+    <div class="lfield"><label>E-posta Adresi</label><input type="email" id="forgotEmail" placeholder="Kayıtlı e-posta adresiniz" style=""></div

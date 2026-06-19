@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rostrum Akademi — Zaman Kazandıran Eğitim Yönetim Sistemi</title>
+<meta name="description" content="Türkiye'nin zaman kazandıran eğitim yönetim sistemi. Haftalık program, TYT/AYT deneme takibi, anlık mesajlaşma, PDF raporlar. 180+ koç kullanıyor. 14 gün ücretsiz deneyin.">
+<meta name="keywords" content="koçluk platformu, öğrenci yönetimi, TYT takibi, AYT deneme, haftalık program, YKS koç">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://rostrumakademi.com/">
+<meta property="og:title" content="Rostrum Akademi — Zaman Kazandıran Eğitim Yönetim Sistemi">
+<meta property="og:description" content="Türkiye'nin zaman kazandıran eğitim yönetim sistemi. Öğrencilerinizi ve koçluk süreçlerinizi profesyonelce yönetin. 14 gün ücretsiz deneyin.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rostrumakademi.com/">
+<meta property="og:site_name" content="Rostrum Akademi">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rostrum Akademi — Zaman Kazandıran Eğitim Yönetim Sistemi">
+<meta name="twitter:description" content="Haftalık program, deneme takibi, PDF raporlar. 180+ koç kullanıyor.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23f0a500'/><text y='.9em' font-size='80' x='10'>R</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#07060a;--s1:#0f0d14;--s2:#17151e;--s3:#201d29;
+  --bd:#2d2a3a;--bd2:#3d3a4e;
+  --acc:#f0a500;--acc2:#c084fc;--acc3:#3ecf8e;--acc4:#60b4ff;
+  --text:#f0eaf8;--mid:#a09ab8;--dim:#4a4660;
+  --red:#ff5c7a;
+  --r:14px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;}
+
+/* CURSOR */
+
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 52px;background:rgba(7,6,10,0);backdrop-filter:blur(0px);border-bottom:1px solid rgba(255,255,255,0);transition:all .4s;}
+nav.scrolled{background:rgba(7,6,10,.9);backdrop-filter:blur(24px);border-bottom-color:rgba(255,255,255,.05);}
+.nav-logo{font-family:'Geist',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.3px;text-decoration:none;color:var(--text);}
+.nav-logo b{color:var(--acc);}
+.nav-center{display:flex;align-items:center;gap:36px;}
+.nav-center a{color:var(--mid);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s;letter-spacing:.1px;}
+.nav-center a:hover{color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.btn-ghost-sm{background:transparent;color:var(--mid);padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;border:1px solid var(--bd);transition:all .15s;cursor:pointer;}
+.btn-ghost-sm:hover{color:var(--text);border-color:var(--bd2);}
+.btn-acc-sm{background:var(--acc);color:#07060a;padding:8px 20px;border-radius:9px;font-weight:700;font-size:13px;text-decoration:none;transition:all .15s;border:none;cursor:pointer;font-family:inherit;}
+.btn-acc-sm:hover{background:#fbb800;transform:translateY(-1px);box-shadow:0 6px 20px rgba(240,165,0,.25);}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:100px 40px 60px;text-align:center;position:relative;overflow:hidden;}
+
+/* Mesh gradient background */
+.hero-mesh{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.mesh-orb{position:absolute;border-radius:50%;filter:blur(80px);animation:float 12s ease-in-out infinite;}
+.mesh-orb:nth-child(1){width:700px;height:700px;background:rgba(240,165,0,.08);top:-200px;left:50%;transform:translateX(-50%);animation-delay:0s;}
+.mesh-orb:nth-child(2){width:500px;height:500px;background:rgba(192,132,252,.06);bottom:-100px;right:-150px;animation-delay:-4s;}
+.mesh-orb:nth-child(3){width:400px;height:400px;background:rgba(62,207,142,.04);bottom:100px;left:-100px;animation-delay:-8s;}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0) scale(1);}33%{transform:translateX(-48%) translateY(-20px) scale(1.03);}66%{transform:translateX(-52%) translateY(10px) scale(.97);}}
+
+/* Grid lines */
+.hero-grid-lines{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(ellipse 70% 80% at 50% 40%,black 40%,transparent 100%);}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(240,165,0,.07);border:1px solid rgba(240,165,0,.18);border-radius:99px;padding:5px 16px 5px 8px;font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:1px;margin-bottom:28px;animation:fadeUp .6s both;}
+.live-dot{width:20px;height:20px;border-radius:50%;background:rgba(62,207,142,.15);display:flex;align-items:center;justify-content:center;}
+.live-dot::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--acc3);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(62,207,142,.5);}50%{opacity:.7;box-shadow:0 0 0 5px rgba(62,207,142,0);}}
+
+.hero h1{font-family:'Geist',sans-serif;font-size:clamp(44px,6.5vw,82px);font-weight:800;line-height:1.02;letter-spacing:-3px;max-width:880px;margin-bottom:24px;animation:fadeUp .6s .1s both;}
+.h1-plain{display:block;color:var(--text);}
+.h1-grad{display:block;background:linear-gradient(120deg,var(--acc) 0%,#ff8c00 40%,var(--acc2) 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.h1-outline{display:block;-webkit-text-stroke:1.5px rgba(255,255,255,.2);color:transparent;}
+
+.hero-desc{font-size:clamp(15px,1.8vw,18px);color:var(--mid);max-width:500px;margin:0 auto 40px;line-height:1.75;animation:fadeUp .6s .2s both;}
+
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s .3s both;}
+.btn-hero-main{background:var(--acc);color:#07060a;padding:15px 36px;border-radius:12px;font-weight:700;font-size:16px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:10px;position:relative;overflow:hidden;}
+.btn-hero-main::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:translateX(-100%);transition:transform .4s;}
+.btn-hero-main:hover::before{transform:translateX(100%);}
+.btn-hero-main:hover{background:#fbb800;transform:translateY(-2px);box-shadow:0 16px 40px rgba(240,165,0,.3);}
+.btn-hero-ghost{background:rgba(255,255,255,.04);color:var(--text);padding:15px 32px;border-radius:12px;font-weight:600;font-size:16px;text-decoration:none;border:1px solid var(--bd);transition:all .2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-hero-ghost:hover{background:rgba(255,255,255,.07);border-color:var(--bd2);transform:translateY(-2px);}
+
+.hero-trust{display:flex;align-items:center;justify-content:center;gap:24px;margin-top:20px;flex-wrap:wrap;animation:fadeUp .6s .4s both;}
+.trust-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim);}
+.trust-item::before{content:'✓';color:var(--acc3);font-weight:700;}
+
+/* FLOATING BADGES on hero */
+.hero-badges{position:absolute;width:100%;height:100%;pointer-events:none;top:0;left:0;}
+.hb{position:absolute;background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:600;white-space:nowrap;animation:floatBadge 6s ease-in-out infinite;}
+.hb1{top:22%;left:6%;animation-delay:0s;}
+.hb2{top:30%;right:5%;animation-delay:-2s;}
+.hb3{bottom:28%;left:4%;animation-delay:-4s;}
+.hb4{bottom:20%;right:6%;animation-delay:-1s;}
+@media(max-width:960px){.hb{font-size:10px;padding:6px 10px;border-radius:8px;}
+.hb1{top:14%;left:0%;}.hb2{top:22%;right:0%;}.hb3{bottom:24%;left:0%;}.hb4{bottom:16%;right:0%;}}
+@keyframes floatBadge{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.hb-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;}
+
+/* TICKER */
+.ticker-outer{border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:14px 0;overflow:hidden;position:relative;margin-top:72px;}
+.ticker-outer::before,.ticker-outer::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;}
+.ticker-outer::before{left:0;background:linear-gradient(90deg,var(--bg),transparent);}
+.ticker-outer::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent);}
+.ticker{display:flex;gap:0;animation:scrollLeft 28s linear infinite;width:max-content;}
+@keyframes scrollLeft{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.t-item{display:flex;align-items:center;gap:12px;padding:0 28px;font-size:13px;color:var(--mid);white-space:nowrap;}
+.t-item strong{color:var(--text);font-weight:600;}
+.t-sep{color:var(--bd2);font-size:20px;line-height:1;}
+
+/* NUMBERS */
+.numbers{max-width:1100px;margin:0 auto;padding:80px 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);}
+.num-card{background:var(--bg);padding:32px 28px;position:relative;}
+.num-card::after{content:'';position:absolute;bottom:0;left:28px;right:28px;height:1px;background:transparent;}
+.num-val{font-family:'Geist',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);margin-bottom:6px;}
+.num-val span{color:var(--acc);}
+.num-label{font-size:14px;color:var(--mid);}
+.num-sub{font-size:11px;color:var(--dim);margin-top:4px;}
+
+/* SECTION */
+.sec{padding:96px 40px;max-width:1100px;margin:0 auto;}
+.sec-chip{display:inline-block;background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.15);color:var(--acc);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 12px;border-radius:99px;margin-bottom:14px;}
+.sec-h{font-family:'Geist',sans-serif;font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1.5px;line-height:1.08;margin-bottom:14px;}
+.sec-p{font-size:16px;color:var(--mid);max-width:460px;line-height:1.75;}
+
+/* FEATURE GRID BENTO */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(180px,auto);gap:12px;margin-top:52px;}
+.bc{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:26px;overflow:hidden;position:relative;transition:border-color .3s,transform .25s;}
+.bc:hover{border-color:rgba(240,165,0,.25);transform:translateY(-5px);box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.bc::after{content:'';position:absolute;inset:0;border-radius:18px;background:radial-gradient(ellipse at 0% 0%,rgba(240,165,0,.04),transparent 60%);opacity:0;transition:opacity .3s;}
+.bc:hover::after{opacity:1;}
+.bc::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:18px 18px 0 0;opacity:0;transition:opacity .3s;z-index:1;}
+.bc:hover::before{opacity:1;}
+.bc-6{grid-column:span 6;}
+.bc-4{grid-column:span 4;}
+.bc-8{grid-column:span 8;}
+.bc-12{grid-column:span 12;}
+.bc-icon{font-size:28px;margin-bottom:14px;}
+.bc-title{font-family:'Geist',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;}
+.bc-desc{font-size:13px;color:var(--mid);line-height:1.65;}
+.bc-tag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 10px;border-radius:99px;margin-bottom:12px;}
+.bc-tag.new{background:rgba(62,207,142,.1);color:var(--acc3);border:1px solid rgba(62,207,142,.2);}
+.bc-tag.soon{background:rgba(192,132,252,.08);color:var(--acc2);border:1px solid rgba(192,132,252,.15);}
+
+/* Bento mini components */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:16px;}
+.ws-day{background:var(--s3);border-radius:9px;padding:7px 4px;text-align:center;border:1px solid transparent;}
+.ws-day.on{background:rgba(240,165,0,.1);border-color:rgba(240,165,0,.2);}
+.ws-dn{font-size:8px;color:var(--dim);font-weight:700;text-transform:uppercase;}
+.ws-num{font-size:18px;font-weight:900;font-family:'Geist',sans-serif;margin-top:1px;color:var(--dim);}
+.ws-day.on .ws-num{color:var(--acc);}
+.ws-task{margin-top:4px;border-radius:4px;padding:3px 0;font-size:9px;font-weight:700;text-align:center;}
+.ws-task.s{background:rgba(96,180,255,.15);color:var(--acc4);}
+.ws-task.k{background:rgba(192,132,252,.15);color:var(--acc2);}
+.ws-task.d{background:rgba(240,165,0,.15);color:var(--acc);}
+
+.chat-msgs{margin-top:14px;display:flex;flex-direction:column;gap:7px;}
+.cm{padding:8px 12px;border-radius:10px;font-size:12px;max-width:85%;}
+.cm.r{background:var(--s3);border-bottom-left-radius:3px;}
+.cm.l{background:rgba(240,165,0,.12);color:var(--acc);align-self:flex-end;border-bottom-right-radius:3px;}
+.cm-time{font-size:9px;color:var(--dim);margin-top:2px;text-align:right;}
+
+.net-boxes{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.net-box{background:var(--s3);border-radius:9px;padding:10px 14px;text-align:center;min-width:64px;}
+.net-val{font-family:'Geist',sans-serif;font-size:22px;font-weight:800;line-height:1;}
+.net-lbl{font-size:10px;color:var(--dim);margin-top:3px;text-transform:uppercase;letter-spacing:.3px;}
+.net-trend{font-size:10px;margin-top:2px;font-weight:700;}
+.net-trend.up{color:var(--acc3);}
+.net-trend.dn{color:var(--red);}
+
+.pdf-preview{margin-top:14px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px;overflow:hidden;}
+.pdf-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--acc);padding-bottom:8px;margin-bottom:10px;}
+.pdf-brand{font-family:'Geist',sans-serif;font-size:12px;font-weight:800;color:var(--acc);}
+.pdf-stu{font-size:10px;font-weight:700;color:var(--text);}
+.pdf-bars{display:flex;align-items:flex-end;gap:4px;height:40px;}
+.pdf-bar{flex:1;border-radius:3px 3px 0 0;background:#f0a500;opacity:.7;}
+.pdf-bar:last-child{opacity:1;}
+.pdf-bar:nth-child(3){background:#3ecf8e;opacity:.8;}
+
+.speed-cards{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.sp-card{background:var(--s3);border-radius:9px;padding:9px 12px;font-size:12px;}
+.sp-ders{color:var(--mid);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
+.sp-val{font-family:'Geist',sans-serif;font-size:20px;font-weight:800;color:var(--acc);}
+.sp-unit{font-size:10px;color:var(--dim);}
+.sp-suggest{background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);border-radius:9px;padding:9px 12px;font-size:12px;}
+.sp-sug-lbl{color:var(--mid);font-size:10px;margin-bottom:2px;}
+.sp-sug-val{font-family:'Geist',sans-serif;font-size:20px;font-weight:800;color:var(--acc);}
+
+/* SOCIAL PROOF */
+.testi-sec{background:var(--s1);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:88px 40px;}
+.testi-inner{max-width:1100px;margin:0 auto;}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:52px;}
+.tc{background:var(--bg);border:1px solid var(--bd);border-radius:18px;padding:26px;transition:all .25s;position:relative;overflow:hidden;}
+.tc::before{content:'"';position:absolute;top:-20px;right:16px;font-family:'Geist',sans-serif;font-size:120px;color:rgba(240,165,0,.05);font-weight:800;line-height:1;}
+.tc:hover{border-color:var(--bd2);transform:translateY(-3px);}
+.tc-stars{display:flex;gap:3px;margin-bottom:16px;}
+.tc-star{color:var(--acc);font-size:14px;}
+.tc-text{font-size:14px;color:var(--mid);line-height:1.75;margin-bottom:20px;}
+.tc-author{display:flex;align-items:center;gap:12px;}
+.tc-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#07060a;flex-shrink:0;}
+.tc-name{font-size:14px;font-weight:700;}
+.tc-role{font-size:11px;color:var(--dim);margin-top:1px;}
+.tc-verified{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--acc3);margin-top:3px;}
+
+/* HOW IT WORKS - Timeline */
+.how-sec{padding:96px 40px;max-width:1100px;margin:0 auto;}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);margin-top:56px;position:relative;gap:0;}
+.timeline::before{content:'';position:absolute;top:30px;left:calc(12.5%);right:calc(12.5%);height:1px;background:linear-gradient(90deg,transparent,var(--bd),var(--bd),transparent);z-index:0;}
+.tl-step{padding:0 20px;text-align:center;position:relative;}
+.tl-num{width:60px;height:60px;border-radius:50%;background:var(--s2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;position:relative;z-index:1;transition:all .3s;}
+.tl-num.active{background:rgba(240,165,0,.1);border-color:rgba(240,165,0,.3);}
+.tl-num-inner{font-family:'Geist',sans-serif;font-size:20px;font-weight:800;color:var(--acc);}
+.tl-title{font-family:'Geist',sans-serif;font-size:15px;font-weight:700;margin-bottom:10px;}
+.tl-desc{font-size:13px;color:var(--mid);line-height:1.65;}
+
+/* PRICING */
+.pricing-sec{padding:96px 40px;background:var(--s1);border-top:1px solid var(--bd);}
+.pricing-inner{max-width:1000px;margin:0 auto;}
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:14px;margin:28px 0 40px;}
+.bt-label{font-size:14px;color:var(--mid);}
+.bt-track{width:52px;height:28px;background:var(--s3);border-radius:99px;cursor:pointer;position:relative;border:1px solid var(--bd);transition:background .2s;}
+.bt-track.on{background:var(--acc);}
+.bt-thumb{width:22px;height:22px;border-radius:50%;background:var(--text);position:absolute;top:2px;left:3px;transition:transform .2s;}
+.bt-track.on .bt-thumb{transform:translateX(24px);}
+.bt-save{background:rgba(62,207,142,.1);color:var(--acc3);border:1px solid rgba(62,207,142,.2);border-radius:99px;padding:3px 12px;font-size:11px;font-weight:700;}
+.pg{display:grid;grid-template-columns:1fr 1.06fr 1fr;gap:12px;align-items:start;}
+.pc{background:var(--bg);border:1px solid var(--bd);border-radius:20px;padding:32px;position:relative;transition:transform .25s;}
+.pc:hover{transform:translateY(-4px);}
+.pc.feat{background:linear-gradient(150deg,rgba(240,165,0,.05),rgba(232,98,42,.02));border-color:rgba(240,165,0,.22);}
+.pc-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--acc);color:#07060a;font-size:11px;font-weight:800;padding:4px 18px;border-radius:99px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.pc-plan{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.pc-price{margin-bottom:5px;}
+.pc-cur{font-size:20px;font-weight:600;color:var(--mid);vertical-align:top;margin-top:8px;display:inline-block;}
+.pc-num{font-family:'Geist',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;color:var(--text);}
+.pc-per{font-size:14px;color:var(--mid);}
+.pc-period{font-size:12px;color:var(--dim);margin-bottom:24px;}
+.pc-sep{height:1px;background:var(--bd);margin:20px 0;}
+.pc-list{list-style:none;display:flex;flex-direction:column;gap:11px;margin-bottom:26px;}
+.pc-list li{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--mid);}
+.pc-list li .ok{color:var(--acc3);font-size:11px;margin-top:2px;flex-shrink:0;font-weight:700;}
+.pc-list li .no{color:var(--dim);font-size:11px;margin-top:2px;flex-shrink:0;}
+.pc-list li.dim-li{color:var(--dim);}
+.pc-btn{width:100%;padding:13px;border-radius:11px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.pc-btn.main{background:var(--acc);color:#07060a;}
+.pc-btn.main:hover{background:#fbb800;transform:translateY(-1px);}
+.pc-btn.out{background:transparent;color:var(--mid);border:1px solid var(--bd);}
+.pc-btn.out:hover{color:var(--text);border-color:var(--bd2);}
+
+/* URGENCY BANNER */
+.urgency{background:linear-gradient(90deg,rgba(240,165,0,.08),rgba(232,98,42,.06),rgba(240,165,0,.08));border:1px solid rgba(240,165,0,.2);border-radius:14px;padding:16px 24px;display:flex;align-items:center;justify-content:center;gap:14px;margin:32px 0;flex-wrap:wrap;text-align:center;}
+.urgency-fire{font-size:20px;}
+.urgency-text{font-size:14px;font-weight:600;color:var(--text);}
+.urgency-counter{font-family:'Geist',sans-serif;font-size:20px;font-weight:800;color:var(--acc);}
+
+/* SOCIAL PROOF NUMBERS */
+.sp-mini{display:flex;align-items:center;gap:24px;justify-content:center;flex-wrap:wrap;margin:20px 0;}
+.sp-mini-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--mid);}
+.sp-mini-num{font-family:'Geist',sans-serif;font-size:16px;font-weight:800;color:var(--text);}
+.sp-mini-avs{display:flex;}
+.sp-mini-av{width:22px;height:22px;border-radius:50%;border:2px solid var(--bg);margin-left:-6px;}
+.sp-mini-av:first-child{margin-left:0;}
+
+/* FAQ */
+.faq-sec{padding:80px 40px;max-width:740px;margin:0 auto;}
+.faq-item{border-bottom:1px solid var(--bd);}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 0;cursor:pointer;font-size:15px;font-weight:600;transition:color .2s;gap:12px;user-select:none;}
+.faq-q:hover{color:var(--acc);}
+.faq-arr{font-size:18px;color:var(--mid);transition:transform .25s;flex-shrink:0;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .3s;font-size:14px;color:var(--mid);line-height:1.75;}
+.faq-item.open .faq-a{max-height:300px;padding-bottom:18px;}
+.faq-item.open .faq-arr{transform:rotate(180deg);}
+
+/* REGISTER */
+.reg-sec{padding:96px 40px;background:var(--s1);border-top:1px solid var(--bd);}
+.reg-inner{max-width:1060px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start;}
+.reg-left .sec-h{font-size:clamp(26px,3.5vw,42px);}
+.reg-left p{font-size:15px;color:var(--mid);line-height:1.75;margin-top:14px;max-width:380px;}
+.perks{margin-top:28px;display:flex;flex-direction:column;gap:12px;}
+.perk{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--mid);}
+.perk-ico{width:28px;height:28px;border-radius:8px;background:rgba(240,165,0,.1);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.reg-social-proof{margin-top:32px;padding:16px 18px;background:var(--bg);border:1px solid var(--bd);border-radius:12px;}
+.rsp-label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.rsp-avs{display:flex;align-items:center;gap:10px;}
+.rsp-av{width:32px;height:32px;border-radius:50%;border:2px solid var(--s1);margin-left:-8px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#07060a;}
+.rsp-av:first-child{margin-left:0;}
+.rsp-text{font-size:13px;color:var(--mid);}
+.rsp-text strong{color:var(--text);}
+.form-card{background:var(--bg);border:1px solid var(--bd);border-radius:22px;padding:34px;}
+.form-h{font-family:'Geist',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;}
+.form-sub{font-size:13px;color:var(--mid);margin-bottom:24px;}
+.ff{margin-bottom:14px;}
+.ff label{display:block;font-size:10px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.ff input,.ff select{width:100%;background:var(--s2);border:1.5px solid var(--bd);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;color:var(--text);outline:none;transition:border .15s,box-shadow .15s;}
+.ff input:focus,.ff select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(240,165,0,.07);}
+.ff input::placeholder{color:var(--dim);}
+.ff-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.plan-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.plan-pill{flex:1;padding:10px 8px;border:1.5px solid var(--bd);border-radius:10px;text-align:center;cursor:pointer;transition:all .15s;min-width:80px;}
+.plan-pill:hover{border-color:var(--bd2);}
+.plan-pill.sel{background:rgba(240,165,0,.08);border-color:rgba(240,165,0,.3);}
+.plan-pill .pp-name{font-size:12px;font-weight:700;color:var(--text);}
+.plan-pill .pp-price{font-size:10px;color:var(--dim);margin-top:2px;}
+.plan-pill.sel .pp-price{color:var(--acc);}
+.f-submit{width:100%;background:var(--acc);color:#07060a;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:6px;position:relative;overflow:hidden;}
+.f-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:translateX(-100%);transition:transform .5s;}
+.f-submit:hover::before{transform:translateX(100%);}
+.f-submit:hover{background:#fbb800;transform:translateY(-1px);box-shadow:0 10px 30px rgba(240,165,0,.25);}
+.f-note{font-size:11px;color:var(--dim);text-align:center;margin-top:10px;line-height:1.6;}
+.f-note a{color:var(--acc);text-decoration:none;}
+.success-box{display:none;padding:32px;text-align:center;}
+.suc-ico{font-size:52px;margin-bottom:12px;}
+.suc-title{font-family:'Geist',sans-serif;font-size:22px;font-weight:800;color:var(--acc3);margin-bottom:8px;}
+.suc-sub{font-size:14px;color:var(--mid);line-height:1.7;}
+
+/* FOOTER */
+footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
+.footer-grid{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
+.fl-logo{font-family:'Geist',sans-serif;font-size:19px;font-weight:800;margin-bottom:12px;}
+.fl-logo b{color:var(--acc);}
+.fl-tagline{font-size:13px;color:var(--dim);max-width:220px;line-height:1.65;margin-bottom:20px;}
+.footer-col-h{font-size:11px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.8px;margin-bottom:16px;}
+.footer-links{display:flex;flex-direction:column;gap:10px;}
+.footer-links a{font-size:13px;color:var(--dim);text-decoration:none;transition:color .15s;}
+.footer-links a:hover{color:var(--text);}
+.footer-bottom{max-width:1100px;margin:0 auto;border-top:1px solid var(--bd);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
+.footer-copy{font-size:12px;color:var(--dim);}
+.footer-made{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.12);color:var(--acc);font-size:11px;font-weight:700;padding:4px 14px;border-radius:99px;}
+
+/* SCROLL ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .65s ease,transform .65s ease;}
+.reveal.v{opacity:1;transform:none;}
+.d1{transition-delay:.08s;}.d2{transition-delay:.16s;}.d3{transition-delay:.24s;}.d4{transition-delay:.32s;}
+
+/* PARALLAX CLASSES */
+.para{will-change:transform;}
+
+/* RESPONSIVE */
+.theme-toggle{background:var(--s2);border:1px solid var(--bd);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.theme-toggle:hover{border-color:var(--bd2);}
+[data-theme="light"]{--bg:#f5f3ee;--s1:#ffffff;--s2:#f0ede8;--s3:#e8e4dd;--bd:#ddd8d0;--bd2:#ccc8c0;--text:#1a1714;--mid:#5a5460;--dim:#9a9088;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:99px;transition:all .2s;display:block;}
+.mobile-menu{display:none;position:fixed;top:58px;left:0;right:0;background:rgba(7,6,10,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:20px 24px;z-index:499;flex-direction:column;gap:4px;}
+.mobile-menu a{color:var(--mid);text-decoration:none;font-size:15px;font-weight:500;padding:11px 0;border-bottom:1px solid var(--bd);display:block;transition:color .15s;}
+.mobile-menu a:hover{color:var(--text);}
+.mobile-menu a:last-child{border-bottom:none;}
+.mobile-menu.open{display:flex;}
+@media(max-width:960px){
+  nav{padding:0 24px;}
+  .hamburger{display:flex;}
+  .nav-center{display:none;}
+  .hero h1{letter-spacing:-2px;}
+  
+  .numbers{grid-template-columns:1fr 1fr;gap:1px;}
+  .bento{grid-template-columns:1fr 1fr;}
+  .bc-6,.bc-4,.bc-8,.bc-12{grid-column:span 2;}
+  .testi-grid{grid-template-columns:1fr;}
+  .timeline{grid-template-columns:1fr 1fr;gap:24px;}
+  .timeline::before{display:none;}
+  .pg{grid-template-columns:1fr;}
+  .reg-inner{grid-template-columns:1fr;gap:36px;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:24px;}
+  .sec{padding:60px 20px;}
+  .how-sec,.faq-sec{padding:60px 20px;}
+}
+@media(max-width:600px){
+  .numbers{grid-template-columns:1fr 1fr;}
+  .bento{grid-template-columns:1fr;}
+  .bc-6,.bc-4,.bc-8,.bc-12{grid-column:span 1;}
+}
+
+/* Role selector & features tabs */
+.features-tabs {
+  display: inline-flex;
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: 99px;
+  padding: 4px;
+  gap: 4px;
+  margin: 32px auto 40px;
+  position: relative;
+  z-index: 10;
+}
+.ft-tab {
+  background: transparent;
+  border: none;
+  color: var(--mid);
+  padding: 10px 24px;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ft-tab:hover {
+  color: var(--text);
+}
+.ft-tab.active {
+  background: var(--acc);
+  color: #07060a;
+  box-shadow: 0 4px 14px rgba(240, 165, 0, 0.25);
+}
+.bento-group {
+  display: none !important;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.bento-group.active {
+  display: grid !important;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+/* Role selector for registration */
+.role-pills {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  border-radius: 12px;
+  padding: 4px;
+}
+.role-pill {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--mid);
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.role-pill:hover {
+  color: var(--text);
+}
+.role-pill.active {
+  background: var(--acc);
+  color: #07060a;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">ROSTRUM<b>AKADEMİ</b></a>
+  <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menü"><span></span><span></span><span></span></button>
+  <div class="nav-center">
+    <a href="#features">Özellikler</a>
+    <a href="#how">Nasıl Çalışır</a>
+    <a href="#pricing">Fiyatlar</a>
+    <a href="#faq">SSS</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Tema değiştir"><span id="themeIcon">☀️</span></button><a href="app.html" class="btn-ghost-sm">Giriş Yap</a>
+    <a href="/app.html" class="btn-acc-sm">Ücretsiz Başla →</a>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features" onclick="closeMobileMenu()">Özellikler</a>
+  <a href="#how" onclick="closeMobileMenu()">Nasıl Çalışır</a>
+  <a href="#pricing" onclick="closeMobileMenu()">Fiyatlar</a>
+  <a href="#faq" onclick="closeMobileMenu()">SSS</a>
+  <a href="#register" onclick="closeMobileMenu()" style="color:var(--acc);font-weight:700">Ücretsiz Başla →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-mesh">
+    <div class="mesh-orb"></div>
+    <div class="mesh-orb"></div>
+    <div class="mesh-orb"></div>
+  </div>
+  <div class="hero-grid-lines"></div>
+
+  <!-- Floating badges -->
+  <div class="hero-badges">
+    <div class="hb hb1"><span class="hb-dot" style="background:#3ecf8e"></span>Arda %78 tamamladı ✓</div>
+    <div class="hb hb2"><span class="hb-dot" style="background:#f0a500"></span>47.5 net · +4.2 artış 📈</div>
+    <div class="hb hb3"><span class="hb-dot" style="background:#60b4ff"></span>14:00 Meet randevusu 📅</div>
+    <div class="hb hb4"><span class="hb-dot" style="background:#c084fc"></span>PDF rapor oluşturuldu 📄</div>
+  </div>
+
+  <div class="hero-eyebrow">
+    <div class="live-dot"></div>
+    Zaman Kazandıran Eğitim Yönetim Sistemi
+  </div>
+
+  <h1>
+    <span class="h1-plain">Eğitim Yönetiminde</span>
+    <span class="h1-grad">Zaman Kazandıran</span>
+    <span class="h1-outline">Yeni Nesil Sistem</span>
+  </h1>
+
+  <p class="hero-desc">
+    Öğrenciler için AI ders asistanı, koçlar için akıllı planlama ve kurumlar için merkezi takip paneli. Hepsi tek bir premium platformda.
+  </p>
+
+  <div class="hero-cta">
+    <a href="#register" class="btn-hero-main">
+      14 Gün Ücretsiz Dene
+      <span>→</span>
+    </a>
+    <a href="#features" class="btn-hero-ghost">
+      <span>▶</span>
+      Özellikleri Gör
+    </a>
+  </div>
+
+  <div class="hero-trust">
+    <div class="trust-item">Kredi kartı gerekmez</div>
+    <div class="trust-item">Kurulum yok</div>
+    <div class="trust-item">5 dakikada başla</div>
+    <div class="trust-item">İstediğinde iptal et</div>
+    <div class="trust-item">Veriler şifreli &amp; güvende</div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker-outer" style="width:100%">
+    <div class="ticker">
+      <div class="t-item"><span class="t-sep">·</span><strong>Haftalık Program</strong> oluşturun</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>TYT / AYT</strong> deneme takibi</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Anlık mesajlaşma</strong></div>
+      <div class="t-item"><span class="t-sep">·</span><strong>PDF Rapor</strong> oluşturun</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>YouTube playlist</strong> entegrasyonu</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Google Meet & Zoom</strong> linki</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Akıllı süre</strong> tahmini</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Öğrenci hız</strong> analizi</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Haftalık Program</strong> oluşturun</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>TYT / AYT</strong> deneme takibi</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Anlık mesajlaşma</strong></div>
+      <div class="t-item"><span class="t-sep">·</span><strong>PDF Rapor</strong> oluşturun</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>YouTube playlist</strong> entegrasyonu</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Google Meet & Zoom</strong> linki</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Akıllı süre</strong> tahmini</div>
+      <div class="t-item"><span class="t-sep">·</span><strong>Öğrenci hız</strong> analizi</div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMBERS -->
+<div class="numbers reveal">
+  <div class="num-card">
+    <div class="num-val"><span data-count="2400">0</span>+</div>
+    <div class="num-label">Aktif Öğrenci</div>
+    <div class="num-sub">Platforma kayıtlı</div>
+  </div>
+  <div class="num-card">
+    <div class="num-val"><span data-count="180">0</span>+</div>
+    <div class="num-label">Koç & Eğitmen</div>
+    <div class="num-sub">Türkiye geneli</div>
+  </div>
+  <div class="num-card">
+    <div class="num-val"><span data-count="47000">0</span>+</div>
+    <div class="num-label">Oluşturulan Görev</div>
+    <div class="num-sub">Bu ay</div>
+  </div>
+  <div class="num-card">
+    <div class="num-val"><span data-count="98">0</span><span>%</span></div>
+    <div class="num-label">Kullanıcı Memnuniyeti</div>
+    <div class="num-sub">Son anket sonucu</div>
+  </div>
+</div>
+
+<!-- LOGOS -->
+<div style="padding:40px 40px 0;border-top:1px solid var(--bd)">
+  <div style="max-width:1100px;margin:0 auto">
+    <div class="reveal" style="text-align:center;font-size:12px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px">Türkiye genelinde koçlar güveniyor</div>
+    <div class="reveal" style="display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;opacity:.45;filter:grayscale(1)">
+      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">BAŞARI AKADEMİ</div>
+      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">YEŞİL KOÇ</div>
+      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">HEDEF MERKEZ</div>
+      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">ZIRVE EĞİTİM</div>
+      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">ATLAS KOÇ</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES BENTO -->
+<section class="sec" id="features">
+  <div class="reveal">
+    <div class="sec-chip">Özellikler</div>
+    <div class="sec-h" style="text-align:center;margin-top:10px">Eğitimi basitleştiren<br>her araç bir arada</div>
+    <div class="sec-p" style="margin:0 auto;text-align:center">Gerçek eğitim ve koçluk ihtiyaçları için tasarlandı. Rolünüze özel araçlarla çalışın.</div>
+  </div>
+  
+  <div style="text-align:center">
+    <div class="features-tabs">
+      <button class="ft-tab active" id="ft-coach" onclick="switchFeatures('coach')">👨‍🏫 Koçlar İçin</button>
+      <button class="ft-tab" id="ft-student" onclick="switchFeatures('student')">🎓 Öğrenciler İçin</button>
+      <button class="ft-tab" id="ft-institution" onclick="switchFeatures('institution')">🏢 Kurumlar İçin</button>
+    </div>
+  </div>
+
+  <!-- BENTO - KOÇLAR İÇİN -->
+  <div class="bento bento-group active" id="bento-coach">
+    <!-- Haftalık Program - 8 col -->
+    <div class="bc bc-8">
+      <div class="bc-icon">📋</div>
+      <div class="bc-title">Haftalık Program</div>
+      <div class="bc-desc">Öğrenci bazında kişiselleştirilmiş programlar. Konu anlatımı, soru bankası, alan denemesi — gün gün planlayın.</div>
+      <div class="week-strip">
+        <div class="ws-day"><div class="ws-dn">PAZ</div><div class="ws-num">25</div></div>
+        <div class="ws-day"><div class="ws-dn">SAL</div><div class="ws-num">26</div></div>
+        <div class="ws-day on"><div class="ws-dn">ÇAR</div><div class="ws-num">27</div><div class="ws-task k">Konu</div></div>
+        <div class="ws-day on"><div class="ws-dn">PER</div><div class="ws-num">28</div><div class="ws-task s">Soru</div><div class="ws-task d">Deneme</div></div>
+        <div class="ws-day on"><div class="ws-dn">CUM</div><div class="ws-num">29</div><div class="ws-task k">Konu</div></div>
+        <div class="ws-day"><div class="ws-dn">CMT</div><div class="ws-num">30</div></div>
+        <div class="ws-day"><div class="ws-dn">PAZ</div><div class="ws-num">31</div></div>
+      </div>
+    </div>
+
+    <!-- Mesajlaşma - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">💬</div>
+      <div class="bc-title">Anlık Mesajlaşma</div>
+      <div class="bc-desc">WebSocket ile gerçek zamanlı chat. Öğrenci ve velilerinizle hızlı, kesintisiz iletişim kurun.</div>
+      <div class="chat-msgs">
+        <div class="cm r">Hocam bu konuyu anlamadım 😕</div>
+        <div class="cm l">Şimdi saat 15:00'da Meet açalım!</div>
+      </div>
+    </div>
+
+    <!-- Deneme Takibi - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">📊</div>
+      <div class="bc-title">Deneme Takibi</div>
+      <div class="bc-desc">TYT/AYT net girişi, ders bazında analiz. İlerlemeyi gelişim grafikleriyle gözlemleyin.</div>
+      <div class="net-boxes">
+        <div class="net-box">
+          <div class="net-val" style="color:var(--acc)">47.5</div>
+          <div class="net-lbl">TYT</div>
+          <div class="net-trend up">▲ +4.2</div>
+        </div>
+        <div class="net-box">
+          <div class="net-val" style="color:var(--acc4)">32.1</div>
+          <div class="net-lbl">AYT</div>
+          <div class="net-trend up">▲ +2.8</div>
+        </div>
+        <div class="net-box">
+          <div class="net-val" style="color:var(--acc3)">%78</div>
+          <div class="net-lbl">Hedef</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PDF - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">📄</div>
+      <div class="bc-title">PDF Raporlar</div>
+      <div class="bc-desc">Markalı, profesyonel gelişim raporları. Velilere tek tıkla şık rapor dosyaları iletin.</div>
+      <div class="pdf-preview">
+        <div class="pdf-header">
+          <div class="pdf-brand">Rostrum Akademi</div>
+          <div class="pdf-stu">Arda · Mayıs 2026</div>
+        </div>
+        <div class="pdf-bars">
+          <div class="pdf-bar" style="height:40%"></div>
+          <div class="pdf-bar" style="height:55%"></div>
+          <div class="pdf-bar" style="height:50%"></div>
+          <div class="pdf-bar" style="height:68%"></div>
+          <div class="pdf-bar" style="height:78%"></div>
+          <div class="pdf-bar" style="height:92%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Akıllı Süre - 8 col -->
+    <div class="bc bc-8">
+      <div class="bc-tag new">Akıllı Özellik</div>
+      <div class="bc-icon">⚡</div>
+      <div class="bc-title">Akıllı Süre Tahmini</div>
+      <div class="bc-desc">Öğrencinin ders bazında çözüm hızını tanımlayın. Görev eklerken otomatik süre hesabı yapılır.</div>
+      <div class="speed-cards">
+        <div class="sp-card"><div class="sp-ders">Matematik</div><div><span class="sp-val">90</span><span class="sp-unit"> sn/soru</span></div></div>
+        <div class="sp-card"><div class="sp-ders">Fizik</div><div><span class="sp-val">75</span><span class="sp-unit"> sn/soru</span></div></div>
+        <div class="sp-card"><div class="sp-ders">Kimya</div><div><span class="sp-val">60</span><span class="sp-unit"> sn/soru</span></div></div>
+        <div class="sp-suggest"><div class="sp-sug-lbl">47 soru × 90 sn =</div><div><span class="sp-sug-val">71</span><span class="sp-unit"> dk önerilen</span></div></div>
+      </div>
+    </div>
+
+    <!-- YouTube - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-tag new">Entegrasyon</div>
+      <div class="bc-icon">▶️</div>
+      <div class="bc-title">YouTube Playlist</div>
+      <div class="bc-desc">URL yapıştır, video listesi otomatik gelsin. Oynatma hızına göre izleme sürelerini hesaplayın.</div>
+    </div>
+
+    <!-- Meet/Zoom - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">📅</div>
+      <div class="bc-title">Meet & Zoom Randevu</div>
+      <div class="bc-desc">Tek tıkla Google Meet veya Zoom linki oluşturun. Görüşme takvimini entegre edin.</div>
+    </div>
+
+    <!-- Güvenlik - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">🔒</div>
+      <div class="bc-title">Veri Güvenliği</div>
+      <div class="bc-desc">Her koç yalnızca kendi öğrencilerini görür. Tamamen izole ve güvenli workspace altyapısı.</div>
+    </div>
+  </div>
+
+  <!-- BENTO - ÖĞRENCİLER İÇİN -->
+  <div class="bento bento-group" id="bento-student" style="display:none">
+    <!-- Öğrenci Portalı - 8 col -->
+    <div class="bc bc-8">
+      <div class="bc-icon">🎓</div>
+      <div class="bc-title">Kişiselleştirilmiş Öğrenci Portalı</div>
+      <div class="bc-desc">Size özel çalışma odası. Koçunuzun atadığı günlük hedefleri inceleyin ve ilerlemenizi işaretleyin.</div>
+      <div class="week-strip">
+        <div class="ws-day on"><div class="ws-dn">PAZ</div><div class="ws-num">25</div><div class="ws-task k" style="background:rgba(62,207,142,.15);color:var(--acc3)">✓ Tamam</div></div>
+        <div class="ws-day on"><div class="ws-dn">SAL</div><div class="ws-num">26</div><div class="ws-task s" style="background:rgba(62,207,142,.15);color:var(--acc3)">✓ 40 Soru</div></div>
+        <div class="ws-day on"><div class="ws-dn">ÇAR</div><div class="ws-num">27</div><div class="ws-task d" style="background:rgba(62,207,142,.15);color:var(--acc3)">✓ Çözüldü</div></div>
+        <div class="ws-day"><div class="ws-dn">PER</div><div class="ws-num">28</div></div>
+        <div class="ws-day"><div class="ws-dn">CUM</div><div class="ws-num">29</div></div>
+        <div class="ws-day"><div class="ws-dn">CMT</div><div class="ws-num">30</div></div>
+        <div class="ws-day"><div class="ws-dn">PAZ</div><div class="ws-num">31</div></div>
+      </div>
+    </div>
+
+    <!-- Sokratik AI - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-tag new">Akıllı Asistan</div>
+      <div class="bc-icon">🤖</div>
+      <div class="bc-title">Sokratik AI Ders Asistanı</div>
+      <div class="bc-desc">Formülü doğrudan söylemek yerine, size adımlı ipuçları vererek doğru cevabı bulmanızı sağlar.</div>
+      <div class="chat-msgs">
+        <div class="cm r">Logaritma sorusunu çözemedim.</div>
+        <div class="cm l">Tabanları 10'a dönüştürmeyi dene, ilk adımı ne olur?</div>
+      </div>
+    </div>
+
+    <!-- Deneme Net - 8 col -->
+    <div class="bc bc-8">
+      <div class="bc-icon">📊</div>
+      <div class="bc-title">Net Analizleri & Gelişim</div>
+      <div class="bc-desc">TYT/AYT deneme netlerinizin yükselişini ve ders bazlı eksiklerinizi gösteren interaktif grafikler.</div>
+      <div class="net-boxes">
+        <div class="net-box"><div class="net-val" style="color:var(--acc)">85.4</div><div class="net-lbl">Son Net</div></div>
+        <div class="net-box"><div class="net-val" style="color:var(--acc3)">+12.5</div><div class="net-lbl">Aylık Artış</div></div>
+        <div class="net-box"><div class="net-val" style="color:var(--acc4)">92%</div><div class="net-lbl">Hedefe Yakınlık</div></div>
+      </div>
+    </div>
+
+    <!-- Süre - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">⏱️</div>
+      <div class="bc-title">Soru Kronometresi</div>
+      <div class="bc-desc">Her soru için harcadığınız süreyi ölçün, sınavda zaman yönetimi becerilerinizi geliştirin.</div>
+      <div style="margin-top:14px;background:var(--s2);padding:10px 14px;border-radius:9px;text-align:center;font-size:18px;font-weight:850;color:var(--acc4)">
+        01:24 <span style="font-size:10px;color:var(--mid)">/ Matematik</span>
+      </div>
+    </div>
+
+    <!-- Kaynak - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">📚</div>
+      <div class="bc-title">Kaynak Yönetimi</div>
+      <div class="bc-desc">Çözdüğünüz soru bankalarının ve kampların ilerleme durumunu yüzde olarak takip edin.</div>
+    </div>
+
+    <!-- Randevu - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">📆</div>
+      <div class="bc-title">Birebir Görüşmeler</div>
+      <div class="bc-desc">Koçunuzla olan online görüşmelerin günlerini görün, Google Meet linklerine tek tıkla katılın.</div>
+    </div>
+
+    <!-- Veli - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">👨‍👩‍👦</div>
+      <div class="bc-title">Veli Bilgilendirme</div>
+      <div class="bc-desc">Aileniz de haftalık tamamlama oranlarınızı ve deneme gelişimlerinizi veli ekranından izleyebilir.</div>
+    </div>
+  </div>
+
+  <!-- BENTO - KURUMLAR İÇİN -->
+  <div class="bento bento-group" id="bento-institution" style="display:none">
+    <!-- Merkezi Kurum - 8 col -->
+    <div class="bc bc-8">
+      <div class="bc-icon">🏢</div>
+      <div class="bc-title">Merkezi Kurum Paneli</div>
+      <div class="bc-desc">Okul veya dershanenizdeki tüm koçların, öğrencilerin aktifliklerini ve başarı analizlerini tek bir ekranda görün.</div>
+      <div class="week-strip" style="grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+        <div class="ws-day on" style="padding:12px;"><div class="ws-dn">KOÇ SAYISI</div><div class="ws-num" style="color:var(--acc)">12</div></div>
+        <div class="ws-day on" style="padding:12px;"><div class="ws-dn">ÖĞRENCİ SAYISI</div><div class="ws-num" style="color:var(--acc3)">185</div></div>
+        <div class="ws-day on" style="padding:12px;"><div class="ws-dn">BAŞARI ORANI</div><div class="ws-num" style="color:var(--acc4)">%89</div></div>
+      </div>
+    </div>
+
+    <!-- Eşleştirme - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">🤝</div>
+      <div class="bc-title">Akıllı Eşleştirme</div>
+      <div class="bc-desc">Landing sayfasından gelen eşleşme başvurularını koçların uzmanlık alanlarına göre saniyeler içinde atayın.</div>
+      <div style="margin-top:14px;background:var(--s3);padding:10px;border-radius:8px;font-size:11px;display:flex;justify-content:space-between;align-items:center;">
+        <span>Arda (Sayısal)</span>
+        <span style="color:var(--acc3);font-weight:700">✓ Koç Ata</span>
+      </div>
+    </div>
+
+    <!-- Markalama - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">🎨</div>
+      <div class="bc-title">Kurumsal Markalama (White Label)</div>
+      <div class="bc-desc">Kendi logonuzu yükleyin, platform renklerinizi belirleyin. Kurumunuzun adıyla öğrencilerinize hizmet verin.</div>
+    </div>
+
+    <!-- Analiz - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">📊</div>
+      <div class="bc-title">Sınıf & Grup Analizleri</div>
+      <div class="bc-desc">Sınıflarınızın ve şubelerinizin deneme sınavı ortalamalarını ve ödev tamamlama oranlarını karşılaştırın.</div>
+    </div>
+
+    <!-- Ölçek - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">🚀</div>
+      <div class="bc-title">Sınırsız Ölçeklenebilirlik</div>
+      <div class="bc-desc">Sınırsız şube, sınıf ve koç rolü tanımlayarak platformu devasa okul operasyonlarına uygun kullanın.</div>
+    </div>
+
+    <!-- Duyuru - 8 col -->
+    <div class="bc bc-8">
+      <div class="bc-icon">📣</div>
+      <div class="bc-title">Toplu Duyuru Sistemi</div>
+      <div class="bc-desc">Tüm koçlara, belirli sınıflara veya tüm velilere tek tıkla toplu SMS, e-posta veya uygulama içi bildirim gönderin.</div>
+      <div class="speed-cards" style="margin-top:10px;">
+        <div class="sp-card" style="font-size:12px;color:var(--mid)">Kurum Duyurusu: "15 Haziran TYT Genel Denemesi tüm şubelerimizde saat 10:00'da başlayacaktır."</div>
+      </div>
+    </div>
+
+    <!-- Finans - 4 col -->
+    <div class="bc bc-4">
+      <div class="bc-icon">💳</div>
+      <div class="bc-title">Ödeme & Lisans Takibi</div>
+      <div class="bc-desc">Koçlarınızın lisans sürelerini, ödemelerini ve faturalandırma detaylarını kurumsal panelinizden yönetin.</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- TESTIMONIALS -->
+<div class="testi-sec">
+  <div class="testi-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-chip" style="display:inline-block">Kullanıcı Yorumları</div>
+      <div class="sec-h" style="text-align:center;margin-top:10px">Koçlar ne diyor?</div>
+    </div>
+    <div class="testi-grid">
+      <div class="tc reveal">
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-text">"Öğrencilerimi takip etmek artık çok daha kolay. Haftalık programı oluşturmak ve deneme sonuçlarını girmek dakikalar alıyor. Çok zaman kazandırdı."</div>
+        <div class="tc-author">
+          <div class="tc-av" style="background:#f0a500">AY</div>
+          <div>
+            <div class="tc-name">Ayşe Yılmaz</div>
+            <div class="tc-role">TYT/AYT Koçu · İstanbul</div>
+            <div class="tc-verified">✓ Doğrulanmış Kullanıcı</div>
+          </div>
+        </div>
+      </div>
+      <div class="tc reveal d1">
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-text">"PDF rapor özelliği mükemmel. Her ay profesyonel raporlar gönderiyorum. Bu güven velilerde büyük etki yaratıyor. Artık vazgeçemiyorum."</div>
+        <div class="tc-author">
+          <div class="tc-av" style="background:#60b4ff">MK</div>
+          <div>
+            <div class="tc-name">Mehmet Kara</div>
+            <div class="tc-role">Matematik Koçu · Ankara</div>
+            <div class="tc-verified">✓ Doğrulanmış Kullanıcı</div>
+          </div>
+        </div>
+      </div>
+      <div class="tc reveal d2">
+        <div class="tc-stars">★★★★★</div>
+        <div class="tc-text">"Deneme takibi ve net gelişim grafikleri harika. Öğrenciye 'işte büyüme bölgen bu' diye gösterince motivasyonları artıyor. Tavsiye ederim."</div>
+        <div class="tc-author">
+          <div class="tc-av" style="background:#3ecf8e">ZD</div>
+          <div>
+            <div class="tc-name">Zeynep Demir</div>
+            <div class="tc-role">Fen Bilimleri Koçu · İzmir</div>
+            <div class="tc-verified">✓ Doğrulanmış Kullanıcı</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how-sec" id="how">
+  <div class="reveal" style="text-align:center">
+    <div class="sec-chip" style="display:inline-block">Nasıl Çalışır</div>
+    <div class="sec-h" style="text-align:center;margin-top:10px">5 dakikada başlayın</div>
+    <div class="sec-p" style="margin:0 auto;text-align:center">Teknik bilgi gerekmez. Koçluğa odaklanın, platform gerisini halleder.</div>
+  </div>
+  <div class="timeline">
+    <div class="tl-step reveal">
+      <div class="tl-num active"><div class="tl-num-inner">1</div></div>
+      <div class="tl-title">Kaydolun</div>
+      <div class="tl-desc">Akademi adınızı girin. Hesabınız anında aktif, kurulum yok, kredi kartı gerekmez.</div>
+    </div>
+    <div class="tl-step reveal d1">
+      <div class="tl-num active"><div class="tl-num-inner">2</div></div>
+      <div class="tl-title">Öğrenci Ekleyin</div>
+      <div class="tl-desc">Her öğrenci için hedef, ders hızları ve renk belirleyin. Platform otomatik süre hesabı yapar.</div>
+    </div>
+    <div class="tl-step reveal d2">
+      <div class="tl-num active"><div class="tl-num-inner">3</div></div>
+      <div class="tl-title">Program Oluşturun</div>
+      <div class="tl-desc">Haftalık görevleri planlayın. YouTube playlist ve soru bankası entegrasyonu ile saniyeler içinde.</div>
+    </div>
+    <div class="tl-step reveal d3">
+      <div class="tl-num"><div class="tl-num-inner">4</div></div>
+      <div class="tl-title">Takip & Raporla</div>
+      <div class="tl-desc">Deneme sonuçları, gelişim grafikleri ve markalı PDF raporlarla profesyonel koçluğu yaşayın.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-sec" id="pricing">
+  <div class="pricing-inner">
+    <div class="reveal" style="text-align:center">
+      <div class="sec-chip" style="display:inline-block">Fiyatlandırma</div>
+      <div class="sec-h" style="text-align:center;margin-top:10px">Büyüklüğünüze uygun plan</div>
+      <div class="sec-p" style="margin:0 auto;text-align:center">14 gün ücretsiz deneyin. İstediğiniz zaman iptal.</div>
+    </div>
+
+    <!-- Urgency -->
+    <div class="urgency reveal" style="margin-top:28px">
+      <div class="urgency-fire">🔥</div>
+      <div class="urgency-text">Bu ay <strong style="color:var(--acc)">23 koç</strong> daha platforma katıldı.</div>
+      <div>Fiyatlar <div class="urgency-counter" id="priceTimer" style="display:inline">02:47</div> sonra artacak</div>
+    </div>
+
+    <div class="billing-toggle reveal">
+      <span class="bt-label">Aylık</span>
+      <div class="bt-track" id="btTrack" onclick="toggleBill()">
+        <div class="bt-thumb"></div>
+      </div>
+      <span class="bt-label">Yıllık</span>
+      <span class="bt-save">2 ay bedava</span>
+    </div>
+
+    <div class="pg reveal">
+      <div class="pc">
+        <div class="pc-plan">Başlangıç</div>
+        <div class="pc-price">
+          <span class="pc-cur">₺</span>
+          <span class="pc-num" id="pr0">0</span>
+          <span class="pc-per"> / ay</span>
+        </div>
+        <div class="pc-period" id="pd0">14 gün ücretsiz, kart gerekmez</div>
+        <div class="pc-sep"></div>
+        <ul class="pc-list">
+          <li><span class="ok">✓</span>3 öğrenciye kadar</li>
+          <li><span class="ok">✓</span>Haftalık program</li>
+          <li><span class="ok">✓</span>Anlık mesajlaşma</li>
+          <li><span class="ok">✓</span>Temel deneme takibi</li>
+          <li class="dim-li"><span class="no">○</span>PDF rapor</li>
+          <li class="dim-li"><span class="no">○</span>YouTube entegrasyonu</li>
+          <li class="dim-li"><span class="no">○</span>Öncelikli destek</li>
+        </ul>
+        <button class="pc-btn out" onclick="goReg()">Ücretsiz Başla</button>
+      </div>
+
+      <div class="pc feat">
+        <div class="pc-badge">En Popüler ✦</div>
+        <div class="pc-plan">Koç Pro</div>
+        <div class="pc-price">
+          <span class="pc-cur">₺</span>
+          <span class="pc-num" id="pr1">299</span>
+          <span class="pc-per"> / ay</span>
+        </div>
+        <div class="pc-period" id="pd1">Aylık faturalandırma · Yıllıkta ₺239/ay</div>
+        <div class="pc-sep"></div>
+        <ul class="pc-list">
+          <li><span class="ok">✓</span>Sınırsız öğrenci</li>
+          <li><span class="ok">✓</span>Haftalık program</li>
+          <li><span class="ok">✓</span>Anlık mesajlaşma</li>
+          <li><span class="ok">✓</span>Gelişmiş deneme takibi + grafik</li>
+          <li><span class="ok">✓</span>Markalı PDF rapor</li>
+          <li><span class="ok">✓</span>YouTube playlist entegrasyonu</li>
+          <li class="dim-li"><span class="no">○</span>Öncelikli destek</li>
+        </ul>
+        <button class="pc-btn main" onclick="goReg()">14 Gün Ücretsiz Dene →</button>
+      </div>
+
+      <div class="pc">
+        <div class="pc-plan">Kurumsal</div>
+        <div class="pc-price">
+          <span class="pc-cur">₺</span>
+          <span class="pc-num" id="pr2">699</span>
+          <span class="pc-per"> / ay</span>
+        </div>
+        <div class="pc-period" id="pd2">Dershane veya koçluk merkezi</div>
+        <div class="pc-sep"></div>
+        <ul class="pc-list">
+          <li><span class="ok">✓</span>Sınırsız öğrenci</li>
+          <li><span class="ok">✓</span>Çoklu koç desteği</li>
+          <li><span class="ok">✓</span>Tüm Profesyonel özellikler</li>
+          <li><span class="ok">✓</span>Özel domain</li>
+          <li><span class="ok">✓</span>Öncelikli destek + eğitim</li>
+          <li><span class="ok">✓</span>API erişimi</li>
+          <li><span class="ok">✓</span>Özel entegrasyonlar</li>
+        </ul>
+        <button class="pc-btn out" onclick="goReg()">Demo İste</button>
+      </div>
+    </div>
+
+    
+    <!-- Student Banner in Pricing -->
+    <div class="reveal" style="margin-top:40px;text-align:center">
+      <div style="display:inline-block;background:rgba(77,166,255,.07);border:1px solid rgba(77,166,255,.2);border-radius:16px;padding:20px 32px;max-width:800px">
+        <h4 style="font-family:'Geist',sans-serif;font-size:16px;font-weight:800;color:var(--acc4);margin-bottom:8px">🎓 Öğrenciler İçin %100 Ücretsiz!</h4>
+        <p style="font-size:13px;color:var(--mid);line-height:1.6">Eğer bir öğrenciyseniz, Rostrum Akademi platformunu kullanmak için herhangi bir ücret ödemeniz gerekmez. Koçunuz veya okul/dershane kurumunuz sizi sisteme davet ettiğinde, size tanımlanan kullanıcı adı veya e-posta adresiyle doğrudan giriş yapabilirsiniz.</p>
+      </div>
+    </div>
+<!-- Social proof under pricing -->
+    <div class="sp-mini reveal">
+      <div class="sp-mini-item">🧑‍🏫 <span class="sp-mini-num">180+</span> koç zaten kullanıyor</div>
+      <div class="sp-mini-item">⭐⭐⭐⭐⭐ <span class="sp-mini-num">4.9/5</span> ortalama puan</div>
+      <div class="sp-mini-item">🔒 Güvenli ödeme · Kolay iptal</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-sec" id="faq">
+  <div class="reveal" style="text-align:center;margin-bottom:44px">
+    <div class="sec-chip" style="display:inline-block">SSS</div>
+    <div class="sec-h" style="text-align:center;margin-top:10px;font-size:clamp(24px,3.5vw,36px)">Sık sorulan sorular</div>
+  </div>
+  <div class="faq-item reveal">
+    <div class="faq-q" onclick="toggleFaq(this)">Ücretsiz deneme süresi nasıl çalışır?<span class="faq-arr">↓</span></div>
+    <div class="faq-a">Kaydolduktan sonra 14 gün boyunca tüm Profesyonel plan özelliklerine erişebilirsiniz. Kredi kartı bilgisi gerekmez. Süre dolduğunda isterseniz abonelik başlatın, isterseniz ücretsiz planla devam edin.</div>
+  </div>
+  <div class="faq-item reveal d1">
+    <div class="faq-q" onclick="toggleFaq(this)">Öğrenci verileri güvende mi?<span class="faq-arr">↓</span></div>
+    <div class="faq-a">Her koç yalnızca kendi öğrencilerinin verilerini görür. Veriler Supabase (PostgreSQL) altyapısında saklanır ve koç bazında tamamen izole edilir. Row Level Security ile başka hiçbir kullanıcı sizin verilerinize erişemez.</div>
+  </div>
+  <div class="faq-item reveal">
+    <div class="faq-q" onclick="toggleFaq(this)">Uygulamayı telefona yükleyebilir miyim?<span class="faq-arr">↓</span></div>
+    <div class="faq-a">Evet! Platform tam responsive tasarıma sahiptir. Chrome veya Safari'de "Ana Ekrana Ekle" seçeneğiyle telefona yükleyip native uygulama gibi kullanabilirsiniz.</div>
+  </div>
+  <div class="faq-item reveal d1">
+    <div class="faq-q" onclick="toggleFaq(this)">YouTube entegrasyonu nasıl çalışır?<span class="faq-arr">↓</span></div>
+    <div class="faq-a">Ücretsiz YouTube Data API v3 key'inizi platforma ekledikten sonra herhangi bir playlist URL'sini yapıştırın. Sistem otomatik olarak video başlıklarını, linklerini ve sürelerini çeker. İzleme hızı seçimine göre (1x-2x) süre otomatik hesaplanır.</div>
+  </div>
+  <div class="faq-item reveal">
+    <div class="faq-q" onclick="toggleFaq(this)">İstediğim zaman iptal edebilir miyim?<span class="faq-arr">↓</span></div>
+    <div class="faq-a">Evet, herhangi bir zamanda iptal edebilirsiniz. İptal sonrası mevcut dönemin sonuna kadar platformu kullanmaya devam edersiniz. Ek ücret veya ceza yoktur.</div>
+  </div>
+  <div class="faq-item reveal d1">
+    <div class="faq-q" onclick="toggleFaq(this)">Birden fazla koç aynı platformu kullanabilir mi?<span class="faq-arr">↓</span></div>
+    <div class="faq-a">Kurumsal planda çoklu koç desteği mevcuttur. Her koç kendi öğrencilerini bağımsız olarak yönetir. Dershane ve koçluk merkezleri için idealdir.</div>
+  </div>
+</section>
+
+<!-- REGISTER -->
+<section class="reg-sec" id="register">
+  <div class="reg-inner">
+    <div class="reg-left reveal">
+      <div class="sec-chip">Hemen Başlayın</div>
+      <div class="sec-h" style="margin-top:10px">14 gün tamamen<br>ücretsiz deneyin</div>
+      <p>Kurulum yok. Kredi kartı gerekmez. Hesabınız 2 dakikada hazır — koçluğa hemen başlayın.</p>
+      <div class="perks">
+        <div class="perk"><div class="perk-ico">📋</div>Haftalık program oluşturun</div>
+        <div class="perk"><div class="perk-ico">📊</div>TYT/AYT deneme takibi ve grafikler</div>
+        <div class="perk"><div class="perk-ico">📄</div>Markalı PDF raporlar</div>
+        <div class="perk"><div class="perk-ico">💬</div>Anlık mesajlaşma</div>
+        <div class="perk"><div class="perk-ico">▶️</div>YouTube playlist entegrasyonu</div>
+        <div class="perk"><div class="perk-ico">📅</div>Zoom & Google Meet entegrasyonu</div>
+      </div>
+      <div class="reg-social-proof">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--mid)"><strong style="color:var(--text)">+18 koç</strong> bu hafta platforma katıldı</div>
+          <div style="font-size:11px;color:var(--acc3);font-weight:700;background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.2);padding:3px 10px;border-radius:99px;">● Aktif</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal d1">
+      
+      <div class="form-card" id="regForm">
+        <div class="form-h">Kayıt Başvurusu Yap</div>
+        <div class="form-sub">Eğitim portalınıza hemen adım atın</div>
+
+        <!-- Kayıt Tipi Seçici -->
+        <div style="font-size:10px;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Kayıt Tipi</div>
+        <div class="role-pills">
+          <div class="role-pill active" id="rp-coach" onclick="selectRole('coach')">👨‍🏫 Koç</div>
+          <div class="role-pill" id="rp-institution" onclick="selectRole('institution')">🏢 Kurum</div>
+          <div class="role-pill" id="rp-student" onclick="selectRole('student')">🎓 Öğrenci</div>
+        </div>
+
+        <div id="formFieldsContainer">
+          <div class="ff-row">
+            <div class="ff"><label>Ad *</label><input type="text" id="rFN" placeholder="Adınız"></div>
+            <div class="ff"><label>Soyad</label><input type="text" id="rLN" placeholder="Soyadınız"></div>
+          </div>
+          <div class="ff" id="fieldBrand"><label>Akademi / Koçluk Adı *</label><input type="text" id="rBrand" placeholder="Örn: Emin Koçluk, Başarı Akademi"></div>
+          <div class="ff"><label>E-posta *</label><input type="email" id="rEmail" placeholder="email@domain.com"></div>
+          <div class="ff"><label>Telefon</label><input type="tel" id="rPhone" placeholder="0532 000 00 00"></div>
+          <div class="ff" id="fieldCount"><label>Kaç öğrenciniz var?</label>
+            <select id="rCount">
+              <option value="">Seçiniz</option>
+              <option value="1-5">1–5 öğrenci</option>
+              <option value="6-15">6–15 öğrenci</option>
+              <option value="16-30">16–30 öğrenci</option>
+              <option value="30+">30+ öğrenci</option>
+            </select>
+          </div>
+
+          <div class="ff" id="fieldPlan">
+            <label>Plan seçin</label>
+            <div class="plan-pills">
+              <div class="plan-pill" onclick="selPlan(this,'starter')">
+                <div class="pp-name">Başlangıç</div>
+                <div class="pp-price">Ücretsiz · 3 öğrenci</div>
+              </div>
+              <div class="plan-pill sel" onclick="selPlan(this,'pro')">
+                <div class="pp-name">Profesyonel ✦</div>
+                <div class="pp-price">₺299/ay · 20 öğrenci</div>
+              </div>
+              <div class="plan-pill" onclick="selPlan(this,'enterprise')">
+                <div class="pp-name">Kurumsal</div>
+                <div class="pp-price">₺699/ay · Sınırsız</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="studentInfoBox" style="display:none;background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.7;color:var(--mid)">
+          🎓 <strong>Öğrenci ve Velilerimiz için:</strong> Kayıtlar koçunuz veya kurumunuz tarafından açılmaktadır. Giriş bilgilerinizi almak için lütfen koçunuza danışın.<br><br>
+          <a href="app.html" class="btn-hero-ghost" style="width:100%;justify-content:center;padding:10px;font-size:13px;margin-top:8px;text-decoration:none">Giriş Yapmak İçin Tıklayın</a>
+        </div>
+
+        <button class="f-submit" id="regBtn" onclick="submitReg()">Ücretsiz Hesap Oluştur →</button>
+        <div class="f-note" id="regNote">Kaydolarak Kullanım Koşullarını kabul edersiniz.<br>İlk 14 gün ücretsiz · İstediğiniz zaman iptal</div>
+      </div>
+<div class="success-box" id="regSuccess">
+        <div class="suc-ico">🎉</div>
+        <div class="suc-title">Başvurunuz Alındı!</div>
+        <div class="suc-sub">En kısa sürede size ulaşacağız.<br>Ortalama yanıt süresi: <strong style="color:var(--acc)">1 iş günü</strong>.<br>Ayrıca e-postanızı kontrol edin.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="fl-logo">ROSTRUM<b>AKADEMİ</b></div>
+      <div class="fl-tagline">Türkiye'nin zaman kazandıran eğitim yönetim sistemi. Her öğrenciye kişisel, her koça profesyonel.</div>
+    </div>
+    <div>
+      <div class="footer-col-h">Platform</div>
+      <div class="footer-links">
+        <a href="#features">Özellikler</a>
+        <a href="#pricing">Fiyatlar</a>
+        <a href="#how">Nasıl Çalışır</a>
+        <a href="#faq">SSS</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-h">Şirket</div>
+      <div class="footer-links">
+        <a href="about.html">Hakkımızda</a>
+        <a href="blog.html">Blog</a>
+        <a href="contact.html">İletişim</a>
+        <a href="contact.html">Kariyer</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-h">Hukuki</div>
+      <div class="footer-links">
+        <a href="privacy.html">Gizlilik Politikası</a>
+        <a href="terms.html">Kullanım Koşulları</a>
+        <a href="kvkk.html">KVKK</a>
+        <a href="cookies.html">Çerezler</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Rostrum Akademi. Tüm hakları saklıdır. <a href="site_admin.html" style="color:transparent;font-size:8px;text-decoration:none;opacity:.15" title="">⚙</a></div>
+    <div class="footer-made">🇹🇷 Türkiye'de üretildi</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+
+// NOT: Bu anon key public'tir (Supabase tasarımı). Güvenlik tamamen
+// Supabase Dashboard > Authentication > Row Level Security (RLS) politikalarına dayanır.
+// site_admin.html erişimi için mutlaka auth.uid() bazlı RLS aktif olmalıdır.
+const _SB=supabase.createClient('https://imyhenrwmsmyikpollur.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34');
+// NAV scroll + active section highlight
+const _sections=["features","how","pricing","faq","register"];
+const _navLinks=document.querySelectorAll(".nav-center a");
+
+
+// ── SWITCH FEATURES TABS ──
+function switchFeatures(role) {
+  document.querySelectorAll('.ft-tab').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`ft-${role}`).classList.add('active');
+
+  const groups = document.querySelectorAll('.bento-group');
+  groups.forEach(g => {
+    g.classList.remove('active');
+    setTimeout(() => {
+      if (!g.classList.contains('active')) g.style.display = 'none';
+    }, 400);
+  });
+
+  const activeGroup = document.getElementById(`bento-${role}`);
+  activeGroup.style.display = 'grid';
+  activeGroup.offsetHeight; // force reflow
+  activeGroup.classList.add('active');
+}
+
+// ── SELECT ROLE REGISTRATION ──
+let selectedRole = 'coach';
+function selectRole(role) {
+  selectedRole = role;
+  document.querySelectorAll('.role-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById(`rp-${role}`).classList.add('active');
+
+  const fieldsContainer = document.getElementById('formFieldsContainer');
+  const studentBox = document.getElementById('studentInfoBox');
+  const btn = document.getElementById('regBtn');
+  const note = document.getElementById('regNote');
+
+  if (role === 'student') {
+    fieldsContainer.style.display = 'none';
+    studentBox.style.display = 'block';
+    btn.style.display = 'none';
+    note.style.display = 'none';
+  } else {
+    fieldsContainer.style.display = 'block';
+    studentBox.style.display = 'none';
+    btn.style.display = 'block';
+    note.style.display = 'block';
+
+    const labelBrand = document.querySelector('#fieldBrand label');
+    const inputBrand = document.getElementById('rBrand');
+    const labelCount = document.querySelector('#fieldCount label');
+    
+    if (role === 'institution') {
+      labelBrand.textContent = 'Kurum Adı (Okul / Dershane) *';
+      inputBrand.placeholder = 'Örn: Başarı Koleji, Limit Kurs Merkezi';
+      labelCount.textContent = 'Öngörülen Toplam Öğrenci Sayısı';
+      btn.textContent = 'Kurumsal Başvuru Yap →';
+      document.getElementById('fieldPlan').style.display = 'none';
+    } else {
+      labelBrand.textContent = 'Akademi / Koçluk Adı *';
+      inputBrand.placeholder = 'Örn: Emin Koçluk, Başarı Akademi';
+      labelCount.textContent = 'Kaç öğrenciniz var?';
+      btn.textContent = 'Ücretsiz Hesap Oluştur →';
+      document.getElementById('fieldPlan').style.display = 'block';
+    }
+  }
+}
+
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',scrollY>40);
+  let cur='';
+  _sections.forEach(id=>{const el=document.getElementById(id);if(el&&scrollY>=el.offsetTop-120)cur=id;});
+  _navLinks.forEach(a=>{const h=a.getAttribute('href').replace('#','');a.style.color=h===cur?'var(--acc)':'';});
+},{passive:true});
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('v'),i*55);}});
+},{threshold:.07,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// COUNTER ANIMATION
+function animCount(el,target,dur=2200){
+  let s=null;
+  const step=ts=>{
+    if(!s)s=ts;
+    const p=Math.min((ts-s)/dur,1);
+    const e2=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    const val=Math.round(e2*target);
+    el.textContent=val>=1000?val.toLocaleString('tr-TR'):val;
+    if(p<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const cObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.querySelectorAll('[data-count]').forEach(el=>animCount(el,+el.dataset.count));
+      cObs.unobserve(e.target);
+    }
+  });
+},{threshold:.3});
+const nb=document.querySelector('.numbers');if(nb)cObs.observe(nb);
+
+// BILLING TOGGLE
+let yearly=false;
+let prices=[[0,0],[299,249],[699,579]]; // Supabase'den güncellenir
+function toggleBill(){
+  yearly=!yearly;
+  const t=document.getElementById('btTrack');
+  t.classList.toggle('on',yearly);
+  [0,1,2].forEach(i=>{
+    const el=document.getElementById('pr'+i);
+    if(el)el.textContent=prices[i][yearly?1:0];
+  });
+  document.getElementById('pd1').textContent=yearly?'Yıllık · 2 ay hediye':'Aylık faturalandırma';
+  document.getElementById('pd2').textContent=yearly?'Yıllık faturalandırma':'Dershane veya merkez';
+}
+
+// URGENCY TIMER — session başına bir kez çalışır, sıfırlanmaz
+(function(){
+  const KEY='ba_urgency_end';
+  let endTs=parseInt(sessionStorage.getItem(KEY)||'0');
+  if(!endTs||endTs<Date.now()){
+    endTs=Date.now()+9*60*1000; // 9 dakika
+    sessionStorage.setItem(KEY,endTs);
+  }
+  const timerEl=document.getElementById('priceTimer');
+  const urgencyEl=timerEl?.closest('.urgency');
+  function tick(){
+    const left=Math.max(0,Math.round((endTs-Date.now())/1000));
+    if(!timerEl)return;
+    if(left===0){
+      if(urgencyEl){
+        urgencyEl.innerHTML='<div class="urgency-fire">🔥</div><div class="urgency-text">Bu hafta <strong style="color:var(--acc)">23 koç</strong> daha platforma katıldı. Siz de başlayın!</div>';
+      }
+      return;
+    }
+    const m=Math.floor(left/60),s=left%60;
+    timerEl.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    setTimeout(tick,1000);
+  }
+  tick();
+})();
+
+// FAQ
+function toggleFaq(el){
+  const item=el.parentElement;
+  const open=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!open)item.classList.add('open');
+}
+
+// PLAN PILLS
+let selectedPlan='pro';
+function selPlan(el,plan){
+  document.querySelectorAll('.plan-pill').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');selectedPlan=plan;
+}
+
+// SCROLL TO REGISTER
+function goReg(){window.location.href='/app.html';}
+
+// FORM SUBMIT
+async function submitReg(){
+  const fn=document.getElementById('rFN').value.trim();
+  const ln=(document.getElementById('rLN')?.value||'').trim();
+  const brand=document.getElementById('rBrand')?.value?.trim() || '';
+  const email=document.getElementById('rEmail').value.trim();
+  const phone=(document.getElementById('rPhone')?.value||'').trim();
+  const count=document.getElementById('rCount')?.value||'';
+  const btn=document.getElementById('regBtn');
+  
+  if(selectedRole === 'student') return;
+  
+  if(!fn||!brand||!email){
+    btn.style.background='#ff5c7a';btn.textContent='Zorunlu alanları doldurun!';
+    setTimeout(()=>{btn.style.background='';btn.textContent=selectedRole==='institution'?'Kurumsal Başvuru Yap →':'Ücretsiz Hesap Oluştur →';},2500);
+    return;
+  }
+  if(!/^[^s@]+@[^s@]+.[^s@]+$/.test(email)){
+    document.getElementById('rEmail').style.borderColor='#ff5c7a';
+    setTimeout(()=>document.getElementById('rEmail').style.borderColor='',2500);
+    return;
+  }
+  btn.textContent='Gönderiliyor...';btn.disabled=true;
+  try{
+    const planValue = selectedRole === 'institution' ? 'enterprise' : (typeof selectedPlan!=='undefined'?selectedPlan:'pro');
+    const {data,error}=await _SB.from('leads').insert({
+      first_name:fn,last_name:ln,brand_name:brand,
+      email,phone,student_count:parseInt(count)||5,
+      plan:planValue,
+      status:'pending',source:'landing',
+      role:selectedRole
+    }).select();
+    if(error){
+      if(error.code==='23505'){
+        btn.style.background='#ff5c7a';
+        btn.textContent='Bu e-posta zaten kayıtlı!';
+        btn.disabled=false;
+        setTimeout(()=>{btn.style.background='';btn.textContent=selectedRole==='institution'?'Kurumsal Başvuru Yap →':'Ücretsiz Hesap Oluştur →';},3000);
+        return;
+      }
+      console.error('Supabase error:',error);
+    }
+  }catch(e){console.error('DB error:',e);}
+  document.getElementById('regForm').style.display='none';
+  document.getElementById('regSuccess').style.display='block';
+  btn.disabled=false;
+}
+
+
+
+// THEME
+let isDark=true;
+function toggleTheme(){
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'':'light');
+  document.getElementById('themeIcon').textContent=isDark?'☀️':'🌙';
+}
+
+// HAMBURGER
+function toggleMobileMenu(){document.getElementById('mobileMenu').classList.toggle('open');}
+function closeMobileMenu(){document.getElementById('mobileMenu').classList.remove('open');}
+
+// LOAD SITE CONTENT FROM SUPABASE
+let _siteContent = {};
+async function loadSiteContent(){
+  try{
+    const {data,error}=await _SB.from('site_content').select('*');
+    if(error||!data){ console.warn('site_content load error:',error); return; }
+    data.forEach(r=>{ _siteContent[r.key]=r.value; });
+
+    // Fiyatlar — hem array'i güncelle hem direkt HTML'e yaz
+    const pPro = parseInt(_siteContent.price_pro)||299;
+    const pEnt = parseInt(_siteContent.price_enterprise)||699;
+    const pProY = Math.round(pPro*10/12);
+    const pEntY = Math.round(pEnt*10/12);
+
+    // Global prices array güncelle (billing toggle için)
+    prices[1][0]=pPro; prices[1][1]=pProY;
+    prices[2][0]=pEnt; prices[2][1]=pEntY;
+
+    // Direkt HTML'e yaz (yearly durumuna göre)
+    const prEl1=document.getElementById('pr1');
+    const prEl2=document.getElementById('pr2');
+    if(prEl1) prEl1.textContent = yearly ? pProY : pPro;
+    if(prEl2) prEl2.textContent = yearly ? pEntY : pEnt;
+
+    // İstatistikler
+    const countMap={
+      0:'student_count', 1:'coach_count',
+      2:'task_count',    3:'satisfaction'
+    };
+    document.querySelectorAll('[data-count]').forEach((el,i)=>{
+      const key=countMap[i];
+      if(key&&_siteContent[key]){
+        const val=parseInt(_siteContent[key]);
+        el.setAttribute('data-count',val);
+        // Eğer zaten animasyon bitmişse direkt yaz
+        if(el.textContent!='0') el.textContent=val>=1000?val.toLocaleString('tr-TR'):val;
+      }
+    });
+
+    // Hero badge koç sayısı
+    if(_siteContent.coach_count){
+      document.getElementById('heroCount').textContent=_siteContent.coach_count;
+    }
+
+    // Hero desc
+    if(_siteContent.hero_desc){
+      const desc=document.querySelector('.hero-desc');
+      if(desc) desc.textContent=_siteContent.hero_desc;
+    }
+
+  }catch(e){ console.warn('loadSiteContent error:',e); }
+}
+
+// Sayfa yüklenince çalıştır — DOM hazır olduktan sonra
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',loadSiteContent);
+} else {
+  setTimeout(loadSiteContent, 100);
+}
+
+// HERO COUNTER animate
+(function(){
+  let n=178;
+  setInterval(()=>{
+    if(Math.random()<0.03){n++;document.getElementById('heroCount').textContent=n;}
+  },4000);
+})();
+
+// PARALLAX (subtle)
+let ticking=false;
+window.addEventListener('scroll',()=>{
+  if(!ticking){
+    requestAnimationFrame(()=>{
+      const y=scrollY*.3;
+      document.querySelectorAll('.mesh-orb').forEach((o,i)=>{
+        const dir=i%2===0?1:-1;
+        o.style.transform=`translateX(-50%) translateY(${y*dir*.08}px)`;
+      });
+      ticking=false;
+    });
+    ticking=true;
+  }
+},{passive:true});
+</script>
+</body>
+</html>
