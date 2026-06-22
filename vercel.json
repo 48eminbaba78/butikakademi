@@ -1,4 +1,5 @@
 {
+  "outputDirectory": "dist",
   "rewrites": [
     { "source": "/admin/(.*)", "destination": "/admin/dist/index.html" }
   ],
