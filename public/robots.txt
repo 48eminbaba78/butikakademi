@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /test.html
+Disallow: /setup.html
+Disallow: /fix_demo_accounts.html
+Disallow: /site_admin.html
+Disallow: /kaynak_yoneticisi.html
+Disallow: /admin/
+Disallow: /__*
+Disallow: /migration*
+Disallow: /*.sql
+
+Sitemap: https://rostrumakademi.com/sitemap.xml

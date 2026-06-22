@@ -111,14 +111,87 @@ nav.scrolled{background:rgba(7,6,10,.9);backdrop-filter:blur(24px);border-bottom
 .t-item strong{color:var(--text);font-weight:600;}
 .t-sep{color:var(--bd2);font-size:20px;line-height:1;}
 
-/* NUMBERS */
-.numbers{max-width:1100px;margin:0 auto;padding:80px 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--bd);}
-.num-card{background:var(--bg);padding:32px 28px;position:relative;}
-.num-card::after{content:'';position:absolute;bottom:0;left:28px;right:28px;height:1px;background:transparent;}
-.num-val{font-family:'Geist',sans-serif;font-size:48px;font-weight:800;letter-spacing:-2px;line-height:1;color:var(--text);margin-bottom:6px;}
-.num-val span{color:var(--acc);}
-.num-label{font-size:14px;color:var(--mid);}
-.num-sub{font-size:11px;color:var(--dim);margin-top:4px;}
+/* PROBLEM & SOLUTION SECTION */
+.prob-sol-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 80px 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.ps-card {
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.25s ease;
+  position: relative;
+}
+.ps-card:hover {
+  border-color: rgba(240, 165, 0, 0.35);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+.ps-badge-prob {
+  display: inline-block;
+  background: rgba(255, 92, 122, 0.08);
+  border: 1px solid rgba(255, 92, 122, 0.2);
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+.ps-badge-sol {
+  display: inline-block;
+  background: rgba(62, 207, 142, 0.08);
+  border: 1px solid rgba(62, 207, 142, 0.2);
+  color: var(--acc3);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+.ps-title {
+  font-family: 'Geist', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.ps-desc {
+  font-size: 12.5px;
+  color: var(--mid);
+  line-height: 1.6;
+}
+.ps-sep {
+  height: 1px;
+  background: var(--bd);
+  position: relative;
+  margin: 6px 0;
+}
+.ps-sep::after {
+  content: "⚡";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg);
+  padding: 0 8px;
+  font-size: 11px;
+}
+[data-theme="light"] .ps-sep::after {
+  background: var(--bg);
+}
 
 /* SECTION */
 .sec{padding:96px 40px;max-width:1100px;margin:0 auto;}
@@ -128,7 +201,8 @@ nav.scrolled{background:rgba(7,6,10,.9);backdrop-filter:blur(24px);border-bottom
 
 /* FEATURE GRID BENTO */
 .bento{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(180px,auto);gap:12px;margin-top:52px;}
-.bc{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:26px;overflow:hidden;position:relative;transition:border-color .3s,transform .25s;}
+.bc{background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:26px;overflow:hidden;position:relative;transition:border-color .3s,transform .25s;cursor:pointer;}
+.bc:active{transform:translateY(-2px) scale(0.98);}
 .bc:hover{border-color:rgba(240,165,0,.25);transform:translateY(-5px);box-shadow:0 12px 40px rgba(0,0,0,.3);}
 .bc::after{content:'';position:absolute;inset:0;border-radius:18px;background:radial-gradient(ellipse at 0% 0%,rgba(240,165,0,.04),transparent 60%);opacity:0;transition:opacity .3s;}
 .bc:hover::after{opacity:1;}
@@ -185,7 +259,7 @@ nav.scrolled{background:rgba(7,6,10,.9);backdrop-filter:blur(24px);border-bottom
 .sp-ders{color:var(--mid);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;}
 .sp-val{font-family:'Geist',sans-serif;font-size:20px;font-weight:800;color:var(--acc);}
 .sp-unit{font-size:10px;color:var(--dim);}
-.sp-suggest{background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);border-radius:9px;padding:9px 12px;font-size:12px;}
+.sp-suggest{background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);border-radius:999px;padding:9px 12px;font-size:12px;}
 .sp-sug-lbl{color:var(--mid);font-size:10px;margin-bottom:2px;}
 .sp-sug-val{font-family:'Geist',sans-serif;font-size:20px;font-weight:800;color:var(--acc);}
 
@@ -342,6 +416,9 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
 .theme-toggle{background:var(--s2);border:1px solid var(--bd);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .theme-toggle:hover{border-color:var(--bd2);}
 [data-theme="light"]{--bg:#f5f3ee;--s1:#ffffff;--s2:#f0ede8;--s3:#e8e4dd;--bd:#ddd8d0;--bd2:#ccc8c0;--text:#1a1714;--mid:#5a5460;--dim:#9a9088;}
+[data-theme="light"] .h1-outline{
+  -webkit-text-stroke:1.5px rgba(26, 23, 20, 0.45);
+}
 .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;}
 .hamburger span{width:22px;height:2px;background:var(--text);border-radius:99px;transition:all .2s;display:block;}
 .mobile-menu{display:none;position:fixed;top:58px;left:0;right:0;background:rgba(7,6,10,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--bd);padding:20px 24px;z-index:499;flex-direction:column;gap:4px;}
@@ -351,11 +428,14 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
 .mobile-menu.open{display:flex;}
 @media(max-width:960px){
   nav{padding:0 24px;}
+  nav .nav-right .btn-ghost-sm, nav .nav-right .btn-acc-sm {
+    display: none !important;
+  }
   .hamburger{display:flex;}
   .nav-center{display:none;}
   .hero h1{letter-spacing:-2px;}
   
-  .numbers{grid-template-columns:1fr 1fr;gap:1px;}
+  .prob-sol-grid{grid-template-columns:1fr 1fr;gap:12px;}
   .bento{grid-template-columns:1fr 1fr;}
   .bc-6,.bc-4,.bc-8,.bc-12{grid-column:span 2;}
   .testi-grid{grid-template-columns:1fr;}
@@ -368,7 +448,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   .how-sec,.faq-sec{padding:60px 20px;}
 }
 @media(max-width:600px){
-  .numbers{grid-template-columns:1fr 1fr;}
+  .prob-sol-grid{grid-template-columns:1fr;}
   .bento{grid-template-columns:1fr;}
   .bc-6,.bc-4,.bc-8,.bc-12{grid-column:span 1;}
 }
@@ -449,6 +529,117 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   background: var(--acc);
   color: #07060a;
 }
+
+/* FEATURE DETAIL MODAL */
+.f-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 6, 10, 0.75);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: modalFadeIn 0.25s ease;
+}
+.f-modal-card {
+  background: var(--s1);
+  border: 1px solid var(--bd);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 580px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  animation: modalScaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.f-modal-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--acc), var(--acc2));
+}
+.f-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  background: transparent;
+  border: none;
+  color: var(--mid);
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.f-modal-close:hover {
+  background: var(--s2);
+  color: var(--text);
+}
+.f-modal-body {
+  padding: 40px;
+}
+.f-modal-icon {
+  font-size: 44px;
+  margin-bottom: 16px;
+}
+.f-modal-title {
+  font-family: 'Geist', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.f-modal-desc {
+  font-size: 14.5px;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+.f-modal-details {
+  background: var(--s2);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 20px;
+  font-size: 13.5px;
+  color: var(--text);
+  line-height: 1.8;
+}
+.f-modal-details ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.f-modal-details li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+.f-modal-details li::before {
+  content: "✦";
+  color: var(--acc);
+  font-weight: bold;
+}
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalScaleUp {
+  from { transform: scale(0.95) translateY(10px); }
+  to { transform: scale(1) translateY(0); }
+}
 </style>
 </head>
 <body>
@@ -473,7 +664,8 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   <a href="#how" onclick="closeMobileMenu()">Nasıl Çalışır</a>
   <a href="#pricing" onclick="closeMobileMenu()">Fiyatlar</a>
   <a href="#faq" onclick="closeMobileMenu()">SSS</a>
-  <a href="#register" onclick="closeMobileMenu()" style="color:var(--acc);font-weight:700">Ücretsiz Başla →</a>
+  <a href="app.html" onclick="closeMobileMenu()" style="border-top:1px solid var(--bd);margin-top:8px;padding-top:16px;">Giriş Yap</a>
+  <a href="app.html" onclick="closeMobileMenu()" style="color:var(--acc);font-weight:700">Ücretsiz Başla →</a>
 </div>
 
 <!-- HERO -->
@@ -485,13 +677,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   </div>
   <div class="hero-grid-lines"></div>
 
-  <!-- Floating badges -->
-  <div class="hero-badges">
-    <div class="hb hb1"><span class="hb-dot" style="background:#3ecf8e"></span>Arda %78 tamamladı ✓</div>
-    <div class="hb hb2"><span class="hb-dot" style="background:#f0a500"></span>47.5 net · +4.2 artış 📈</div>
-    <div class="hb hb3"><span class="hb-dot" style="background:#60b4ff"></span>14:00 Meet randevusu 📅</div>
-    <div class="hb hb4"><span class="hb-dot" style="background:#c084fc"></span>PDF rapor oluşturuldu 📄</div>
-  </div>
+
 
   <div class="hero-eyebrow">
     <div class="live-dot"></div>
@@ -514,9 +700,15 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
       <span>→</span>
     </a>
     <a href="#features" class="btn-hero-ghost">
-      <span>▶</span>
       Özellikleri Gör
     </a>
+    <a href="app.html" class="btn-hero-ghost" style="border-color:var(--acc3);color:var(--acc3)">
+      ⚡ Canlı Demo Sandbox
+    </a>
+  </div>
+
+  <div class="demo-badge reveal" style="margin-top:24px;background:rgba(62,207,142,.06);border:1px solid rgba(62,207,142,.15);border-radius:12px;padding:12px 20px;max-width:560px;font-size:12.5px;color:var(--mid);line-height:1.6;margin-left:auto;margin-right:auto">
+    💡 <strong>Anında Test Edin:</strong> Giriş ekranındaki <strong>Google ile Giriş Yap</strong> butonuna tıklayarak demo koç veya öğrenci hesaplarını seçip platformu anında deneyebilirsiniz.
   </div>
 
   <div class="hero-trust">
@@ -550,40 +742,56 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   </div>
 </section>
 
-<!-- NUMBERS -->
-<div class="numbers reveal">
-  <div class="num-card">
-    <div class="num-val"><span data-count="2400">0</span>+</div>
-    <div class="num-label">Aktif Öğrenci</div>
-    <div class="num-sub">Platforma kayıtlı</div>
+<!-- PROBLEM & SOLUTION -->
+<div class="prob-sol-grid reveal">
+  <div class="ps-card">
+    <div class="ps-badge-prob">❌ Sorun</div>
+    <div class="ps-title">Excel &amp; Kağıt Karmaşası</div>
+    <div class="ps-desc">Ders programı hazırlamak saatlerinizi alır, kaybolur ve revize etmesi zordur.</div>
+    <div class="ps-sep"></div>
+    <div class="ps-badge-sol">✅ Çözüm</div>
+    <div class="ps-title">5 Dakikada Planlama</div>
+    <div class="ps-desc">Akıllı süre tahmini ve hazır şablonlarla kişiselleştirilmiş programı saniyeler içinde atayın.</div>
   </div>
-  <div class="num-card">
-    <div class="num-val"><span data-count="180">0</span>+</div>
-    <div class="num-label">Koç & Eğitmen</div>
-    <div class="num-sub">Türkiye geneli</div>
+  <div class="ps-card">
+    <div class="ps-badge-prob">❌ Sorun</div>
+    <div class="ps-title">WhatsApp Bildirim Kaosu</div>
+    <div class="ps-desc">Ödevler, deneme sonuçları ve koçluk mesajları dağınık sohbet gruplarında kaybolur.</div>
+    <div class="ps-sep"></div>
+    <div class="ps-badge-sol">✅ Çözüm</div>
+    <div class="ps-title">Merkezi İletişim</div>
+    <div class="ps-desc">Öğrenci, veli ve koç tek bir güvenli panelde yazışır. Tüm veri ve hedefler arşivlenir.</div>
   </div>
-  <div class="num-card">
-    <div class="num-val"><span data-count="47000">0</span>+</div>
-    <div class="num-label">Oluşturulan Görev</div>
-    <div class="num-sub">Bu ay</div>
+  <div class="ps-card">
+    <div class="ps-badge-prob">❌ Sorun</div>
+    <div class="ps-title">Velilerin Sürekli Aramaları</div>
+    <div class="ps-desc">Veliler öğrencilerin son durumunu öğrenmek için sürekli arar, rapor hazırlamak saatlerinizi yer.</div>
+    <div class="ps-sep"></div>
+    <div class="ps-badge-sol">✅ Çözüm</div>
+    <div class="ps-title">Tek Tıkla PDF Rapor</div>
+    <div class="ps-desc">Haftalık program tamamlama oranlarını ve deneme gelişimlerini şık PDF belgeleriyle anında sunun.</div>
   </div>
-  <div class="num-card">
-    <div class="num-val"><span data-count="98">0</span><span>%</span></div>
-    <div class="num-label">Kullanıcı Memnuniyeti</div>
-    <div class="num-sub">Son anket sonucu</div>
+  <div class="ps-card">
+    <div class="ps-badge-prob">❌ Sorun</div>
+    <div class="ps-title">Verilerin Güvensizliği</div>
+    <div class="ps-desc">Bireysel veya kurumsal koçların verileri ve öğrencileri yetkisiz erişimlere açık kalabilir.</div>
+    <div class="ps-sep"></div>
+    <div class="ps-badge-sol">✅ Çözüm</div>
+    <div class="ps-title">RLS Tabanlı İzolasyon</div>
+    <div class="ps-desc">Supabase Row-Level Security ile her koç ve öğrencinin çalışma alanı tamamen kendine özel ve şifrelidir.</div>
   </div>
 </div>
 
 <!-- LOGOS -->
 <div style="padding:40px 40px 0;border-top:1px solid var(--bd)">
   <div style="max-width:1100px;margin:0 auto">
-    <div class="reveal" style="text-align:center;font-size:12px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px">Türkiye genelinde koçlar güveniyor</div>
+    <div class="reveal" style="text-align:center;font-size:12px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px">Butik Akademi ve Bireysel Koçların Tercih Ettiği Modern Altyapı</div>
     <div class="reveal" style="display:flex;align-items:center;justify-content:center;gap:40px;flex-wrap:wrap;opacity:.45;filter:grayscale(1)">
-      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">BAŞARI AKADEMİ</div>
-      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">YEŞİL KOÇ</div>
-      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">HEDEF MERKEZ</div>
-      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">ZIRVE EĞİTİM</div>
-      <div style="font-family:'Geist',sans-serif;font-size:17px;font-weight:800;color:var(--text)">ATLAS KOÇ</div>
+      <div style="font-family:'Geist',sans-serif;font-size:14px;font-weight:800;color:var(--text)">BUTİK AKADEMİLER</div>
+      <div style="font-family:'Geist',sans-serif;font-size:14px;font-weight:800;color:var(--text)">BİREYSEL REHBERLER</div>
+      <div style="font-family:'Geist',sans-serif;font-size:14px;font-weight:800;color:var(--text)">ÖZEL DERS PLATFORMLARI</div>
+      <div style="font-family:'Geist',sans-serif;font-size:14px;font-weight:800;color:var(--text)">KOÇLUK MERKEZLERİ</div>
+      <div style="font-family:'Geist',sans-serif;font-size:14px;font-weight:800;color:var(--text)">YKS HAZIRLIK GRUPLARI</div>
     </div>
   </div>
 </div>
@@ -607,7 +815,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   <!-- BENTO - KOÇLAR İÇİN -->
   <div class="bento bento-group active" id="bento-coach">
     <!-- Haftalık Program - 8 col -->
-    <div class="bc bc-8">
+    <div class="bc bc-8" onclick="openFeatureModal('haftalik-program')">
       <div class="bc-icon">📋</div>
       <div class="bc-title">Haftalık Program</div>
       <div class="bc-desc">Öğrenci bazında kişiselleştirilmiş programlar. Konu anlatımı, soru bankası, alan denemesi — gün gün planlayın.</div>
@@ -623,7 +831,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Mesajlaşma - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('anlik-mesajlasma')">
       <div class="bc-icon">💬</div>
       <div class="bc-title">Anlık Mesajlaşma</div>
       <div class="bc-desc">WebSocket ile gerçek zamanlı chat. Öğrenci ve velilerinizle hızlı, kesintisiz iletişim kurun.</div>
@@ -634,10 +842,10 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Deneme Takibi - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('deneme-takibi')">
       <div class="bc-icon">📊</div>
       <div class="bc-title">Deneme Takibi</div>
-      <div class="bc-desc">TYT/AYT net girişi, ders bazında analiz. İlerlemeyi gelişim grafikleriyle gözlemleyin.</div>
+      <div class="bc-desc">TYT/AYT net gelişim grafikleri ve analizler. Son sınav performanslarını anlık görün.</div>
       <div class="net-boxes">
         <div class="net-box">
           <div class="net-val" style="color:var(--acc)">47.5</div>
@@ -657,7 +865,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- PDF - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('pdf-raporlar')">
       <div class="bc-icon">📄</div>
       <div class="bc-title">PDF Raporlar</div>
       <div class="bc-desc">Markalı, profesyonel gelişim raporları. Velilere tek tıkla şık rapor dosyaları iletin.</div>
@@ -678,7 +886,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Akıllı Süre - 8 col -->
-    <div class="bc bc-8">
+    <div class="bc bc-8" onclick="openFeatureModal('akilli-sure')">
       <div class="bc-tag new">Akıllı Özellik</div>
       <div class="bc-icon">⚡</div>
       <div class="bc-title">Akıllı Süre Tahmini</div>
@@ -692,7 +900,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- YouTube - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('youtube-playlist')">
       <div class="bc-tag new">Entegrasyon</div>
       <div class="bc-icon">▶️</div>
       <div class="bc-title">YouTube Playlist</div>
@@ -700,14 +908,14 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Meet/Zoom - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('meet-zoom')">
       <div class="bc-icon">📅</div>
       <div class="bc-title">Meet & Zoom Randevu</div>
       <div class="bc-desc">Tek tıkla Google Meet veya Zoom linki oluşturun. Görüşme takvimini entegre edin.</div>
     </div>
 
     <!-- Güvenlik - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('veri-guvenligi')">
       <div class="bc-icon">🔒</div>
       <div class="bc-title">Veri Güvenliği</div>
       <div class="bc-desc">Her koç yalnızca kendi öğrencilerini görür. Tamamen izole ve güvenli workspace altyapısı.</div>
@@ -717,7 +925,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   <!-- BENTO - ÖĞRENCİLER İÇİN -->
   <div class="bento bento-group" id="bento-student" style="display:none">
     <!-- Öğrenci Portalı - 8 col -->
-    <div class="bc bc-8">
+    <div class="bc bc-8" onclick="openFeatureModal('ogrenci-portali')">
       <div class="bc-icon">🎓</div>
       <div class="bc-title">Kişiselleştirilmiş Öğrenci Portalı</div>
       <div class="bc-desc">Size özel çalışma odası. Koçunuzun atadığı günlük hedefleri inceleyin ve ilerlemenizi işaretleyin.</div>
@@ -733,7 +941,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Sokratik AI - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('sokratik-ai')">
       <div class="bc-tag new">Akıllı Asistan</div>
       <div class="bc-icon">🤖</div>
       <div class="bc-title">Sokratik AI Ders Asistanı</div>
@@ -745,9 +953,9 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Deneme Net - 8 col -->
-    <div class="bc bc-8">
+    <div class="bc bc-8" onclick="openFeatureModal('net-analizleri')">
       <div class="bc-icon">📊</div>
-      <div class="bc-title">Net Analizleri & Gelişim</div>
+      <div class="bc-title">Net Analizleri &amp; Gelişim</div>
       <div class="bc-desc">TYT/AYT deneme netlerinizin yükselişini ve ders bazlı eksiklerinizi gösteren interaktif grafikler.</div>
       <div class="net-boxes">
         <div class="net-box"><div class="net-val" style="color:var(--acc)">85.4</div><div class="net-lbl">Son Net</div></div>
@@ -757,7 +965,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Süre - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('soru-kronometresi')">
       <div class="bc-icon">⏱️</div>
       <div class="bc-title">Soru Kronometresi</div>
       <div class="bc-desc">Her soru için harcadığınız süreyi ölçün, sınavda zaman yönetimi becerilerinizi geliştirin.</div>
@@ -767,21 +975,21 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Kaynak - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('kaynak-yonetimi')">
       <div class="bc-icon">📚</div>
       <div class="bc-title">Kaynak Yönetimi</div>
       <div class="bc-desc">Çözdüğünüz soru bankalarının ve kampların ilerleme durumunu yüzde olarak takip edin.</div>
     </div>
 
     <!-- Randevu - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('birebir-gorusmeler')">
       <div class="bc-icon">📆</div>
       <div class="bc-title">Birebir Görüşmeler</div>
       <div class="bc-desc">Koçunuzla olan online görüşmelerin günlerini görün, Google Meet linklerine tek tıkla katılın.</div>
     </div>
 
     <!-- Veli - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('veli-bilgilendirme')">
       <div class="bc-icon">👨‍👩‍👦</div>
       <div class="bc-title">Veli Bilgilendirme</div>
       <div class="bc-desc">Aileniz de haftalık tamamlama oranlarınızı ve deneme gelişimlerinizi veli ekranından izleyebilir.</div>
@@ -791,7 +999,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   <!-- BENTO - KURUMLAR İÇİN -->
   <div class="bento bento-group" id="bento-institution" style="display:none">
     <!-- Merkezi Kurum - 8 col -->
-    <div class="bc bc-8">
+    <div class="bc bc-8" onclick="openFeatureModal('merkezi-kurum')">
       <div class="bc-icon">🏢</div>
       <div class="bc-title">Merkezi Kurum Paneli</div>
       <div class="bc-desc">Okul veya dershanenizdeki tüm koçların, öğrencilerin aktifliklerini ve başarı analizlerini tek bir ekranda görün.</div>
@@ -803,7 +1011,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Eşleştirme - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('akilli-eslestirme')">
       <div class="bc-icon">🤝</div>
       <div class="bc-title">Akıllı Eşleştirme</div>
       <div class="bc-desc">Landing sayfasından gelen eşleşme başvurularını koçların uzmanlık alanlarına göre saniyeler içinde atayın.</div>
@@ -814,28 +1022,28 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Markalama - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('kurumsal-markalama')">
       <div class="bc-icon">🎨</div>
       <div class="bc-title">Kurumsal Markalama (White Label)</div>
       <div class="bc-desc">Kendi logonuzu yükleyin, platform renklerinizi belirleyin. Kurumunuzun adıyla öğrencilerinize hizmet verin.</div>
     </div>
 
     <!-- Analiz - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('sinif-grup')">
       <div class="bc-icon">📊</div>
-      <div class="bc-title">Sınıf & Grup Analizleri</div>
+      <div class="bc-title">Sınıf &amp; Grup Analizleri</div>
       <div class="bc-desc">Sınıflarınızın ve şubelerinizin deneme sınavı ortalamalarını ve ödev tamamlama oranlarını karşılaştırın.</div>
     </div>
 
     <!-- Ölçek - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('sinirsiz-olcek')">
       <div class="bc-icon">🚀</div>
       <div class="bc-title">Sınırsız Ölçeklenebilirlik</div>
       <div class="bc-desc">Sınırsız şube, sınıf ve koç rolü tanımlayarak platformu devasa okul operasyonlarına uygun kullanın.</div>
     </div>
 
     <!-- Duyuru - 8 col -->
-    <div class="bc bc-8">
+    <div class="bc bc-8" onclick="openFeatureModal('toplu-duyuru')">
       <div class="bc-icon">📣</div>
       <div class="bc-title">Toplu Duyuru Sistemi</div>
       <div class="bc-desc">Tüm koçlara, belirli sınıflara veya tüm velilere tek tıkla toplu SMS, e-posta veya uygulama içi bildirim gönderin.</div>
@@ -845,9 +1053,9 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
     </div>
 
     <!-- Finans - 4 col -->
-    <div class="bc bc-4">
+    <div class="bc bc-4" onclick="openFeatureModal('odeme-lisans')">
       <div class="bc-icon">💳</div>
-      <div class="bc-title">Ödeme & Lisans Takibi</div>
+      <div class="bc-title">Ödeme &amp; Lisans Takibi</div>
       <div class="bc-desc">Koçlarınızın lisans sürelerini, ödemelerini ve faturalandırma detaylarını kurumsal panelinizden yönetin.</div>
     </div>
   </div>
@@ -858,43 +1066,43 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
 <div class="testi-sec">
   <div class="testi-inner">
     <div class="reveal" style="text-align:center">
-      <div class="sec-chip" style="display:inline-block">Kullanıcı Yorumları</div>
-      <div class="sec-h" style="text-align:center;margin-top:10px">Koçlar ne diyor?</div>
+      <div class="sec-chip" style="display:inline-block">Pilot Kullanıcı Görüşleri</div>
+      <div class="sec-h" style="text-align:center;margin-top:10px">Koçlarımızın İlk Deneyimleri</div>
     </div>
     <div class="testi-grid">
       <div class="tc reveal">
         <div class="tc-stars">★★★★★</div>
-        <div class="tc-text">"Öğrencilerimi takip etmek artık çok daha kolay. Haftalık programı oluşturmak ve deneme sonuçlarını girmek dakikalar alıyor. Çok zaman kazandırdı."</div>
+        <div class="tc-text">"Rostrum Akademi ile koçluk sürecini tamamen dijitalleştirdik. Özellikle haftalık program planlama ve akıllı süre tahmini modülü, her bir öğrencime ayırdığım hazırlık süresini yarı yarıya azalttı."</div>
         <div class="tc-author">
-          <div class="tc-av" style="background:#f0a500">AY</div>
+          <div class="tc-av" style="background:#f0a500">AŞ</div>
           <div>
-            <div class="tc-name">Ayşe Yılmaz</div>
-            <div class="tc-role">TYT/AYT Koçu · İstanbul</div>
-            <div class="tc-verified">✓ Doğrulanmış Kullanıcı</div>
+            <div class="tc-name">Ahmet Şahin</div>
+            <div class="tc-role">YKS Sayısal Koçu · İstanbul (simkoc1)</div>
+            <div class="tc-verified">✓ Pilot Süreç Kullanıcısı</div>
           </div>
         </div>
       </div>
       <div class="tc reveal d1">
         <div class="tc-stars">★★★★★</div>
-        <div class="tc-text">"PDF rapor özelliği mükemmel. Her ay profesyonel raporlar gönderiyorum. Bu güven velilerde büyük etki yaratıyor. Artık vazgeçemiyorum."</div>
+        <div class="tc-text">"Veliler gelişim grafiklerine bayılıyor. Eskiden WhatsApp üzerinden dağınık giden raporlar yerine, tek tuşla markalı PDF rapor gönderebiliyoruz. Kurumsal imajımız için harika bir adım oldu."</div>
         <div class="tc-author">
-          <div class="tc-av" style="background:#60b4ff">MK</div>
+          <div class="tc-av" style="background:#60b4ff">EY</div>
           <div>
-            <div class="tc-name">Mehmet Kara</div>
-            <div class="tc-role">Matematik Koçu · Ankara</div>
-            <div class="tc-verified">✓ Doğrulanmış Kullanıcı</div>
+            <div class="tc-name">Elif Yılmaz</div>
+            <div class="tc-role">LGS/YKS Rehberlik Uzmanı · Ankara (simkoc2)</div>
+            <div class="tc-verified">✓ Pilot Süreç Kullanıcısı</div>
           </div>
         </div>
       </div>
       <div class="tc reveal d2">
         <div class="tc-stars">★★★★★</div>
-        <div class="tc-text">"Deneme takibi ve net gelişim grafikleri harika. Öğrenciye 'işte büyüme bölgen bu' diye gösterince motivasyonları artıyor. Tavsiye ederim."</div>
+        <div class="tc-text">"Öğrencilerin kendi çalışma panellerinde hedeflerini görüp tamamlandı olarak işaretlemesi onları inanılmaz motive ediyor. Deneme takibi modülü sayesinde net artışlarını net analiz edebiliyoruz."</div>
         <div class="tc-author">
-          <div class="tc-av" style="background:#3ecf8e">ZD</div>
+          <div class="tc-av" style="background:#3ecf8e">MD</div>
           <div>
-            <div class="tc-name">Zeynep Demir</div>
-            <div class="tc-role">Fen Bilimleri Koçu · İzmir</div>
-            <div class="tc-verified">✓ Doğrulanmış Kullanıcı</div>
+            <div class="tc-name">Mustafa Demir</div>
+            <div class="tc-role">Matematik Eğitmeni &amp; Koç · İzmir (simkoc3)</div>
+            <div class="tc-verified">✓ Pilot Süreç Kullanıcısı</div>
           </div>
         </div>
       </div>
@@ -1205,6 +1413,24 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   </div>
 </footer>
 
+<!-- FEATURE DETAIL MODAL -->
+<div id="featureModal" class="f-modal-overlay" style="display:none" onclick="closeFeatureModal(event)">
+  <div class="f-modal-card" onclick="event.stopPropagation()">
+    <button class="f-modal-close" onclick="closeFeatureModal(event)" aria-label="Kapat">×</button>
+    <div class="f-modal-body">
+      <div class="f-modal-icon" id="fm-icon">📋</div>
+      <h3 class="f-modal-title" id="fm-title">Haftalık Program</h3>
+      <div class="f-modal-desc" id="fm-desc">Öğrenci bazında kişiselleştirilmiş programlar. Konu anlatımı, soru bankası, alan denemesi — gün gün planlayın.</div>
+      <div class="f-modal-details" id="fm-details">
+        <!-- Diller dinamik olarak buraya eklenecektir -->
+      </div>
+      <div style="margin-top:28px;display:flex;justify-content:flex-end">
+        <button class="btn-acc-sm" style="padding:10px 24px" onclick="closeFeatureModal(event)">Anladım, Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 
@@ -1422,6 +1648,266 @@ async function submitReg(){
   btn.disabled=false;
 }
 
+
+
+// FEATURE MODAL DATA
+const FEATURE_DATA = {
+  'haftalik-program': {
+    title: 'Haftalık Çalışma Programı',
+    icon: '📋',
+    desc: 'Öğrencilerinizin tüm haftasını gün gün, saat saat planlayın. Konu çalışmaları, soru hedefleri, denemeler ve mola sürelerini tek bir arayüzden yönetin.',
+    details: [
+      '<b>Akıllı Dağıtım:</b> Konu anlatımı ve soru bankası görevlerini dengeli dağıtarak öğrenciyi sıkmadan optimum çalışma verimi elde edin.',
+      '<b>Öğrenci Senkronizasyonu:</b> Yaptığınız her güncelleme anında öğrencinin kendi portalına yansır.',
+      '<b>Durum Takibi:</b> Öğrenci gün sonunda görevleri "Tamamlandı" olarak işaretlediğinde anında bilgilendirilirsiniz.'
+    ]
+  },
+  'anlik-mesajlasma': {
+    title: 'Gerçek Zamanlı Mesajlaşma',
+    icon: '💬',
+    desc: 'Öğrenci, veli ve koç arasında kesintisiz, anlık ve güvenli iletişim ağı. WhatsApp karmaşasına son vererek tamamen eğitim odaklı haberleşin.',
+    details: [
+      '<b>Dosya ve Görsel Paylaşımı:</b> Çözülemeyen soruları, deneme sınavı fotoğraflarını anında iletin.',
+      '<b>Grup Görüşmeleri:</b> Veli, koç ve öğrencinin yer aldığı özel üçlü gruplarla koordinasyonu artırın.',
+      '<b>Güvenli Sınırlar:</b> Çalışma saatlerinize göre bildirimleri sessize alma seçeneğiyle özel hayatınızı koruyun.'
+    ]
+  },
+  'deneme-takibi': {
+    title: 'TYT / AYT Deneme Analizi',
+    icon: '📊',
+    desc: 'Detaylı net girişleri ve ders bazında gelişim takibi. Öğrencinizin ders bazında nerede tıkandığını, hangi derslerde yükselişte olduğunu görün.',
+    details: [
+      '<b>Net Gelişim Grafikleri:</b> Tarihsel süreçte netlerin artış ivmesini interaktif grafiklerle analiz edin.',
+      '<b>Konu Analizi:</b> Yanlış yapılan sorular üzerinden eksik olunan alt konuları otomatik belirleyin.',
+      '<b>Hedef Takibi:</b> Öğrencinin hedeflediği üniversite/bölüm netleriyle mevcut durumunu karşılaştırın.'
+    ]
+  },
+  'pdf-raporlar': {
+    title: 'Kurumsal PDF Raporları',
+    icon: '📄',
+    desc: 'Velilerinize sunabileceğiniz, kendi logonuz ve renklerinizle özelleştirilmiş, üst düzey profesyonel PDF gelişim dosyaları.',
+    details: [
+      '<b>Tek Tıkla Raporlama:</b> Haftalık veya aylık tüm program tamamlama ve deneme verilerini saniyeler içinde şık bir PDF belgesine dönüştürün.',
+      '<b>Veli Güvenini Artırın:</b> Dağınık mesajlar yerine resmi ve kurumsal bir sunumla veli memnuniyetini en üst düzeye çıkarın.',
+      '<b>Detaylı Analiz Sunumu:</b> Ders tamamlama oranları, deneme sınavı istatistikleri ve koç notlarını içerir.'
+    ]
+  },
+  'akilli-sure': {
+    title: 'Akıllı Süre Tahmini',
+    icon: '⚡',
+    desc: 'Öğrencinin soru çözme hızını analiz ederek ona en uygun çalışma sürelerini belirleyin. Soru hedeflerine göre çalışma saati önerileri alın.',
+    details: [
+      '<b>Ders Bazlı Hız Tanımı:</b> Her öğrencinin Matematik, Fizik, Türkçe gibi farklı derslerdeki soru başına harcadığı saniyeyi tanımlayın.',
+      '<b>Önerilen Çalışma Süresi:</b> Örneğin 40 Matematik sorusu için öğrencinin hızına göre 60 dakika, 30 Kimya sorusu için 30 dakika önererek gerçekçi hedefler koyun.',
+      '<b>Tükenmişliği Önleyin:</b> Çalışma programlarındaki aşırı yükleme veya yetersiz süre planlamalarının önüne geçin.'
+    ]
+  },
+  'youtube-playlist': {
+    title: 'YouTube Playlist Entegrasyonu',
+    icon: '▶️',
+    desc: 'Öğrenciye atayacağınız video oynatma listelerini tek bir linkle sisteme ekleyin. Video izleme sürelerini oynatma hızına göre otomatik hesaplayın.',
+    details: [
+      '<b>Kolay Müfredat Atama:</b> YouTube video veya oynatma listesi URL\'sini yapıştırın; videolar, başlıkları ve süreleriyle otomatik yüklensin.',
+      '<b>Hız Seçimi (1.25x - 2x):</b> Öğrencinin izleme alışkanlığına göre (örn: 1.5x hızda) kalan net izleme süresini sistem kendisi hesaplar.',
+      '<b>Portal İçi Takip:</b> Öğrenciler videoları doğrudan kendi portallarından izleyerek ilerlemelerini kaydedebilir.'
+    ]
+  },
+  'meet-zoom': {
+    title: 'Google Meet & Zoom Randevu',
+    icon: '📅',
+    desc: 'Birebir görüşmeleriniz (seanslar) için tek tıkla online video konferans linki üretin. Tüm takviminizi platform üzerinden organize edin.',
+    details: [
+      '<b>Otomatik Link Üretimi:</b> Google Takvim ve Zoom entegrasyonu sayesinde seans saati geldiğinde görüşme linkleri otomatik hazır olur.',
+      '<b>Öğrenci Hatırlatıcıları:</b> Görüşme saatinden önce öğrenci portalında belirgin uyarılar gösterilerek gecikmeler önlenir.',
+      '<b>Seans Notları:</b> Görüşme sonrasında koç notlarını kaydederek bir sonraki haftanın planı için temel oluşturun.'
+    ]
+  },
+  'veri-guvenligi': {
+    title: 'RLS Tabanlı Veri İzolasyonu',
+    icon: '🔒',
+    desc: 'Kurumunuzun veya öğrencilerinizin verilerinin %100 güvende olduğundan emin olun. Başka hiçbir koç veya üçüncü şahıs sizin alanınıza erişemez.',
+    details: [
+      '<b>Supabase Row Level Security:</b> Verileriniz veri tabanı seviyesinde güvenlik kuralları (RLS) ile korunmaktadır.',
+      '<b>İzole Çalışma Alanı:</b> Her koç ve her kurum yalnızca kendi yetkilendirildiği şube, sınıf ve öğrencilerin verilerini görebilir.',
+      '<b>SSL Şifreleme:</b> Tüm iletişim kanalları ve veri transferleri endüstri standardı yüksek güvenlikli SSL protokolleri ile şifrelenir.'
+    ]
+  },
+  'ogrenci-portali': {
+    title: 'Kişiselleştirilmiş Öğrenci Çalışma Odası',
+    icon: '🎓',
+    desc: 'Sadece sizin hedeflerinize ve derslerinize odaklanmış, dikkat dağıtıcı unsurlardan arındırılmış dijital çalışma odanız.',
+    details: [
+      '<b>Günlük Hedefler:</b> Koçunuzun o güne özel atadığı konu çalışmaları ve soru bankası hedeflerini tek bir ekranda görün.',
+      '<b>İlerleme İşaretleme:</b> Çözdüğünüz veya tamamladığınız görevleri tek dokunuşla işaretleyerek koçunuza raporlayın.',
+      '<b>Ders Programı:</b> Haftalık ders çalışma planınızı düzenli olarak inceleyin.'
+    ]
+  },
+  'sokratik-ai': {
+    title: 'Sokratik Yapay Zeka Asistanı',
+    icon: '🤖',
+    desc: 'Çözemediğiniz sorularda cevabı doğrudan vermek yerine, size adımlı ipuçları ve yönlendirici sorular sorarak öğrenmenizi sağlayan akıllı asistan.',
+    details: [
+      '<b>Düşündürerek Öğretme:</b> Cevabı kopyalayıp yapıştırmak yerine konunun mantığını kavramanıza yardımcı olur.',
+      '<b>7/24 Aktif:</b> Koçunuza ulaşamadığınız saatlerde dahi ders asistanınız olarak her zaman yanınızdadır.',
+      '<b>Ders Bazlı Destek:</b> Matematik, Fen, Türkçe ve Sosyal Bilimler konularındaki soruları cevaplar.'
+    ]
+  },
+  'net-analizleri': {
+    title: 'Detaylı Net Takip Paneli',
+    icon: '📊',
+    desc: 'Deneme sınavlarındaki performansınızı ders ders analiz eden, hedefinize ne kadar yakın olduğunuzu gösteren grafiksel takip paneli.',
+    details: [
+      '<b>Tarihsel Gelişim:</b> Girdiğiniz tüm TYT/AYT deneme netlerini grafikler üzerinde yükseliş trendi olarak izleyin.',
+      '<b>Güçlü ve Zayıf Yanlar:</b> Netlerinizin düşük olduğu dersleri tespit ederek hangi konulara odaklanmanız gerektiğini görün.',
+      '<b>Hedef Cetveli:</b> Hayalinizdeki üniversite bölümüne ulaşmak için kaç nete daha ihtiyacınız olduğunu görün.'
+    ]
+  },
+  'soru-kronometresi': {
+    title: 'İnteraktif Soru Kronometresi',
+    icon: '⏱️',
+    desc: 'Soru çözerken zaman yönetimi yeteneğinizi geliştirmek amacıyla tasarlanmış, ders bazında süre ölçümü yapan hassas araç.',
+    details: [
+      '<b>Ders Seçimi:</b> Matematik, Türkçe, Fen gibi çözdüğünüz derse özel kronometre başlatın.',
+      '<b>Hız Ölçümü:</b> Soru başına harcanan süreyi hesaplayarak gerçek sınav temposuna hazırlanın.',
+      '<b>Veri Kaydı:</b> Harcadığınız süreler koçunuza iletilerek daha dengeli bir program yapılmasına katkı sağlar.'
+    ]
+  },
+  'kaynak-yonetimi': {
+    title: 'Soru Bankası & Kitap Takibi',
+    icon: '📚',
+    desc: 'Elinizdeki tüm kaynak kitapları, soru bankalarını ve video kamplarını sisteme tanımlayarak ilerleme yüzdelerini görün.',
+    details: [
+      '<b>Kitap Bitirme Oranı:</b> Hangi soru bankasının yüzde kaçını çözdüğünüzü görsel ilerleme çubuklarıyla izleyin.',
+      '<b>Dengeli Kitap Çözümü:</b> Aynı anda birden fazla kaynağı dengeli şekilde bitirmenize yardımcı olur.',
+      '<b>Yeni Kaynak Önerileri:</b> Mevcut kaynaklarınız bittiğinde sistem üzerinden yeni kitap takipleri ekleyebilirsiniz.'
+    ]
+  },
+  'birebir-gorusmeler': {
+    title: 'Online Koçluk Seansları',
+    icon: '📆',
+    desc: 'Koçunuzla planlanan haftalık online görüşmeleri (seansları) takip edebileceğiniz, linklere tek tıkla erişebileceğiniz alan.',
+    details: [
+      '<b>Randevu Takvimi:</b> Görüşmenin hangi gün ve hangi saatte olduğunu seans kartından görün.',
+      '<b>Hızlı Katılım:</b> Google Meet veya Zoom linklerine harici bir yere gitmeden doğrudan seans kartından bağlanın.',
+      '<b>Koç Geri Bildirimleri:</b> Görüşme sonrası koçunuzun sizin için yazdığı notları ve ödevleri inceleyin.'
+    ]
+  },
+  'veli-bilgilendirme': {
+    title: 'Veli Raporlama & Takip Modülü',
+    icon: '👨‍👩‍👦',
+    desc: 'Velinizin sizin gelişim süreçlerinizi, ödev tamamlama durumunuzu ve deneme sonuçlarınızı takip edebileceği özel ekran.',
+    details: [
+      '<b>Ortak İletişim:</b> Koçunuzun yazdığı raporları ve notları velinizle birlikte inceleyebilirsiniz.',
+      '<b>Süreç Şeffaflığı:</b> Velinizin çalışma disiplininizi ve net artışlarınızı düzenli görerek size daha fazla destek olmasını sağlar.',
+      '<b>İzole Veli Portalı:</b> Veli, sizin çalışma odanıza müdahale edemez; yalnızca raporları ve duyuruları izleyebilir.'
+    ]
+  },
+  'merkezi-kurum': {
+    title: 'Merkezi Yönetim & Denetim Paneli',
+    icon: '🏢',
+    desc: 'Okul, dershane veya kurs merkezinizdeki tüm şube, koç, öğrenci ve veli süreçlerini tek ekrandan denetleyen üst düzey panel.',
+    details: [
+      '<b>Genel İstatistikler:</b> Toplam öğrenci sayısı, koç sayısı ve bu haftaki ödev tamamlama oranlarını görün.',
+      '<b>Şube ve Sınıf Karşılaştırmaları:</b> Farklı şubelerinizin deneme sınavı başarı ortalamalarını karşılaştırın.',
+      '<b>Koç Aktiflik Durumu:</b> Hangi koçun öğrencileriyle ne sıklıkla görüştüğünü ve program yaptığını izleyin.'
+    ]
+  },
+  'akilli-eslestirme': {
+    title: 'Otomatik Koç-Öğrenci Eşleştirme',
+    icon: '🤝',
+    desc: 'Kaydolan öğrencileri şubelerine, hedeflerine (Sayısal, Sözel, Eşit Ağırlık) veya koçların uzmanlık alanlarına göre saniyeler içinde atayın.',
+    details: [
+      '<b>Hızlı Atama:</b> Başvurusu onaylanan öğrenciye tek tıkla uygun branştaki koçu atayarak zaman kazanın.',
+      '<b>Kota Kontrolü:</b> Koçların maksimum öğrenci limitlerini aşmasını engelleyecek doluluk oranlarını görün.',
+      '<b>Esnek Değişiklik:</b> Gerekli durumlarda koç atamalarını saniyeler içinde güncelleyin.'
+    ]
+  },
+  'kurumsal-markalama': {
+    title: 'Kurumsal Kimlik & White Label',
+    icon: '🎨',
+    desc: 'Rostrum Akademi arayüzünü tamamen kendi logonuz, renkleriniz ve alan adınız (Custom Domain) ile yayınlayın.',
+    details: [
+      '<b>Özel Logo & Renkler:</b> Platformun sol üst köşesindeki logoyu ve ana tema renklerini kurumunuza göre özelleştirin.',
+      '<b>Kendi Domain Adresiniz:</b> Portalı panel.kurumadi.com gibi kendi web adresiniz üzerinden çalıştırın.',
+      '<b>Prestijli İmaj:</b> Öğrencilerinize ve velilerinize kendi yazılım sisteminizle hizmet veriyor olmanın prestijini yaşayın.'
+    ]
+  },
+  'sinif-grup': {
+    title: 'Sınıf ve Sınıf Karşılaştırma Analizleri',
+    icon: '📊',
+    desc: 'Şubelerinizdeki sınıfların genel başarı durumlarını, ödev tamamlama grafiklerini ve deneme net ortalamalarını karşılaştırmalı görün.',
+    details: [
+      '<b>Grup Bazlı Analiz:</b> Matematik-1, Sayısal-A gibi grupların haftalık tamamladıkları soru sayılarını izleyin.',
+      '<b>Başarı Kıyaslaması:</b> Sınıfların TYT/AYT deneme sınavlarındaki ders bazlı gelişim farklarını görerek ek dersler planlayın.',
+      '<b>Toplu Konu Analizi:</b> Sınıf genelinde yanlış yapılan ortak konuları belirleyerek tekrar dersleri açın.'
+    ]
+  },
+  'sinirsiz-olcek': {
+    title: 'Sınırsız Altyapı & Ölçeklenebilirlik',
+    icon: '🚀',
+    desc: 'Binlerce öğrenci, yüzlerce koç ve onlarca farklı şubesi olan devasa eğitim kurumları için tasarlanmış yüksek performanslı mimari.',
+    details: [
+      '<b>Çoklu Şube Desteği:</b> Kadıköy, Beşiktaş gibi farklı lokasyonlardaki şubelerinizi tek bir ana hesaba bağlayın.',
+      '<b>Yüksek Trafik Toleransı:</b> Aynı anda binlerce kullanıcının sisteme girip işlem yapabileceği stabil PostgreSQL veritabanı.',
+      '<b>Gelişmiş Rol Yönetimi:</b> Şube müdürü, rehberlik koordinatörü, sistem yöneticisi gibi gelişmiş yetkilendirmeler tanımlayın.'
+    ]
+  },
+  'toplu-duyuru': {
+    title: 'Gelişmiş Toplu Duyuru & Bildirim',
+    icon: '📣',
+    desc: 'Tüm sisteme, belirli sınıflara, sadece koçlara veya velilere tek tıkla e-posta, SMS veya uygulama içi anlık bildirim gönderme aracı.',
+    details: [
+      '<b>Hedefli Gönderim:</b> Sadece "12-Sayısal-A" sınıfına veya sadece velilere duyurular iletin.',
+      '<b>Şablon Kütüphanesi:</b> Veli bilgilendirme, deneme sınavı hatırlatması, tatil duyuruları gibi hazır şablonları kullanın.',
+      '<b>Okundu Takibi:</b> Gönderdiğiniz duyuruların kimler tarafından görüntülendiğini raporlayın.'
+    ]
+  },
+  'odeme-lisans': {
+    title: 'Ödeme Takip & Finansal Raporlama',
+    icon: '💳',
+    desc: 'Bireysel koçlarınızın veya şubelerinizin lisans sürelerini, faturalandırma detaylarını ve ödeme durumlarını tek bir yerden izleyin.',
+    details: [
+      '<b>Lisans Yönetimi:</b> Koçlarınızın kullanım sürelerini ve aktif lisans sayılarını takip edin.',
+      '<b>Gelir/Gider Takibi:</b> Kurumunuzun eğitim koçluğundan elde ettiği finansal verileri özetleyin.',
+      '<b>Otomatik Hatırlatıcılar:</b> Lisans süresi dolmak üzere olan koçlara otomatik yenileme uyarısı gönderin.'
+    ]
+  }
+};
+
+// MODAL CONTROLLERS
+function openFeatureModal(featureId) {
+  const data = FEATURE_DATA[featureId];
+  if (!data) return;
+
+  document.getElementById('fm-icon').textContent = data.icon;
+  document.getElementById('fm-title').textContent = data.title;
+  document.getElementById('fm-desc').textContent = data.desc;
+
+  const detailsContainer = document.getElementById('fm-details');
+  let listHtml = '<ul>';
+  data.details.forEach(item => {
+    listHtml += `<li>${item}</li>`;
+  });
+  listHtml += '</ul>';
+  detailsContainer.innerHTML = listHtml;
+
+  const modal = document.getElementById('featureModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // prevent background scrolling
+}
+
+function closeFeatureModal(event) {
+  const modal = document.getElementById('featureModal');
+  modal.style.display = 'none';
+  document.body.style.overflow = ''; // restore scrolling
+}
+
+// Close on escape key or outer overlay click
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeFeatureModal();
+  }
+});
 
 
 // THEME

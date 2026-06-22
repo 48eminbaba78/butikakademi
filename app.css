@@ -31,9 +31,9 @@ body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);displ
 /* Brand panel (left) */
 .login-brand{flex:0 0 420px;background:linear-gradient(135deg,var(--surface2) 0%,var(--bg) 100%);border-right:1px solid var(--border);padding:48px 40px;display:flex;flex-direction:column;justify-content:center;gap:0;position:relative;overflow:hidden;}
 .login-brand::before{content:'';position:absolute;top:-100px;right:-80px;width:380px;height:380px;background:radial-gradient(circle,rgba(240,165,0,.08),transparent 70%);pointer-events:none;}
-.lb-logo{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-1px;color:var(--text);margin-bottom:36px;}
-.lb-logo span{color:var(--accent);}
-.lb-tagline{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;line-height:1.15;letter-spacing:-1.5px;color:var(--text);margin-bottom:32px;}
+.lb-logo{font-family:'Inter',sans-serif;font-size:24px;font-weight:800;letter-spacing:0.5px;color:var(--text);margin-bottom:36px;}
+.lb-logo span{color:var(--accent);margin-left:3px;}
+.lb-tagline{font-family:'Inter',sans-serif;font-size:clamp(24px, 3.2vw, 32px);font-weight:700;line-height:1.25;letter-spacing:-0.2px;color:var(--text);margin-bottom:32px;}
 .lb-features{display:flex;flex-direction:column;gap:12px;margin-bottom:36px;}
 .lb-feat{font-size:13px;color:var(--text-mid);display:flex;align-items:center;gap:10px;}
 .lb-feat::before{display:none;}
@@ -42,8 +42,8 @@ body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);displ
 /* Form panel (right) */
 .login-form-panel{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;overflow-y:auto;}
 .login-box{width:100%;max-width:400px;animation:fadeUp .4s ease;}
-.login-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;margin-bottom:20px;letter-spacing:-1px;}
-.login-logo span{color:var(--accent);}
+.login-logo{font-family:'Inter',sans-serif;font-size:26px;font-weight:800;margin-bottom:20px;letter-spacing:0.5px;}
+.login-logo span{color:var(--accent);margin-left:3px;}
 
 /* Mode tabs: Giriş / Kayıt */
 .login-mode-tabs{display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:20px;}
@@ -142,7 +142,7 @@ body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);displ
 .sb-logo{width:100%;display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:6px;cursor:pointer;user-select:none;}
 .sb-logo-icon{width:28px;height:28px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#0f0e0c;flex-shrink:0;transition:background .15s;}
 .sb-logo-icon:hover{background:#fbb800;}
-.sb-logo-text{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--accent);white-space:nowrap;opacity:0;transition:opacity .2s;}
+.sb-logo-text{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;letter-spacing:0.2px;color:var(--accent);white-space:nowrap;opacity:0;transition:opacity .2s;margin-left:2px;}
 .sidebar.open .sb-logo-text{opacity:1;}
 .sb-divider{width:28px;height:1px;background:var(--border);margin:5px auto;transition:width .25s;}
 .sidebar.open .sb-divider{width:182px;}
@@ -770,4 +770,75 @@ body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--text);displ
   min-height: 100px;
   max-height: 150px;
   overflow-y: auto;
+}
+
+/* Google Account Chooser Simulator */
+.g-chooser {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 18px;
+}
+.g-account-row {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+.g-account-row:last-child {
+  border-bottom: none;
+}
+.g-account-row:hover {
+  background: var(--surface3);
+}
+.g-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #0f0e0c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-right: 12px;
+}
+.g-avatar.student {
+  background: var(--green);
+}
+.g-avatar.new {
+  background: var(--surface3);
+  color: var(--text-mid);
+  border: 1px dashed var(--border2);
+}
+.g-info {
+  display: flex;
+  flex-direction: column;
+}
+.g-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.g-email {
+  font-size: 11px;
+  color: var(--text-mid);
+  margin-top: 2px;
+}
+.g-email span {
+  font-weight: 700;
+  color: var(--accent);
+  margin-left: 4px;
 }
