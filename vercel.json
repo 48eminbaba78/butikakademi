@@ -1,5 +1,6 @@
 {
   "outputDirectory": "dist",
+  "buildCommand": "node -e \"console.log('No build step - serving pre-built dist/')\"",
   "rewrites": [
     { "source": "/admin/(.*)", "destination": "/admin/dist/index.html" }
   ],
