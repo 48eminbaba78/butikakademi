@@ -369,7 +369,7 @@ async function publishToInstagram(imageUrl, caption) {
   }
 
   // 1. Adım: Container Oluştur
-  const containerUrl = `https://graph.facebook.com/v12.0/${accountId}/media`;
+  const containerUrl = `https://graph.facebook.com/v20.0/${accountId}/media`;
   const containerRes = await fetch(containerUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -386,7 +386,7 @@ async function publishToInstagram(imageUrl, caption) {
   const creationId = containerData.id;
 
   // 2. Adım: Yayınla
-  const publishUrl = `https://graph.facebook.com/v12.0/${accountId}/media_publish`;
+  const publishUrl = `https://graph.facebook.com/v20.0/${accountId}/media_publish`;
   const publishRes = await fetch(publishUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

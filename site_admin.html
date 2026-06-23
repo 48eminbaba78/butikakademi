@@ -2323,7 +2323,7 @@ async function testIgConnection() {
 
   showToast('Meta Graph API bağlantısı test ediliyor...');
   try {
-    const testUrl = `https://graph.facebook.com/v12.0/${accountId}?fields=username,name&access_token=${token}`;
+    const testUrl = `https://graph.facebook.com/v20.0/${accountId}?fields=username,name&access_token=${token}`;
     const response = await fetch(testUrl);
     const data = await response.json();
     if(data.username) {

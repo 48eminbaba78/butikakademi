@@ -175,30 +175,41 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Override DB credentials with our permanent tokens
-    const accountId = '17841416299824950';
-    const accessToken = 'EAAN9aeN38hwBR0SlDaIQy8CU06gRkKiIE7juSWMC9alusj2QEk3ZCOZBhTtN2HKC0hLpQF6e8ZCM4GYvlZBXiZAbLYctU6Bemok8vty12nuGe2MKdnZCblIJUHpvQJGHu3PPd0r3uWzVL97JZBFpZC95pG18JwiKKEhld4DKjbHGx4gqfleFUFXW9MHtJ3qgswZDZD';
+    // 1. Credentials'ı Supabase'den oku (admin panelinden kaydedilen)
+    const { data: credData, error: credError } = await db
+      .from('platform_settings')
+      .select('value')
+      .eq('key', 'instagram_credentials')
+      .maybeSingle();
 
-    // 2. Render SVG to PNG
-    console.log('[API] Generating SVG and rendering to PNG...');
-    const svgContent = getPostSvg(type, daysLeft, quote, author, title);
-    
-    if (!svgContent) {
-      return res.status(400).json({ message: 'Failed to generate SVG content' });
+    if (credError) {
+      return res.status(500).json({ message: 'Kimlik bilgileri okunamadı: ' + credError.message });
     }
 
-    const resvg = new Resvg(svgContent, {
-      fitTo: {
-        mode: 'width',
-        value: 1080
-      }
-    });
-    
+    const creds = credData?.value;
+    if (!creds?.instagram_account_id || !creds?.instagram_access_token) {
+      return res.status(400).json({
+        message: 'Instagram kimlik bilgileri eksik. Lütfen admin panelinde Yapay Zeka & Pazarlama → Bağlantı Ayarları bölümünden Account ID ve Access Token girin ve kaydedin.'
+      });
+    }
+
+    const accountId = creds.instagram_account_id;
+    const accessToken = creds.instagram_access_token;
+
+    // 2. SVG → PNG render
+    console.log('[API] SVG oluşturuluyor ve PNG\'ye dönüştürülüyor...');
+    const svgContent = getPostSvg(type, daysLeft, quote, author, title);
+
+    if (!svgContent) {
+      return res.status(400).json({ message: 'SVG içeriği oluşturulamadı' });
+    }
+
+    const resvg = new Resvg(svgContent, { fitTo: { mode: 'width', value: 1080 } });
     const pngData = resvg.render();
     const pngBuffer = pngData.asPng();
 
-    // 3. Upload to Supabase Storage
-    const fileName = `daily-post-${Date.now()}.png`;
+    // 3. Supabase Storage'a yükle
+    const fileName = `ig-post-${Date.now()}.png`;
     const { error: uploadError } = await db.storage
       .from('platform_assets')
       .upload(`instagram_posts/${fileName}`, pngBuffer, {
@@ -208,56 +219,44 @@ export default async function handler(req, res) {
       });
 
     if (uploadError) {
-      return res.status(500).json({ message: 'Storage upload failed: ' + uploadError.message });
+      return res.status(500).json({
+        message: `Storage yüklemesi başarısız: ${uploadError.message}. Supabase Storage'da "platform_assets" adında public bir bucket oluşturduğunuzdan emin olun.`
+      });
     }
 
-    // Get public URL
     const { data: { publicUrl } } = db.storage
       .from('platform_assets')
       .getPublicUrl(`instagram_posts/${fileName}`);
 
-    console.log('[API] PNG public URL:', publicUrl);
+    console.log('[API] PNG URL:', publicUrl);
 
-    // 4. Publish to Instagram Graph API
-    // Step 4.1: Create Container
-    const containerUrl = `https://graph.facebook.com/v12.0/${accountId}/media`;
-    const containerRes = await fetch(containerUrl, {
+    // 4. Instagram Graph API v20.0 ile yayınla
+    const containerRes = await fetch(`https://graph.facebook.com/v20.0/${accountId}/media`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        image_url: publicUrl,
-        caption: caption,
-        access_token: accessToken
-      })
+      body: JSON.stringify({ image_url: publicUrl, caption, access_token: accessToken })
     });
 
     const containerData = await containerRes.json();
     if (containerData.error) {
-      return res.status(400).json({ message: 'Meta Graph API Error (Container): ' + containerData.error.message });
+      return res.status(400).json({ message: 'Meta Graph API Hatası (Container): ' + containerData.error.message });
     }
-    
-    const creationId = containerData.id;
 
-    // Step 4.2: Publish Container
-    const publishUrl = `https://graph.facebook.com/v12.0/${accountId}/media_publish`;
-    const publishRes = await fetch(publishUrl, {
+    const publishRes = await fetch(`https://graph.facebook.com/v20.0/${accountId}/media_publish`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        creation_id: creationId,
-        access_token: accessToken
-      })
+      body: JSON.stringify({ creation_id: containerData.id, access_token: accessToken })
     });
 
     const publishData = await publishRes.json();
     if (publishData.error) {
-      return res.status(400).json({ message: 'Meta Graph API Error (Publish): ' + publishData.error.message });
+      return res.status(400).json({ message: 'Meta Graph API Hatası (Publish): ' + publishData.error.message });
     }
 
     return res.status(200).json({ success: true, id: publishData.id, imageUrl: publicUrl });
 
   } catch (err) {
     console.error('Publish Instagram API error:', err);
-    return res.status(500).json({ message: 'Server error: ' + err.message });
+    return res.status(500).json({ message: 'Sunucu hatası: ' + err.message });
   }
 }
