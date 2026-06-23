@@ -231,6 +231,7 @@ export default async function handler(req, res) {
     console.log('[API] PNG URL:', publicUrl);
 
     // 4. Instagram Graph API v20.0 ile yayınla
+    // 4.1: Container oluştur
     const containerRes = await fetch(`https://graph.facebook.com/v20.0/${accountId}/media`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -242,10 +243,31 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: 'Meta Graph API Hatası (Container): ' + containerData.error.message });
     }
 
+    const creationId = containerData.id;
+
+    // 4.2: Container hazır olana kadar bekle (max 30 saniye)
+    let statusCode = 'IN_PROGRESS';
+    let attempts = 0;
+    while (statusCode === 'IN_PROGRESS' && attempts < 10) {
+      await new Promise(r => setTimeout(r, 3000));
+      const statusRes = await fetch(
+        `https://graph.facebook.com/v20.0/${creationId}?fields=status_code&access_token=${accessToken}`
+      );
+      const statusData = await statusRes.json();
+      statusCode = statusData.status_code || 'ERROR';
+      attempts++;
+      console.log(`[API] Container status (${attempts}): ${statusCode}`);
+    }
+
+    if (statusCode !== 'FINISHED') {
+      return res.status(400).json({ message: `Container hazırlanamadı. Son durum: ${statusCode}` });
+    }
+
+    // 4.3: Yayınla
     const publishRes = await fetch(`https://graph.facebook.com/v20.0/${accountId}/media_publish`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ creation_id: containerData.id, access_token: accessToken })
+      body: JSON.stringify({ creation_id: creationId, access_token: accessToken })
     });
 
     const publishData = await publishRes.json();
