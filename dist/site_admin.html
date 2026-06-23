@@ -2134,15 +2134,30 @@ async function regenerateIgPostPanel() {
   btn.disabled = true;
 
   try {
-    const prompt = `Biz eğitim kurumlarına ve YKS (Yükseköğretim Kurumları Sınavı) koçlarına SaaS çözümü sunan Rostrum Akademi'yiz. 
-    YKS sistemi; TYT (Temel Yeterlilik Testi) ve AYT (Alan Yeterlilik Testleri) olmak üzere 2 ana oturumdan oluşmaktadır. Hedef sınav olan YKS 2027'nin tahmini tarihi 19-20 Haziran 2027'dir.
-    
-    Bana koçluk yazılımı/platformu satışını destekleyecek ${d.type} tipinde yepyeni, B2B SaaS odaklı ve Türkçe bir söz ("quote") ve bir yazar ("author") üret. 
-    Ayrıca Instagram için koçları ve eğitimcileri platformumuzu denemeye davet eden (koçlara zaman kazandıran, öğrencilerin YKS TYT/AYT netlerini artıran sistem vurgulu) etkileyici bir açıklama metni ("caption") yaz.
-    Ek olarak:
-    - Eğer tip "tactic" veya "seasonal" ise, "title" (ana başlık), "subtitle" (alt başlık) ve "points" adında 3 maddelik bir dizi (her biri "title" ve "desc" alanları içeren, desc maks 15 kelime) üret (Örn: Eğitim Kurumunu Büyütmenin 3 Yolu).
-    - Eğer tip "comparison" ise "title": "BÜYÜK KARŞILAŞTIRMA" ve "subtitle": "Klasik Kağıt Program vs Rostrum Akademi SaaS" alanlarını dön.
-    JSON formatında dön. Lütfen sadece ham JSON dön.`;
+    const prompt = `Sen Rostrum Akademi'nin Instagram içerik yazarısın.
+
+KİMİZ: Rostrum Akademi, Türkiye'deki bağımsız YKS koçlarına özel bir SaaS platformudur. Koçların öğrenci takibini, ders planlamasını ve iletişimini tek yerden yönetmesini sağlarız. Hedef kitle: Excel ve WhatsApp ile çalışmaktan yorulmuş, işini büyütmek isteyen bağımsız özel ders koçları.
+
+TON KURALLARI:
+- Profesyonel ama soğuk değil. Koçun yanında duran bir ekip gibi konuş.
+- Klişeden kaçın: "Başarıya ulaş", "Hayallerinin peşinden koş" gibi ifadeler YASAK.
+- Rakamlarla konuş: "Haftada 3 saat" > "Çok zaman kazanırsın"
+- Kahraman koçtur, yazılım arka plandaki araçtır.
+- "Bizi takip et" yasak → "erken erişim listesine katıl" de.
+- "En iyi platform" gibi kanıtlanmamış iddialar yasak.
+- İngilizce terim karışımı (SaaS, dashboard, feature) yasak → Türkçe karşılık kullan.
+- Emoji: az ve anlamlı. Dekoratif emoji yasak.
+- Hashtag: 5-8 adet, mikro ve niş. #özelkoç #ykskoçu #eğitimteknolojisi gibi. Genel hashtaglerden kaçın.
+
+GÖREV: "${d.type}" tipinde yepyeni bir Instagram içeriği üret.
+- "quote": Kısa, vurucu, klişesiz bir söz (max 12 kelime).
+- "author": "Rostrum Akademi" veya ilgili yazar.
+- "caption": İlk cümle kaydırma durdurucu olmalı (soru, istatistik veya keskin gözlem). 3-5 kısa paragraf. Son satır net CTA.
+- Eğer tip "tactic" veya "seasonal" ise: "title" (başlık), "subtitle" (alt başlık) ve "points" (3 madde, her biri "title" ve "desc", desc max 12 kelime).
+- Eğer tip "comparison" ise: "title": "KLASIK vs DİJİTAL", "subtitle": "Kağıt Program vs Rostrum Akademi".
+- Eğer tip "countdown" ise: YKS 2027'ye ${d.days_left} gün kaldı bilgisini kullan.
+
+Sadece ham JSON döndür, başka açıklama ekleme.`;
     const response = await fetch('/api/ai-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

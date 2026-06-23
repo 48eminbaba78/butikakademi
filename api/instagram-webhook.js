@@ -36,8 +36,13 @@ export default async function handler(req, res) {
     // Check if it is an Instagram event
     if (body.object === 'instagram') {
       try {
-        // Override DB token with our permanent token
-        const accessToken = 'EAAN9aeN38hwBR0SlDaIQy8CU06gRkKiIE7juSWMC9alusj2QEk3ZCOZBhTtN2HKC0hLpQF6e8ZCM4GYvlZBXiZAbLYctU6Bemok8vty12nuGe2MKdnZCblIJUHpvQJGHu3PPd0r3uWzVL97JZBFpZC95pG18JwiKKEhld4DKjbHGx4gqfleFUFXW9MHtJ3qgswZDZD';
+        // Token'ı Supabase'den oku
+        const { data: credData } = await db.from('platform_settings').select('value').eq('key', 'instagram_credentials').maybeSingle();
+        const accessToken = credData?.value?.instagram_access_token;
+        if (!accessToken) {
+          console.error('[Webhook] Access token bulunamadı');
+          return res.status(200).json({ status: 'no_token' });
+        }
 
         // Fetch automation rules
         const { data: rulesData } = await db.from('platform_settings').select('value').eq('key', 'instagram_automation_rules').maybeSingle();
@@ -57,14 +62,14 @@ export default async function handler(req, res) {
 
               console.log(`[Webhook] Comment received from @${username}: "${value.text}" on media_id: ${value.media_id}`);
 
-              // Find a matching automation rule
-              const matchingRule = rules.find(r => r.trigger.toUpperCase() === text);
+              // Yorumun içinde trigger kelimesi geçiyor mu kontrol et
+              const matchingRule = rules.find(r => text.includes(r.trigger.toUpperCase()));
 
               if (matchingRule) {
                 console.log(`[Webhook] Match found for trigger "${matchingRule.trigger}"! Executing actions...`);
 
                 // Action A: Post public comment reply
-                const commentReplyUrl = `https://graph.facebook.com/v12.0/${commentId}/replies`;
+                const commentReplyUrl = `https://graph.facebook.com/v20.0/${commentId}/replies`;
                 const replyCommentRes = await fetch(commentReplyUrl, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -81,7 +86,7 @@ export default async function handler(req, res) {
                 }
 
                 // Action B: Send private DM to user who commented
-                const dmUrl = `https://graph.facebook.com/v12.0/me/messages?access_token=${accessToken}`;
+                const dmUrl = `https://graph.facebook.com/v20.0/me/messages?access_token=${accessToken}`;
                 const dmRes = await fetch(dmUrl, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
