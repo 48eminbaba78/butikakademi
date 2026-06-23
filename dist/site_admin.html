@@ -532,58 +532,177 @@ tr:hover td{background:var(--s2);}
       </div>
 
       <!-- INSTAGRAM YÖNETİM & OTOMASYON PANELİ -->
-      <div class="view" id="view-instagram">
-        <div class="page-h">📸 Instagram Yönetim &amp; Otomasyon</div>
-        <div class="page-sub">Bağlantınızı yönetin, AI gönderileri onaylayın ve otomatik DM/yorum yanıtlarını kurgulayın</div>
+      <div class="view" id="view-instagram" style="padding:0;display:flex;flex-direction:column;height:calc(100vh - 60px);overflow:hidden">
 
-        <div class="tab-h" style="display:flex;gap:12px;margin-bottom:20px;border-bottom:1px solid var(--bd);padding-bottom:10px;margin-top:14px">
-          <button class="btn btn-ghost" id="tab-ig-posts" onclick="switchIgPanelTab('posts')" style="font-weight:600">📸 Gönderi Taslakları</button>
-          <button class="btn btn-ghost" id="tab-ig-rules" onclick="switchIgPanelTab('rules')" style="font-weight:600">🤖 Otomasyon &amp; DM Kuralları</button>
-          <button class="btn btn-ghost" id="tab-ig-config" onclick="switchIgPanelTab('config')" style="font-weight:600">⚙️ Bağlantı Ayarları</button>
+        <!-- IG TOPBAR -->
+        <div style="display:flex;align-items:center;gap:16px;padding:12px 24px;background:#0D1117;border-bottom:0.5px solid rgba(255,255,255,0.08);flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:17px">📸</span>
+            <span style="font-weight:700;color:#e6edf3;font-size:14px;letter-spacing:-.2px">Instagram Yönetim</span>
+          </div>
+          <div style="flex:1;display:flex;justify-content:center">
+            <div style="background:rgba(244,162,97,0.12);border:0.5px solid rgba(244,162,97,0.3);border-radius:6px;padding:4px 14px;font-size:12px;font-weight:600;color:#F4A261">
+              YKS · <span id="igTopbarCountdown">…</span> gün kaldı
+            </div>
+          </div>
+          <span style="font-size:11px;color:rgba(230,237,243,0.3)">rostrumakademi.app</span>
+        </div>
+
+        <!-- IG TAB BAR -->
+        <div style="display:flex;background:#0D1117;border-bottom:0.5px solid rgba(255,255,255,0.08);flex-shrink:0">
+          <button id="tab-ig-posts" onclick="switchIgPanelTab('posts')"
+            style="padding:10px 20px;background:none;border:none;border-bottom:2px solid #F4A261;color:#e6edf3;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Gönderi Taslakları</button>
+          <button id="tab-ig-rules" onclick="switchIgPanelTab('rules')"
+            style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(230,237,243,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Otomasyon Kuralları</button>
+          <button id="tab-ig-config" onclick="switchIgPanelTab('config')"
+            style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(230,237,243,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Bağlantı Ayarları</button>
         </div>
 
         <!-- 1. GÖNDERİLER TABI -->
-        <div id="ig-posts-section" style="display:none">
-          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px">
-            <!-- Sol: Taslak Listesi -->
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-                <span style="font-size:12px;color:var(--dim)">Taslağa tıklayarak önizleme ve yayınlama yapın</span>
-                <button class="btn btn-ghost" id="btnRegenAll" onclick="regenerateAllDrafts()" style="font-size:12px;padding:5px 12px">🔄 Tümünü Yenile</button>
-              </div>
-              <div class="card tbl-wrap" style="padding:0">
-                <table style="margin:0">
-                  <thead><tr><th>İçerik Türü</th><th>Açıklama/Özet</th><th>Sayaç Kalan Gün</th><th>Durum</th></tr></thead>
-                  <tbody id="igPanelTable"><tr><td colspan="4" class="loading">Taslaklar yükleniyor...</td></tr></tbody>
-                </table>
-              </div>
+        <div id="ig-posts-section" style="display:flex;flex:1;overflow:hidden">
+
+          <!-- SOL PANEL -->
+          <div style="flex:1;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:14px">
+
+            <div id="igErrorBanner" style="display:none;background:rgba(224,90,90,0.12);border:0.5px solid rgba(224,90,90,0.35);border-radius:6px;padding:7px 12px;font-size:12px;color:#e05a5a">
+              ⚠ Supabase bağlantı hatası — veriler yüklenemedi
             </div>
-            <!-- Sağ: Önizleme Paneli -->
-            <div>
-              <div class="card" style="padding:20px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;position:sticky;top:80px">
-                <h3 style="margin-bottom:4px;color:var(--acc)">📱 Önizleme</h3>
-                <div id="igPanelPreviewContainer" style="width:100%;aspect-ratio:1;background:#07060a;display:flex;align-items:center;justify-content:center;border-radius:10px;overflow:hidden;border:1px solid var(--bd);margin-bottom:12px">
-                  <span style="color:var(--dim);font-size:12px">Önizlemek için sol taraftan bir taslak seçin</span>
-                </div>
 
-                <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Açıklama Metni (Caption)</div>
-                <textarea id="igPanelCaptionPreview" style="font-size:12px;color:var(--text);background:var(--s2);border:1px solid var(--bd);padding:10px;border-radius:8px;min-height:90px;width:100%;box-sizing:border-box;font-family:inherit;outline:none;resize:vertical" placeholder="Açıklama metni burada görünecek..."></textarea>
-
-                <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 6px">Üretim</div>
-                <button class="btn btn-ghost" id="btnPanelRejectIg" style="width:100%;justify-content:center" disabled onclick="regenerateIgPostPanel()">🔄 Yeniden Üret (AI)</button>
-
-                <div style="font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin:12px 0 6px">Dağıtım</div>
-                <div style="display:flex;gap:8px">
-                  <button class="btn btn-green" id="btnPanelApproveIg" style="flex:1;justify-content:center" disabled onclick="publishIgPostPanel(false)">🚀 Post Yayınla</button>
-                  <button class="btn" id="btnPanelStoryIg" style="flex:1;justify-content:center;background:#833ab4;color:#fff" disabled onclick="publishIgPostPanel(true)">📱 Hikaye</button>
+            <!-- Haftalık Tema Banner -->
+            <div style="background:rgba(244,162,97,0.07);border:0.5px solid rgba(244,162,97,0.2);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:8px;height:8px;border-radius:50%;background:#F4A261;flex-shrink:0;box-shadow:0 0 6px rgba(244,162,97,0.5)"></div>
+                <div>
+                  <div style="font-size:10px;color:rgba(244,162,97,0.6);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px">Bu hafta · Tema <span id="igCurrentWeekNum">1</span>/4</div>
+                  <div id="igCurrentThemeName" style="font-size:15px;font-weight:700;color:#F4A261">—</div>
                 </div>
               </div>
+              <div style="text-align:right">
+                <div style="font-size:10px;color:rgba(230,237,243,0.25);margin-bottom:2px">Sonraki →</div>
+                <div id="igNextThemeName" style="font-size:12px;color:rgba(230,237,243,0.45)">—</div>
+              </div>
             </div>
+
+            <!-- Rotasyon Pills -->
+            <div id="igWeekPills" style="display:flex;gap:8px"></div>
+
+            <!-- İçerik Kuyruğu -->
+            <div style="background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden;flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:0.5px solid rgba(255,255,255,0.06)">
+                <span style="font-size:10px;font-weight:700;color:rgba(230,237,243,0.35);text-transform:uppercase;letter-spacing:.6px">İçerik Kuyruğu</span>
+                <button id="btnRegenAll" onclick="regenerateAllIgPosts()"
+                  style="background:none;border:0.5px solid rgba(255,255,255,0.12);border-radius:5px;padding:3px 10px;font-size:11px;color:rgba(230,237,243,0.45);cursor:pointer;font-family:inherit">↺ Tümünü Yenile</button>
+              </div>
+              <table style="width:100%;border-collapse:collapse">
+                <thead>
+                  <tr style="border-bottom:0.5px solid rgba(255,255,255,0.05)">
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:600;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.5px">İçerik Türü</th>
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:600;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.5px">Tema</th>
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:600;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.5px">Yayın Zamanı</th>
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:600;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.5px">Durum</th>
+                  </tr>
+                </thead>
+                <tbody id="igPostsTable">
+                  <tr><td colspan="4" style="text-align:center;padding:40px;color:rgba(230,237,243,0.25);font-size:13px">Yükleniyor…</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Ay Özeti Şeridi -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+              <div style="background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px 14px">
+                <div style="font-size:10px;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">İçgörü / Platform</div>
+                <div id="igSummaryInsight" style="font-size:22px;font-weight:700;color:#e6edf3">—</div>
+              </div>
+              <div style="background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px 14px">
+                <div style="font-size:10px;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Sosyal Kanıt</div>
+                <div id="igSummarySocial" style="font-size:22px;font-weight:700;color:#e6edf3">— / 1</div>
+              </div>
+              <div style="background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px 14px">
+                <div style="font-size:10px;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Haftalık Toplam</div>
+                <div id="igSummaryTotal" style="font-size:22px;font-weight:700;color:#e6edf3">—</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SAĞ PANEL (320px sabit) -->
+          <div style="width:320px;flex-shrink:0;background:#0a0d10;border-left:0.5px solid rgba(255,255,255,0.07);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px">
+
+            <!-- Önizleme Kartı -->
+            <div style="background:#0D1B2A;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden">
+              <div style="padding:7px 12px;border-bottom:0.5px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:9px;font-weight:700;color:rgba(244,162,97,0.55);letter-spacing:1.2px;text-transform:uppercase">ROSTRUM AKADEMİ</span>
+                <span style="font-size:9px;color:rgba(230,237,243,0.18)">1:1</span>
+              </div>
+              <div id="igPanelPreviewContainer" style="width:100%;aspect-ratio:1;background:#07060a;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                <span style="font-size:11px;color:rgba(230,237,243,0.2);text-align:center;padding:16px;line-height:1.6">İçerik seçince<br>önizleme burada görünür</span>
+              </div>
+            </div>
+
+            <!-- İçerik Belleği -->
+            <div style="background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:1px">İçerik Belleği</div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:11px;color:rgba(230,237,243,0.4)">Son yayın</span>
+                <span id="igMemLastType" style="font-size:11px;color:#e6edf3;font-weight:500">—</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:11px;color:rgba(230,237,243,0.4)">Tema tekrar riski</span>
+                <span id="igMemRepeatRisk" style="font-size:11px;font-weight:600;color:#3dba8f">Yok</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:11px;color:rgba(230,237,243,0.4)">Bu ay sosyal kanıt</span>
+                <span id="igMemSocialCount" style="font-size:11px;color:#e6edf3;font-weight:500">— / 1</span>
+              </div>
+            </div>
+
+            <!-- Caption -->
+            <div>
+              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Caption</div>
+              <textarea id="igPanelCaptionPreview"
+                style="width:100%;min-height:88px;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:9px;font-size:12px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
+                placeholder="İçerik seçince caption burada görünür…"></textarea>
+              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 5px">Hashtag'ler</div>
+              <div id="igHashtagDisplay" style="font-size:11px;color:#60a0e0;line-height:1.8;background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 10px;word-break:break-word;min-height:30px">—</div>
+            </div>
+
+            <!-- Hikaye Slaytları -->
+            <div>
+              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Hikaye Slaytları</div>
+              <div style="display:flex;gap:5px;margin-bottom:8px">
+                <button onclick="selectStorySlide(0)" id="slide-btn-0" style="flex:1;padding:5px 3px;background:none;border:0.5px solid #F4A261;border-radius:5px;font-size:8px;color:#F4A261;cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">01<br><span style="color:rgba(244,162,97,0.5)">Kanca</span></button>
+                <button onclick="selectStorySlide(1)" id="slide-btn-1" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">02<br>Geliştir</button>
+                <button onclick="selectStorySlide(2)" id="slide-btn-2" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">03<br>Genişlet</button>
+                <button onclick="selectStorySlide(3)" id="slide-btn-3" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">04<br>İçgörü</button>
+                <button onclick="selectStorySlide(4)" id="slide-btn-4" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">05<br>CTA</button>
+              </div>
+              <textarea id="igStorySlideText"
+                style="width:100%;min-height:65px;background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 10px;font-size:12px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box"
+                placeholder="Slayt metnini seç…"></textarea>
+            </div>
+
+            <!-- Aksiyon Butonları -->
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="display:flex;gap:7px">
+                <button id="btnIgRegen" onclick="regenerateIgPost()" disabled
+                  style="flex:1;padding:9px;background:#161b22;border:0.5px solid rgba(255,255,255,0.12);border-radius:7px;font-size:12px;color:rgba(230,237,243,0.6);cursor:pointer;font-weight:500;font-family:inherit">↺ Yeniden Üret</button>
+                <button id="btnIgApprove" onclick="approveIgPost()" disabled
+                  style="flex:1;padding:9px;background:rgba(61,186,143,0.1);border:0.5px solid rgba(61,186,143,0.3);border-radius:7px;font-size:12px;color:#3dba8f;cursor:pointer;font-weight:600;font-family:inherit">✓ Onayla</button>
+              </div>
+              <div style="display:flex;gap:7px">
+                <button id="btnPanelApproveIg" onclick="publishIgPost(false)" disabled
+                  style="flex:1;padding:9px;background:rgba(61,186,143,0.06);border:0.5px solid rgba(61,186,143,0.15);border-radius:7px;font-size:12px;color:rgba(61,186,143,0.35);cursor:not-allowed;font-weight:600;font-family:inherit">🚀 Post Yayınla</button>
+                <button id="btnPanelStoryIg" onclick="publishIgPost(true)" disabled
+                  style="flex:1;padding:9px;background:rgba(155,149,224,0.06);border:0.5px solid rgba(155,149,224,0.15);border-radius:7px;font-size:12px;color:rgba(155,149,224,0.35);cursor:not-allowed;font-weight:600;font-family:inherit">📱 Hikaye</button>
+              </div>
+            </div>
+
           </div>
         </div>
 
         <!-- 2. KURALLAR TABI -->
-        <div id="ig-rules-section" style="display:none">
+        <div id="ig-rules-section" style="display:none;padding:20px 24px;overflow-y:auto;flex:1">
           <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px">
             <!-- Sol: Kurallar Listesi -->
             <div class="card tbl-wrap" style="padding:0">
@@ -613,7 +732,7 @@ tr:hover td{background:var(--s2);}
         </div>
 
         <!-- 3. BAĞLANTI AYARLARI TABI -->
-        <div id="ig-config-section" style="display:none;max-width:550px">
+        <div id="ig-config-section" style="display:none;padding:20px 24px;overflow-y:auto;flex:1;max-width:600px">
           <div class="card" style="padding:24px;background:var(--s1);border:1px solid var(--bd);border-radius:14px">
             <h3 style="margin-bottom:16px;color:var(--acc)">⚙️ Meta Graph API Bağlantı Ayarları</h3>
             <div class="ff">
@@ -1976,121 +2095,307 @@ let _selectedIgPanelDraftId = null;
 let _igRules = [];
 let _igConfig = { instagram_access_token: '', instagram_account_id: '', facebook_page_id: '' };
 
+// ── INSTAGRAM PANEL STATE ──
+let _igPosts = [];
+let _igMemory = null;
+let _selectedIgPostId = null;
+let _selectedStorySlide = 0;
+let _igApproved = false;
+
+const IG_WEEK_THEMES = {
+  1: { name: 'Acı Nokta', color: '#e05a5a', cat: 'pain_point' },
+  2: { name: 'Platform / Özellik', color: '#60a0e0', cat: 'feature' },
+  3: { name: 'YKS İçgörüsü', color: '#3dba8f', cat: 'insight' },
+  4: { name: 'Sosyal Kanıt', color: '#9b95e0', cat: 'social_proof' }
+};
+
+function getThemeInfo(cat) {
+  return Object.values(IG_WEEK_THEMES).find(t => t.cat === cat) || { name: cat, color: '#e6edf3' };
+}
+
+function igTypeLabel(type) {
+  if (type === 'countdown') return '⏳ YKS Sayaç';
+  if (type === 'tactic') return '💡 Ders Taktiği';
+  if (type === 'comparison') return '⚖️ Karşılaştırma';
+  if (type === 'seasonal') return '☀️ Mevsimsel';
+  return type || '—';
+}
+
 function switchIgPanelTab(tab) {
   _activeIgPanelTab = tab;
-  document.getElementById('tab-ig-posts').classList.remove('btn-acc');
-  document.getElementById('tab-ig-posts').classList.add('btn-ghost');
-  document.getElementById('tab-ig-rules').classList.remove('btn-acc');
-  document.getElementById('tab-ig-rules').classList.add('btn-ghost');
-  document.getElementById('tab-ig-config').classList.remove('btn-acc');
-  document.getElementById('tab-ig-config').classList.add('btn-ghost');
-
-  document.getElementById('tab-ig-' + tab).classList.remove('btn-ghost');
-  document.getElementById('tab-ig-' + tab).classList.add('btn-acc');
-
-  document.getElementById('ig-posts-section').style.display = tab === 'posts' ? 'block' : 'none';
+  ['posts','rules','config'].forEach(t => {
+    const btn = document.getElementById('tab-ig-' + t);
+    if (t === tab) {
+      btn.style.color = '#e6edf3';
+      btn.style.borderBottomColor = '#F4A261';
+      btn.style.fontWeight = '600';
+    } else {
+      btn.style.color = 'rgba(230,237,243,0.4)';
+      btn.style.borderBottomColor = 'transparent';
+      btn.style.fontWeight = '500';
+    }
+  });
+  document.getElementById('ig-posts-section').style.display = tab === 'posts' ? 'flex' : 'none';
   document.getElementById('ig-rules-section').style.display = tab === 'rules' ? 'block' : 'none';
   document.getElementById('ig-config-section').style.display = tab === 'config' ? 'block' : 'none';
-
-  if (tab === 'posts') renderIgPanelDrafts();
   if (tab === 'rules') loadAndRenderIgRules();
   if (tab === 'config') loadIgConfig();
 }
 
 async function loadAndRenderInstagramPanel() {
   try {
-    const { data } = await db.from('platform_settings').select('value').eq('key', 'instagram_drafts').maybeSingle();
-    if (data && data.value) {
-      _igDrafts = data.value;
-    } else {
-      _igDrafts = DEFAULT_IG_DRAFTS;
-    }
-  } catch (e) {
-    console.error('Instagram drafts load error:', e);
-    _igDrafts = DEFAULT_IG_DRAFTS;
+    // content_memory'den hafta ve YKS sayacı
+    const { data: mem } = await db.from('content_memory').select('*').order('created_at', { ascending: false }).limit(1).maybeSingle();
+    _igMemory = mem || { current_week: 1, yks_days_remaining: 360, monthly_social_proof_count: 0, last_published_type: null, last_published_theme: null };
+  } catch(e) {
+    // Tablo yoksa platform_settings'den fallback
+    const { data: settData } = await db.from('platform_settings').select('value').eq('key', 'instagram_drafts').maybeSingle();
+    _igPosts = settData?.value || DEFAULT_IG_DRAFTS;
+    _igMemory = { current_week: 1, yks_days_remaining: 360, monthly_social_proof_count: 0 };
+    renderIgTopbar();
+    renderIgThemeBanner();
+    renderIgPosts();
+    switchIgPanelTab(_activeIgPanelTab);
+    return;
   }
+
+  try {
+    const { data: posts, error } = await db.from('instagram_posts').select('*').in('status', ['draft','pending','approved']).order('created_at', { ascending: true });
+    if (error) throw error;
+    if (posts && posts.length > 0) {
+      _igPosts = posts;
+    } else {
+      // Yeni tabloda veri yoksa platform_settings fallback
+      const { data: settData } = await db.from('platform_settings').select('value').eq('key', 'instagram_drafts').maybeSingle();
+      _igPosts = (settData?.value || DEFAULT_IG_DRAFTS).map(d => ({
+        id: d.id, content_type: d.type, theme_category: 'pain_point',
+        caption: d.caption, hashtags: '', story_slides: (d.story_slides || []).map((t,i)=>({slide:i+1,text:t})),
+        status: d.status || 'draft', week_number: 1,
+        preview_data: { type: d.type, days_left: d.days_left, quote: d.quote, author: d.author, title: d.title, subtitle: d.subtitle, points: d.points }
+      }));
+    }
+  } catch(e) {
+    document.getElementById('igErrorBanner').style.display = 'block';
+    const { data: settData } = await db.from('platform_settings').select('value').eq('key', 'instagram_drafts').maybeSingle();
+    _igPosts = (settData?.value || DEFAULT_IG_DRAFTS).map(d => ({
+      id: d.id, content_type: d.type, theme_category: 'pain_point',
+      caption: d.caption, hashtags: '', story_slides: [],
+      status: d.status || 'draft', week_number: 1,
+      preview_data: { type: d.type, days_left: d.days_left, quote: d.quote, author: d.author, title: d.title, subtitle: d.subtitle, points: d.points }
+    }));
+  }
+
+  renderIgTopbar();
+  renderIgThemeBanner();
+  renderIgPosts();
+  renderMonthSummary();
   switchIgPanelTab(_activeIgPanelTab);
+  if (_igPosts.length > 0) selectIgPost(_igPosts[0].id);
 }
 
-function renderIgPanelDrafts() {
-  const tbody = document.getElementById('igPanelTable');
-  tbody.innerHTML = _igDrafts.map(d => {
-    let typeLabel = '';
-    if(d.type==='countdown') typeLabel = '⏳ YKS Sayaç';
-    else if(d.type==='tactic') typeLabel = '💡 Ders Taktiği';
-    else if(d.type==='comparison') typeLabel = '⚖️ Karşılaştırma';
-    else if(d.type==='seasonal') typeLabel = '☀️ Mevsimsel/Gündem';
+function renderIgTopbar() {
+  const days = _igMemory?.yks_days_remaining ?? '—';
+  document.getElementById('igTopbarCountdown').textContent = days;
+}
 
-    const isSelected = _selectedIgPanelDraftId === d.id ? 'style="background:rgba(240,165,0,.08)"' : '';
-    const statusText = d.status === 'published' ? '<span style="color:var(--acc3)">Yayınlandı</span>' : '⏳ Bekliyor';
+function renderIgThemeBanner() {
+  const week = _igMemory?.current_week ?? 1;
+  const cur = IG_WEEK_THEMES[week] || IG_WEEK_THEMES[1];
+  const nxt = IG_WEEK_THEMES[(week % 4) + 1];
+  document.getElementById('igCurrentWeekNum').textContent = week;
+  document.getElementById('igCurrentThemeName').textContent = cur.name;
+  document.getElementById('igNextThemeName').textContent = nxt.name;
 
-    return `
-      <tr onclick="selectIgPanelDraft('${d.id}')" ${isSelected} class="cursor-pointer">
-        <td><strong>${typeLabel}</strong></td>
-        <td>${esc(d.title)}</td>
-        <td>YKS - ${d.days_left} Gün</td>
-        <td><strong>${statusText}</strong></td>
-      </tr>
-    `;
+  const pills = document.getElementById('igWeekPills');
+  pills.innerHTML = [1,2,3,4].map(w => {
+    const t = IG_WEEK_THEMES[w];
+    const isCur = w === week, isPast = w < week;
+    return `<div style="flex:1;text-align:center;padding:5px 4px;border-radius:6px;font-size:10px;font-weight:600;
+      ${isCur ? `background:rgba(244,162,97,0.15);border:0.5px solid rgba(244,162,97,0.4);color:#F4A261;` :
+        isPast ? `background:none;border:0.5px solid rgba(255,255,255,0.06);color:rgba(230,237,243,0.2);text-decoration:line-through;` :
+                 `background:none;border:0.5px solid rgba(255,255,255,0.1);color:rgba(230,237,243,0.35);`}">
+      H${w} · ${t.name.split(' ')[0]}
+    </div>`;
   }).join('');
 }
 
-function selectIgPanelDraft(id) {
-  _selectedIgPanelDraftId = id;
-  renderIgPanelDrafts();
+function renderIgPosts() {
+  const tbody = document.getElementById('igPostsTable');
+  if (!_igPosts || _igPosts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:48px;color:rgba(230,237,243,0.25);font-size:13px">Henüz taslak yok — yeni içerik ekle</td></tr>';
+    return;
+  }
+  tbody.innerHTML = _igPosts.map(p => {
+    const theme = getThemeInfo(p.theme_category);
+    const isSelected = _selectedIgPostId === p.id;
+    const statusDot = p.status === 'published' ? '#3dba8f' : p.status === 'approved' ? '#3dba8f' : p.status === 'pending' ? '#F4A261' : 'rgba(230,237,243,0.25)';
+    const statusTxt = p.status === 'published' ? 'Yayınlandı' : p.status === 'approved' ? 'Onaylandı' : 'Bekliyor';
+    const schedTime = p.scheduled_at ? new Date(p.scheduled_at).toLocaleDateString('tr-TR', {day:'numeric',month:'short'}) : '—';
+    return `<tr onclick="selectIgPost('${p.id}')" style="cursor:pointer;border-bottom:0.5px solid rgba(255,255,255,0.04);${isSelected ? 'background:rgba(244,162,97,0.06);' : ''}transition:background .15s">
+      <td style="padding:11px 16px;font-size:12px;color:#e6edf3;font-weight:500">${igTypeLabel(p.content_type)}</td>
+      <td style="padding:11px 16px"><span style="display:inline-block;padding:2px 8px;background:${theme.color}18;border:0.5px solid ${theme.color}40;border-radius:4px;font-size:10px;font-weight:600;color:${theme.color}">${theme.name}</span></td>
+      <td style="padding:11px 16px;font-size:11px;color:rgba(230,237,243,0.4)">${schedTime}</td>
+      <td style="padding:11px 16px"><span style="display:flex;align-items:center;gap:5px;font-size:11px;color:rgba(230,237,243,0.55)"><span style="width:6px;height:6px;border-radius:50%;background:${statusDot};flex-shrink:0"></span>${statusTxt}</span></td>
+    </tr>`;
+  }).join('');
+}
 
-  const d = _igDrafts.find(x => x.id === id);
-  if (!d) return;
+function renderMonthSummary() {
+  const insight = _igPosts.filter(p => p.theme_category === 'insight' || p.theme_category === 'feature').length;
+  const social = _igMemory?.monthly_social_proof_count ?? 0;
+  const total = _igPosts.length;
+  document.getElementById('igSummaryInsight').textContent = insight;
+  const socialEl = document.getElementById('igSummarySocial');
+  socialEl.textContent = social + ' / 1';
+  socialEl.style.color = social > 1 ? '#e05a5a' : '#e6edf3';
+  document.getElementById('igSummaryTotal').textContent = total;
+}
 
-  const previewContainer = document.getElementById('igPanelPreviewContainer');
-  previewContainer.innerHTML = getPostSvg(d);
-  
-  document.getElementById('igPanelCaptionPreview').value = d.caption;
+function selectIgPost(id) {
+  _selectedIgPostId = id;
+  _igApproved = false;
+  _selectedStorySlide = 0;
+  renderIgPosts();
 
-  document.getElementById('btnPanelApproveIg').disabled = false;
-  document.getElementById('btnPanelStoryIg').disabled = false;
-  document.getElementById('btnPanelRejectIg').disabled = false;
+  const p = _igPosts.find(x => x.id === id);
+  if (!p) return;
 
-  if (d.status === 'published') {
-    document.getElementById('btnPanelApproveIg').textContent = '✓ Yayınlandı';
-    document.getElementById('btnPanelApproveIg').disabled = true;
+  // Önizleme
+  const d = p.preview_data || { type: p.content_type, days_left: _igMemory?.yks_days_remaining || 360 };
+  d.type = d.type || p.content_type;
+  document.getElementById('igPanelPreviewContainer').innerHTML = getPostSvg(d);
+
+  // Caption + hashtag
+  const fullCaption = p.caption || '';
+  const hashtagMatch = fullCaption.match(/(#\S+(\s+#\S+)*)\s*$/);
+  if (hashtagMatch) {
+    document.getElementById('igPanelCaptionPreview').value = fullCaption.replace(hashtagMatch[0], '').trim();
+    document.getElementById('igHashtagDisplay').textContent = hashtagMatch[0].trim();
   } else {
-    document.getElementById('btnPanelApproveIg').textContent = '🚀 Post Yayınla';
-    document.getElementById('btnPanelApproveIg').disabled = false;
+    document.getElementById('igPanelCaptionPreview').value = fullCaption;
+    document.getElementById('igHashtagDisplay').textContent = p.hashtags || '—';
+  }
+
+  // Story slides
+  const slides = Array.isArray(p.story_slides) ? p.story_slides : [];
+  document.getElementById('igStorySlideText').value = slides[0]?.text || slides[0] || '';
+  selectStorySlide(0);
+
+  // İçerik belleği
+  document.getElementById('igMemLastType').textContent = igTypeLabel(_igMemory?.last_published_type) || '—';
+  const isRepeat = _igMemory?.last_published_theme && _igMemory.last_published_theme === p.theme_category;
+  const riskEl = document.getElementById('igMemRepeatRisk');
+  riskEl.textContent = isRepeat ? 'Var ⚠' : 'Yok';
+  riskEl.style.color = isRepeat ? '#F4A261' : '#3dba8f';
+  const sc = _igMemory?.monthly_social_proof_count ?? 0;
+  const scEl = document.getElementById('igMemSocialCount');
+  scEl.textContent = sc + ' / 1';
+  scEl.style.color = sc > 1 ? '#e05a5a' : '#e6edf3';
+
+  // Butonlar — approved ise yayınla aktif
+  const isApproved = p.status === 'approved' || p.status === 'published';
+  document.getElementById('btnIgRegen').disabled = false;
+  document.getElementById('btnIgApprove').disabled = p.status === 'published';
+  enablePublishBtns(isApproved);
+  if (p.status === 'published') {
+    document.getElementById('btnIgApprove').textContent = '✓ Yayınlandı';
+    document.getElementById('btnIgApprove').style.color = '#3dba8f';
+  } else {
+    document.getElementById('btnIgApprove').textContent = '✓ Onayla';
   }
 }
 
-async function publishIgPostPanel(isStory = false) {
-  if(!_selectedIgPanelDraftId) return;
-  const d = _igDrafts.find(x => x.id === _selectedIgPanelDraftId);
-  if(!d) return;
+function enablePublishBtns(enable) {
+  const postBtn = document.getElementById('btnPanelApproveIg');
+  const storyBtn = document.getElementById('btnPanelStoryIg');
+  if (enable) {
+    postBtn.disabled = false;
+    postBtn.style.color = '#3dba8f';
+    postBtn.style.borderColor = 'rgba(61,186,143,0.4)';
+    postBtn.style.cursor = 'pointer';
+    storyBtn.disabled = false;
+    storyBtn.style.color = '#9b95e0';
+    storyBtn.style.borderColor = 'rgba(155,149,224,0.4)';
+    storyBtn.style.cursor = 'pointer';
+  } else {
+    postBtn.disabled = true;
+    postBtn.style.color = 'rgba(61,186,143,0.3)';
+    postBtn.style.borderColor = 'rgba(61,186,143,0.12)';
+    postBtn.style.cursor = 'not-allowed';
+    storyBtn.disabled = true;
+    storyBtn.style.color = 'rgba(155,149,224,0.3)';
+    storyBtn.style.borderColor = 'rgba(155,149,224,0.12)';
+    storyBtn.style.cursor = 'not-allowed';
+  }
+}
+
+function selectStorySlide(n) {
+  _selectedStorySlide = n;
+  const p = _igPosts.find(x => x.id === _selectedIgPostId);
+  const slides = p?.story_slides || [];
+  const text = slides[n]?.text || slides[n] || '';
+  document.getElementById('igStorySlideText').value = text;
+  for (let i = 0; i < 5; i++) {
+    const btn = document.getElementById('slide-btn-' + i);
+    if (i === n) {
+      btn.style.borderColor = '#F4A261';
+      btn.style.color = '#F4A261';
+    } else {
+      btn.style.borderColor = 'rgba(255,255,255,0.1)';
+      btn.style.color = 'rgba(230,237,243,0.38)';
+    }
+  }
+}
+
+async function approveIgPost() {
+  if (!_selectedIgPostId) return;
+  const p = _igPosts.find(x => x.id === _selectedIgPostId);
+  if (!p) return;
+  try {
+    await db.from('instagram_posts').update({ status: 'approved' }).eq('id', p.id);
+  } catch(e) {
+    // platform_settings fallback
+    p.status = 'approved';
+    const updated = _igPosts.map(x => x.id === p.id ? p : x);
+    await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: updated });
+  }
+  p.status = 'approved';
+  enablePublishBtns(true);
+  document.getElementById('btnIgApprove').textContent = '✓ Onaylandı';
+  renderIgPosts();
+  showToast('İçerik onaylandı — artık yayınlayabilirsiniz ✓');
+}
+
+async function publishIgPost(isStory = false) {
+  if (!_selectedIgPostId) return;
+  const p = _igPosts.find(x => x.id === _selectedIgPostId);
+  if (!p) return;
 
   const btnId = isStory ? 'btnPanelStoryIg' : 'btnPanelApproveIg';
   const btn = document.getElementById(btnId);
+  const origText = btn.textContent;
   btn.textContent = '⏳ Hazırlanıyor...';
   btn.disabled = true;
 
-  const editedCaption = document.getElementById('igPanelCaptionPreview').value;
+  const d = p.preview_data || { type: p.content_type, days_left: _igMemory?.yks_days_remaining || 360 };
+  d.type = d.type || p.content_type;
+  const caption = document.getElementById('igPanelCaptionPreview').value + '\n\n' + (document.getElementById('igHashtagDisplay').textContent || '');
 
   try {
-    // Görsel tarayıcıda canvas ile üret (font sorunu olmaz)
-    // Story için ayrı 1080x1920 SVG kullan, post için mevcut önizleme SVG
     const W = 1080, H = isStory ? 1920 : 1080;
     const svgStr = isStory
       ? new XMLSerializer().serializeToString(new DOMParser().parseFromString(getStorySvg(d), 'image/svg+xml').documentElement)
-      : (() => { const el = document.querySelector('#igPanelPreviewContainer svg'); if (!el) throw new Error('Önizleme SVG bulunamadı.'); return new XMLSerializer().serializeToString(el); })();
+      : (() => { const el = document.querySelector('#igPanelPreviewContainer svg'); if (!el) throw new Error('Önizleme SVG bulunamadı'); return new XMLSerializer().serializeToString(el); })();
 
     const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
     const svgUrl = URL.createObjectURL(svgBlob);
-
     const imageBase64 = await new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#07060a';
-        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
         ctx.drawImage(img, 0, 0, W, H);
         URL.revokeObjectURL(svgUrl);
         resolve(canvas.toDataURL('image/jpeg', 0.95).split(',')[1]);
@@ -2100,32 +2405,77 @@ async function publishIgPostPanel(isStory = false) {
     });
 
     btn.textContent = '⏳ Yayınlanıyor...';
-
     const response = await fetch('/api/publish-instagram', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ draftId: d.id, caption: isStory ? '' : editedCaption, imageBase64, isStory })
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ caption: isStory ? '' : caption, imageBase64, isStory })
     });
 
     if (response.ok) {
-      if (!isStory) {
-        d.status = 'published';
-        d.caption = editedCaption;
-        await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
-      }
-      showToast(isStory ? '📱 Hikaye başarıyla paylaşıldı! ✓' : '📸 Gönderi Instagram\'da yayınlandı! ✓');
+      p.status = 'published';
+      try {
+        await db.from('instagram_posts').update({ status: 'published' }).eq('id', p.id);
+        if (_igMemory?.id) {
+          const updates = { last_published_type: p.content_type, last_published_theme: p.theme_category };
+          if (p.theme_category === 'social_proof') updates.monthly_social_proof_count = (_igMemory.monthly_social_proof_count || 0) + 1;
+          await db.from('content_memory').update(updates).eq('id', _igMemory.id);
+          Object.assign(_igMemory, updates);
+        }
+      } catch(e) { console.warn('DB update skip:', e.message); }
+      renderIgPosts();
+      showToast(isStory ? '📱 Hikaye paylaşıldı! ✓' : '📸 Post Instagram\'da yayınlandı! ✓');
     } else {
-      const errRes = await response.json();
-      showToast('Hata: ' + (errRes.message || 'Yayınlanamadı'), false);
+      const err = await response.json();
+      showToast('Hata: ' + (err.message || 'Yayınlanamadı'), false);
     }
   } catch(e) {
-    console.error('Publish error:', e);
     showToast('Hata: ' + e.message, false);
   }
-
-  btn.textContent = isStory ? '📱 Hikaye Paylaş' : '🚀 Post Yayınla';
+  btn.textContent = origText;
   btn.disabled = false;
-  selectIgPanelDraft(_selectedIgPanelDraftId);
+}
+
+async function regenerateIgPost() {
+  if (!_selectedIgPostId) return;
+  const p = _igPosts.find(x => x.id === _selectedIgPostId);
+  if (!p) return;
+  _selectedIgPanelDraftId = p.id;
+  const d = p.preview_data || { type: p.content_type, days_left: _igMemory?.yks_days_remaining || 360 };
+  d.type = d.type || p.content_type;
+  // _igDrafts fallback bağlantısı
+  const legacyD = _igDrafts.find(x => x.id === p.id) || d;
+  const mergedD = Object.assign({}, legacyD, d);
+  if (!_igDrafts.find(x => x.id === p.id)) _igDrafts.push(mergedD);
+  _selectedIgPanelDraftId = p.id;
+  await regenerateIgPostPanel();
+  // Sonucu p'ye yansıt
+  const updated = _igDrafts.find(x => x.id === p.id);
+  if (updated) {
+    p.caption = updated.caption || p.caption;
+    p.preview_data = updated;
+    p.story_slides = (updated.story_slides || []).map((t,i) => ({slide:i+1,text:t}));
+    p.status = 'draft';
+    try {
+      await db.from('instagram_posts').update({
+        caption: p.caption, story_slides: p.story_slides, status: 'draft', preview_data: p.preview_data
+      }).eq('id', p.id);
+    } catch(e) {}
+  }
+  selectIgPost(p.id);
+}
+
+async function regenerateAllIgPosts() {
+  const btn = document.getElementById('btnRegenAll');
+  btn.textContent = '⏳ Yenileniyor...';
+  btn.disabled = true;
+  for (let i = 0; i < _igPosts.length; i++) {
+    _selectedIgPostId = _igPosts[i].id;
+    btn.textContent = `⏳ ${i+1}/${_igPosts.length}`;
+    await regenerateIgPost();
+  }
+  if (_igPosts[0]) selectIgPost(_igPosts[0].id);
+  btn.textContent = '↺ Tümünü Yenile';
+  btn.disabled = false;
+  showToast('✨ Tüm içerikler yenilendi ✓');
 }
 
 async function regenerateIgPostPanel() {
@@ -2133,7 +2483,7 @@ async function regenerateIgPostPanel() {
   const d = _igDrafts.find(x => x.id === _selectedIgPanelDraftId);
   if(!d) return;
 
-  const btn = document.getElementById('btnPanelRejectIg');
+  const btn = document.getElementById('btnIgRegen');
   btn.textContent = '⏳ Üretiliyor...';
   btn.disabled = true;
 
@@ -2303,29 +2653,9 @@ Sadece ham JSON döndür, başka açıklama ekleme.`;
     await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
   } catch(e){}
 
-  btn.textContent = '🔄 Yeniden Üret';
+  btn.textContent = '↺ Yeniden Üret';
   btn.disabled = false;
-  showToast('✨ İçerik yeniden üretildi — artık yayınlayabilirsiniz! ✓');
-  selectIgPanelDraft(_selectedIgPanelDraftId);
-}
-
-// ── TÜMÜNÜ YENİLE ──
-async function regenerateAllDrafts() {
-  const btn = document.getElementById('btnRegenAll');
-  btn.textContent = '⏳ Yenileniyor...';
-  btn.disabled = true;
-  let done = 0;
-  for (const d of _igDrafts) {
-    _selectedIgPanelDraftId = d.id;
-    await regenerateIgPostPanel();
-    done++;
-    btn.textContent = `⏳ ${done}/${_igDrafts.length}`;
-  }
-  _selectedIgPanelDraftId = _igDrafts[0]?.id;
-  selectIgPanelDraft(_selectedIgPanelDraftId);
-  btn.textContent = '🔄 Tümünü Yenile';
-  btn.disabled = false;
-  showToast('✨ Tüm taslaklar yenilendi! ✓');
+  showToast('✨ İçerik yeniden üretildi ✓');
 }
 
 // ── OTOMASYON KURALLARI ──
