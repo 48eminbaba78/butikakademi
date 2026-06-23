@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<title>Demo Hesap Düzeltme</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<style>
+body{font-family:monospace;background:#07060a;color:#f0eaf8;padding:32px;max-width:700px;margin:0 auto}
+pre{background:#1e1b27;border:1px solid #2d2a3a;border-radius:8px;padding:16px;white-space:pre-wrap;word-break:break-all;font-size:13px;margin:12px 0}
+.ok{color:#3ecf8e} .err{color:#ff5c7a} .warn{color:#f0a500} .info{color:#4da6ff}
+h1{color:#f0a500;margin-bottom:20px} h2{margin:20px 0 8px;font-size:14px;color:#a09ab8}
+button{background:#f0a500;color:#07060a;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;margin:4px}
+</style>
+</head>
+<body>
+<h1>Demo Hesap Düzeltme</h1>
+<p style="color:#a09ab8;font-size:13px">Bu sayfa demo hesapların password_hash değerini SHA-256 formatına günceller.</p>
+<br>
+<button onclick="fixAll()">Tüm Demo Hesapları Düzelt</button>
+<button onclick="testLogin()">Login Test Et</button>
+<h2>Log:</h2>
+<pre id="log">...</pre>
+
+<script>
+const db = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+const logEl = document.getElementById('log');
+function log(msg, cls='info') {
+  const line = document.createElement('div');
+  line.className = cls;
+  line.textContent = msg;
+  logEl.appendChild(line);
+  if (logEl.firstChild?.textContent === '...') logEl.removeChild(logEl.firstChild);
+}
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function fixAll() {
+  logEl.innerHTML = '';
+  log('Başlıyor...', 'info');
+
+  const kocHash = await sha256('koc123');
+  const stuHash = await sha256('ogrenci123');
+  log('SHA-256 koc123: ' + kocHash, 'info');
+  log('SHA-256 ogrenci123: ' + stuHash, 'info');
+
+  // Try 1: Upsert coach
+  log('--- Koç güncelleme (upsert)...', 'info');
+  const { data: d1, error: e1 } = await db.from('users')
+    .upsert({ username: 'demokoc', password_hash: kocHash }, { onConflict: 'username' })
+    .select();
+  if (e1) {
+    log('❌ Upsert hatası: ' + e1.message, 'err');
+  } else {
+    log('✅ Koç upsert: ' + JSON.stringify(d1), 'ok');
+  }
+
+  // Try 2: Update coach by username
+  log('--- Koç update (match username)...', 'info');
+  const { data: d2, error: e2 } = await db.from('users')
+    .update({ password_hash: kocHash })
+    .eq('username', 'demokoc')
+    .select();
+  if (e2) {
+    log('❌ Update hatası: ' + e2.message, 'err');
+  } else {
+    log('✅ Koç update: ' + JSON.stringify(d2), 'ok');
+  }
+
+  // Try 3: Update student
+  log('--- Öğrenci update...', 'info');
+  const { data: d3, error: e3 } = await db.from('users')
+    .update({ password_hash: stuHash })
+    .eq('username', 'demoogrenci')
+    .select();
+  if (e3) {
+    log('❌ Öğrenci update hatası: ' + e3.message, 'err');
+  } else {
+    log('✅ Öğrenci update: ' + JSON.stringify(d3), 'ok');
+  }
+
+  // Verify
+  log('--- Mevcut kayıtlar...', 'info');
+  const { data: users, error: ue } = await db.from('users')
+    .select('username, role, password_hash')
+    .in('username', ['demokoc', 'demoogrenci']);
+  if (ue) {
+    log('❌ Okuma hatası: ' + ue.message, 'err');
+  } else {
+    (users || []).forEach(u => {
+      const hashMatch = (u.role === 'coach' && u.password_hash === kocHash) ||
+                        (u.role === 'student' && u.password_hash === stuHash);
+      log(`${hashMatch ? '✅' : '⚠️'} ${u.username} (${u.role}): ${u.password_hash?.substring(0,16)}...`, hashMatch ? 'ok' : 'warn');
+    });
+  }
+}
+
+async function testLogin() {
+  logEl.innerHTML = '';
+  const kocHash = await sha256('koc123');
+  log('koc123 hash: ' + kocHash, 'info');
+
+  const { data, error } = await db.from('users')
+    .select('username, role, password_hash')
+    .eq('username', 'demokoc')
+    .maybeSingle();
+
+  if (error) {
+    log('❌ Sorgu hatası: ' + error.message, 'err');
+    return;
+  }
+  if (!data) {
+    log('⚠️ demokoc bulunamadı', 'warn');
+    return;
+  }
+  log('Kayıt bulundu: ' + JSON.stringify({username: data.username, role: data.role, hash_prefix: data.password_hash?.substring(0,16)}), 'info');
+  const match = data.password_hash === kocHash;
+  log(match ? '✅ Şifre eşleşiyor — login çalışır!' : '❌ Şifre UYUŞMUYOR! password_hash=' + data.password_hash, match ? 'ok' : 'err');
+}
+</script>
+</body>
+</html>

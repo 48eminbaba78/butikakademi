@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Koç Bul | Rostrum Akademi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0e0c;
+      --surface: #1a1916;
+      --surface2: #242220;
+      --border: #383430;
+      --accent: #f0a500;
+      --accent-dim: rgba(240, 165, 0, 0.12);
+      --text: #f0ece6;
+      --text-mid: #9a9088;
+      --text-dim: #5a5450;
+      --green: #3ecf8e;
+      --shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.5;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--text-mid);
+      font-size: 15px;
+    }
+
+    /* SEARCH & FILTER */
+    .filter-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-mid);
+    }
+
+    .filter-group input, .filter-group select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .filter-group input:focus, .filter-group select:focus {
+      border-color: var(--accent);
+    }
+
+    /* GRID */
+    .coaches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .coach-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+    }
+
+    .coach-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .coach-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .coach-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f0e0c;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .coach-meta {
+      flex: 1;
+    }
+
+    .coach-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .coach-brand {
+      font-size: 12px;
+      color: var(--accent);
+      margin-top: 2px;
+    }
+
+    .coach-subjects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .subject-badge {
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+    }
+
+    .coach-bio {
+      font-size: 13px;
+      color: var(--text-mid);
+      margin-bottom: 20px;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .coach-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #0f0e0c;
+    }
+
+    .btn-accent:hover {
+      background: #fbb800;
+    }
+
+    .btn-ghost {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-mid);
+    }
+
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--text-mid);
+    }
+
+    /* MODAL */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-bg.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 540px;
+      padding: 28px;
+      position: relative;
+      box-shadow: var(--shadow);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    .modal h2 {
+      font-family: 'Syne', sans-serif;
+      margin-bottom: 20px;
+    }
+
+    .form-field {
+      margin-bottom: 14px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-field input, .form-field select, .form-field textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+    }
+
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .form-field textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 12px 24px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      z-index: 1001;
+      pointer-events: none;
+      transition: all 0.3s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Rostrum Akademi <span>Koç Bul</span></h1>
+    <p class="subtitle">Hedeflerinize en uygun eğitim koçunu bulun ve hemen eşleşme başvurusu yapın.</p>
+  </header>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label for="searchName">Koç Adı / Marka</label>
+      <input type="text" id="searchName" placeholder="Arama yapın..." oninput="filterCoaches()">
+    </div>
+    <div class="filter-group">
+      <label for="searchSubject">Uzmanlık Dersi</label>
+      <select id="searchSubject" onchange="filterCoaches()">
+        <option value="">Tümü</option>
+        <option value="Matematik">Matematik</option>
+        <option value="Geometri">Geometri</option>
+        <option value="Fizik">Fizik</option>
+        <option value="Kimya">Kimya</option>
+        <option value="Biyoloji">Biyoloji</option>
+        <option value="Türkçe">Türkçe</option>
+        <option value="Sosyal">Sosyal Bilimler</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="coachesContainer" class="coaches-grid">
+    <!-- Coaches list dynamically rendered here -->
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="modal-bg" onclick="closeModal(event, 'profileModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('profileModal').classList.remove('open')">✕</button>
+    <div id="modalProfileContent"></div>
+  </div>
+</div>
+
+<!-- APPLY FORM MODAL -->
+<div id="applyModal" class="modal-bg" onclick="closeModal(event, 'applyModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('applyModal').classList.remove('open')">✕</button>
+    <h2>Eşleşme <span>Başvurusu</span></h2>
+    <input type="hidden" id="applyCoachId">
+    
+    <div class="form-field">
+      <label>Adınız Soyadınız</label>
+      <input type="text" id="applyName" placeholder="Öğrencinin adı soyadı" required>
+    </div>
+    
+    <div class="form-field">
+      <label>E-posta Adresiniz</label>
+      <input type="email" id="applyEmail" placeholder="iletisim@örnek.com" required>
+    </div>
+    
+    <div class="form-field">
+      <label>Telefon Numaranız</label>
+      <input type="tel" id="applyPhone" placeholder="0555 555 5555" required>
+    </div>
+    
+    <div class="form-field">
+      <label>Sınav Grubu / Profil</label>
+      <select id="applyProfile">
+        <option value="YKS">YKS (Üniversiteye Hazırlık)</option>
+        <option value="LGS">LGS (Lise Giriş Sınavı)</option>
+        <option value="KPSS">KPSS (Kamu Personeli Sınavı)</option>
+        <option value="ALES">ALES</option>
+      </select>
+    </div>
+    
+    <div class="form-field">
+      <label>Özel Tercih / İstediğiniz Koçluk Tarzı</label>
+      <input type="text" id="applyStyle" placeholder="Örn: Disiplinli, Arkadaş canlısı, Haftada 2 görüşme...">
+    </div>
+    
+    <button class="btn btn-accent" style="width: 100%; margin-top: 10px; padding: 14px" onclick="submitApplication()">Başvuruyu Gönder</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SB_URL = 'https://imyhenrwmsmyikpollur.supabase.co';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34';
+  const db = supabase.createClient(SB_URL, SB_KEY);
+  
+  let allCoaches = [];
+  
+  async function loadCoaches() {
+    try {
+      const { data: users, error: usersErr } = await db.from('users').select('id, full_name, color, target').eq('role', 'coach');
+      if (usersErr) throw usersErr;
+      
+      const { data: profiles, error: profErr } = await db.from('coach_profiles').select('*');
+      if (profErr) throw profErr;
+      
+      const profileMap = {};
+      (profiles || []).forEach(p => { profileMap[p.id] = p; });
+      
+      // Merge local storage overrides
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('coach_profile_')) {
+          const uId = key.replace('coach_profile_', '');
+          try {
+            const cached = JSON.parse(localStorage.getItem(key));
+            if (cached) {
+              profileMap[uId] = { ...(profileMap[uId] || {}), ...cached };
+            }
+          } catch(e) {}
+        }
+      }
+      
+      allCoaches = (users || []).map(u => ({
+        id: u.id,
+        name: u.full_name,
+        color: u.color || '#f0a500',
+        brand: u.target || 'Rostrum Akademi Koçu',
+        profile: profileMap[u.id] || {}
+      }));
+      
+      renderCoaches(allCoaches);
+    } catch(e) {
+      console.error('loadCoaches error:', e);
+      showToast('Koçlar yüklenirken hata oluştu.');
+    }
+  }
+  
+  function renderCoaches(coaches) {
+    const container = document.getElementById('coachesContainer');
+    if (coaches.length === 0) {
+      container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-mid); padding: 40px;">Aranan kriterlere uygun koç bulunamadı.</div>';
+      return;
+    }
+    
+    container.innerHTML = coaches.map(c => {
+      const bio = c.profile.bio || 'Henüz biyografi eklenmemiş.';
+      const subjects = (c.profile.subjects || 'Genel Koçluk').split(',').map(s => s.trim()).filter(Boolean);
+      const avatarStyle = c.profile.photo_url ? `background-image: url('${c.profile.photo_url}')` : `background: ${c.color}`;
+      const avatarChar = c.profile.photo_url ? '' : c.name[0];
+      
+      return `
+        <div class="coach-card">
+          <div class="coach-header">
+            <div class="coach-avatar" style="${avatarStyle}">${avatarChar}</div>
+            <div class="coach-meta">
+              <div class="coach-name">${esc(c.name)}</div>
+              <div class="coach-brand">${esc(c.brand)}</div>
+            </div>
+          </div>
+          
+          <div class="coach-subjects">
+            ${subjects.map(s => `<span class="subject-badge">${esc(s)}</span>`).join('')}
+          </div>
+          
+          <div class="coach-bio">${esc(bio)}</div>
+          
+          <div class="coach-actions">
+            <button class="btn btn-ghost" onclick="viewCoachDetails('${c.id}')">Profili Gör</button>
+            <button class="btn btn-accent" onclick="openApplyModal('${c.id}')">Başvur</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  function filterCoaches() {
+    const nameQ = document.getElementById('searchName').value.trim().toLowerCase();
+    const subjectQ = document.getElementById('searchSubject').value.trim().toLowerCase();
+    
+    const filtered = allCoaches.filter(c => {
+      const matchesName = c.name.toLowerCase().includes(nameQ) || c.brand.toLowerCase().includes(nameQ);
+      const matchesSubject = !subjectQ || (c.profile.subjects || '').toLowerCase().includes(subjectQ);
+      return matchesName && matchesSubject;
+    });
+    
+    renderCoaches(filtered);
+  }
+  
+  function viewCoachDetails(coachId) {
+    const c = allCoaches.find(x => x.id === coachId);
+    if (!c) return;
+    
+    const bio = c.profile.bio || 'Biyografi belirtilmemiş.';
+    const experience = c.profile.experience || 'Deneyim belirtilmemiş.';
+    const education = c.profile.education || 'Eğitim bilgisi belirtilmemiş.';
+    const insta = c.profile.instagram ? `<p style="margin-top:6px">📸 Instagram: <a href="https://instagram.com/${esc(c.profile.instagram)}" target="_blank" style="color:var(--accent); text-decoration:none">@${esc(c.profile.instagram)}</a></p>` : '';
+    const linkedin = c.profile.linkedin ? `<p style="margin-top:4px">💼 LinkedIn: <a href="${esc(c.profile.linkedin)}" target="_blank" style="color:var(--accent); text-decoration:none">Profil Linki →</a></p>` : '';
+    const avatarStyle = c.profile.photo_url ? `background-image: url('${c.profile.photo_url}')` : `background: ${c.color}`;
+    const avatarChar = c.profile.photo_url ? '' : c.name[0];
+
+    const content = `
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px; padding-bottom:16px; border-bottom: 1px solid var(--border)">
+        <div class="coach-avatar" style="${avatarStyle}">${avatarChar}</div>
+        <div>
+          <h2 style="margin:0">${esc(c.name)}</h2>
+          <div style="color:var(--accent); font-size:13px; font-weight:700">${esc(c.brand)}</div>
+        </div>
+      </div>
+      <div style="font-size:14px; line-height:1.6; display:flex; flex-direction:column; gap:14px">
+        <div>
+          <b style="color:var(--accent); font-size:11px; text-transform:uppercase; letter-spacing:0.5px">Hakkında</b>
+          <p style="margin-top:4px; color:var(--text-mid)">${esc(bio).replace(/\n/g, '<br>')}</p>
+        </div>
+        <div>
+          <b style="color:var(--accent); font-size:11px; text-transform:uppercase; letter-spacing:0.5px">Deneyim</b>
+          <p style="margin-top:4px; color:var(--text-mid)">${esc(experience).replace(/\n/g, '<br>')}</p>
+        </div>
+        <div>
+          <b style="color:var(--accent); font-size:11px; text-transform:uppercase; letter-spacing:0.5px">Eğitim</b>
+          <p style="margin-top:4px; color:var(--text-mid)">${esc(education).replace(/\n/g, '<br>')}</p>
+        </div>
+        ${insta || linkedin ? `
+        <div>
+          <b style="color:var(--accent); font-size:11px; text-transform:uppercase; letter-spacing:0.5px">Sosyal Medya / İletişim</b>
+          ${insta}
+          ${linkedin}
+        </div>` : ''}
+      </div>
+      <button class="btn btn-accent" style="width:100%; margin-top:24px; padding:12px" onclick="document.getElementById('profileModal').classList.remove('open'); openApplyModal('${c.id}')">Eşleşme Başvurusu Yap</button>
+    `;
+    
+    document.getElementById('modalProfileContent').innerHTML = content;
+    document.getElementById('profileModal').classList.add('open');
+  }
+  
+  function openApplyModal(coachId) {
+    document.getElementById('applyCoachId').value = coachId;
+    document.getElementById('applyModal').classList.add('open');
+  }
+  
+  async function submitApplication() {
+    const coachId = document.getElementById('applyCoachId').value;
+    const name = document.getElementById('applyName').value.trim();
+    const email = document.getElementById('applyEmail').value.trim();
+    const phone = document.getElementById('applyPhone').value.trim();
+    const exam = document.getElementById('applyProfile').value;
+    const style = document.getElementById('applyStyle').value.trim();
+    
+    if (!name || !email || !phone) {
+      showToast('Lütfen zorunlu alanları doldurun!');
+      return;
+    }
+    
+    try {
+      const { error } = await db.from('match_requests').insert({
+        student_name: name,
+        email,
+        phone,
+        exam_profile: exam,
+        style,
+        status: 'pending',
+        matched_coach_id: coachId
+      });
+      
+      if (error) throw error;
+      
+      showToast('Eşleşme başvurunuz başarıyla alındı! Koçunuz sizinle iletişime geçecektir.');
+      document.getElementById('applyModal').classList.remove('open');
+      
+      // Clear inputs
+      document.getElementById('applyName').value = '';
+      document.getElementById('applyEmail').value = '';
+      document.getElementById('applyPhone').value = '';
+      document.getElementById('applyStyle').value = '';
+    } catch(e) {
+      console.error('submitApplication error:', e);
+      showToast('Başvuru gönderilirken hata oluştu: ' + e.message);
+    }
+  }
+
+  function closeModal(e, modalId) {
+    if (e.target === document.getElementById(modalId)) {
+      document.getElementById(modalId).classList.remove('open');
+    }
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  function esc(s) {
+    if (!s) return '';
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+  }
+
+  window.onload = loadCoaches;
+</script>
+</body>
+</html>

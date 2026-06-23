@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Deployment Test — Rostrum Akademi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #07060a;
+    color: #f0eaf8;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .card {
+    background: #0f0d14;
+    border: 1px solid #2d2a3a;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 520px;
+    width: 100%;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .logo span { color: #f0a500; }
+  .subtitle {
+    font-size: 12px;
+    color: #5a5668;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 32px;
+  }
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #17151e;
+    border: 1px solid #2d2a3a;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot.green { background: #3ecf8e; box-shadow: 0 0 6px #3ecf8e66; }
+  .dot.yellow { background: #f0a500; box-shadow: 0 0 6px #f0a50066; }
+  .dot.red { background: #ff5c7a; box-shadow: 0 0 6px #ff5c7a66; }
+  .dot.spin {
+    background: #4da6ff;
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
+  .row-label { color: #a09ab8; flex: 1; }
+  .row-val { color: #f0eaf8; font-weight: 600; font-size: 13px; }
+  .divider { border: none; border-top: 1px solid #2d2a3a; margin: 20px 0; }
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .info-box {
+    background: #17151e;
+    border: 1px solid #2d2a3a;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .info-box-lbl { font-size: 10px; color: #5a5668; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+  .info-box-val { font-size: 13px; font-weight: 600; color: #f0eaf8; word-break: break-all; }
+  .links {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .link-btn {
+    background: #17151e;
+    border: 1px solid #2d2a3a;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a09ab8;
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .link-btn:hover { color: #f0eaf8; border-color: #3d3a4e; background: #1e1b27; }
+  .link-btn.primary { background: #f0a500; color: #07060a; border-color: #f0a500; }
+  .link-btn.primary:hover { background: #fbb800; }
+  .tag {
+    display: inline-block;
+    background: rgba(62,207,142,.12);
+    color: #3ecf8e;
+    border: 1px solid rgba(62,207,142,.2);
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">ROSTRUM<span>AKADEMİ</span></div>
+  <div class="subtitle">Deployment Test Sayfası</div>
+  <div class="tag" id="statusTag">● Kontrol ediliyor...</div>
+
+  <div class="status-row">
+    <div class="dot green"></div>
+    <span class="row-label">Statik dosyalar</span>
+    <span class="row-val">Yüklendi ✓</span>
+  </div>
+
+  <div class="status-row">
+    <div class="dot" id="dotDomain"></div>
+    <span class="row-label">Domain / HTTPS</span>
+    <span class="row-val" id="valDomain">—</span>
+  </div>
+
+  <div class="status-row">
+    <div class="dot" id="dotSupabase"></div>
+    <span class="row-label">Supabase bağlantısı</span>
+    <span class="row-val" id="valSupabase">Kontrol ediliyor...</span>
+  </div>
+
+  <div class="status-row">
+    <div class="dot" id="dotApp"></div>
+    <span class="row-label">app.html</span>
+    <span class="row-val" id="valApp">Kontrol ediliyor...</span>
+  </div>
+
+  <hr class="divider">
+
+  <div class="info-grid">
+    <div class="info-box">
+      <div class="info-box-lbl">URL</div>
+      <div class="info-box-val" id="infoUrl">—</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-lbl">Protokol</div>
+      <div class="info-box-val" id="infoProto">—</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-lbl">Zaman</div>
+      <div class="info-box-val" id="infoTime">—</div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-lbl">Tarayıcı</div>
+      <div class="info-box-val" id="infoBrowser">—</div>
+    </div>
+  </div>
+
+  <div class="links">
+    <a href="/" class="link-btn">Ana Sayfa</a>
+    <a href="/app.html" class="link-btn primary">Uygulamayı Aç →</a>
+    <a href="/site_admin.html" class="link-btn">Admin Panel</a>
+    <a href="/koc_bul.html" class="link-btn">Koç Bul</a>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://imyhenrwmsmyikpollur.supabase.co';
+
+function setDot(id, cls) {
+  const el = document.getElementById(id);
+  if (el) { el.className = 'dot ' + cls; }
+}
+function setVal(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+
+// Domain / HTTPS
+const proto = location.protocol;
+const host  = location.hostname;
+setVal('infoUrl', location.hostname);
+setVal('infoProto', proto.replace(':', ''));
+setVal('infoTime', new Date().toLocaleTimeString('tr-TR'));
+setVal('infoBrowser', navigator.userAgent.match(/(Chrome|Firefox|Safari|Edge)\/[\d.]+/)?.[0] || 'Bilinmiyor');
+
+if (proto === 'https:') {
+  setDot('dotDomain', 'green');
+  setVal('valDomain', host + ' (HTTPS ✓)');
+} else if (host === 'localhost' || host === '127.0.0.1') {
+  setDot('dotDomain', 'yellow');
+  setVal('valDomain', 'localhost (geliştirme)');
+} else {
+  setDot('dotDomain', 'red');
+  setVal('valDomain', 'HTTP — HTTPS aktif değil!');
+}
+
+// Supabase ping
+(async () => {
+  try {
+    setDot('dotSupabase', 'spin');
+    const t0 = Date.now();
+    const res = await fetch(SB_URL + '/rest/v1/', {
+      headers: { 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34' }
+    });
+    const ms = Date.now() - t0;
+    // 200 veya 401 = sunucu erişilebilir (401 auth gerektirir, normal)
+    if (res.ok || res.status === 401) {
+      setDot('dotSupabase', 'green');
+      setVal('valSupabase', `Sunucu erişilebilir (${ms}ms) ✓`);
+    } else {
+      setDot('dotSupabase', 'yellow');
+      setVal('valSupabase', `HTTP ${res.status} (${ms}ms)`);
+    }
+  } catch(e) {
+    setDot('dotSupabase', 'red');
+    setVal('valSupabase', 'Bağlanamadı — ' + e.message.substring(0, 40));
+  }
+})();
+
+// app.html erişilebilir mi?
+(async () => {
+  try {
+    setDot('dotApp', 'spin');
+    const res = await fetch('/app.html', { method: 'HEAD' });
+    if (res.ok) {
+      setDot('dotApp', 'green');
+      setVal('valApp', 'Erişilebilir ✓');
+    } else {
+      setDot('dotApp', 'red');
+      setVal('valApp', 'HTTP ' + res.status);
+    }
+  } catch(e) {
+    setDot('dotApp', 'red');
+    setVal('valApp', 'Erişilemiyor');
+  }
+})();
+
+// Genel durum
+setTimeout(() => {
+  const allGreen = ['dotDomain','dotSupabase','dotApp']
+    .every(id => document.getElementById(id)?.className.includes('green'));
+  const tag = document.getElementById('statusTag');
+  if (allGreen) {
+    tag.style.background = 'rgba(62,207,142,.12)';
+    tag.style.color = '#3ecf8e';
+    tag.style.borderColor = 'rgba(62,207,142,.2)';
+    tag.textContent = '● Her şey çalışıyor';
+  } else {
+    tag.style.background = 'rgba(240,165,0,.12)';
+    tag.style.color = '#f0a500';
+    tag.style.borderColor = 'rgba(240,165,0,.2)';
+    tag.textContent = '⚠ Bazı kontroller bekliyor';
+  }
+}, 4000);
+</script>
+</body>
+</html>
