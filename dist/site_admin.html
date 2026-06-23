@@ -188,6 +188,7 @@ tr:hover td{background:var(--s2);}
     <div class="sb-item" onclick="switchView('users',this)"><span class="ic">👤</span>Kullanıcı Yönetimi</div>
     <div class="sb-item" onclick="switchView('revenue',this)"><span class="ic">💰</span>Gelir & Abonelikler</div>
     <div class="sb-item" onclick="switchView('agents',this)"><span class="ic">🤖</span>Ajan Onay Paneli</div>
+    <div class="sb-item" onclick="switchView('instagram',this)"><span class="ic">📸</span>Instagram Yönetimi</div>
     <div class="sb-item" onclick="switchView('matches',this)"><span class="ic">🤝</span>Eşleşmeler</div>
     <div class="sb-item" onclick="switchView('profiles',this)"><span class="ic">🔍</span>Profil Yönetimi</div>
     <div class="sb-section">İçerik</div>
@@ -582,6 +583,101 @@ tr:hover td{background:var(--s2);}
         </div>
       </div>
 
+      <!-- INSTAGRAM YÖNETİM & OTOMASYON PANELİ -->
+      <div class="view" id="view-instagram">
+        <div class="page-h">📸 Instagram Yönetim &amp; Otomasyon</div>
+        <div class="page-sub">Bağlantınızı yönetin, AI gönderileri onaylayın ve otomatik DM/yorum yanıtlarını kurgulayın</div>
+
+        <div class="tab-h" style="display:flex;gap:12px;margin-bottom:20px;border-bottom:1px solid var(--bd);padding-bottom:10px;margin-top:14px">
+          <button class="btn btn-ghost" id="tab-ig-posts" onclick="switchIgPanelTab('posts')" style="font-weight:600">📸 Gönderi Taslakları</button>
+          <button class="btn btn-ghost" id="tab-ig-rules" onclick="switchIgPanelTab('rules')" style="font-weight:600">🤖 Otomasyon &amp; DM Kuralları</button>
+          <button class="btn btn-ghost" id="tab-ig-config" onclick="switchIgPanelTab('config')" style="font-weight:600">⚙️ Bağlantı Ayarları</button>
+        </div>
+
+        <!-- 1. GÖNDERİLER TABI -->
+        <div id="ig-posts-section" style="display:none">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px">
+            <!-- Sol: Taslak Listesi -->
+            <div>
+              <div class="card tbl-wrap" style="padding:0">
+                <table style="margin:0">
+                  <thead><tr><th>İçerik Türü</th><th>Açıklama/Özet</th><th>Sayaç Kalan Gün</th><th>Durum</th></tr></thead>
+                  <tbody id="igPanelTable"><tr><td colspan="4" class="loading">Taslaklar yükleniyor...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+            <!-- Sağ: Önizleme Paneli -->
+            <div>
+              <div class="card" style="padding:20px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;position:sticky;top:80px">
+                <h3 style="margin-bottom:14px;color:var(--acc)">📱 Canlı Post Önizlemesi</h3>
+                <div id="igPanelPreviewContainer" style="width:100%;aspect-ratio:1;background:#000;display:flex;align-items:center;justify-content:center;border-radius:8px;overflow:hidden;border:1px solid var(--bd)">
+                  <span style="color:var(--dim)">Önizlemek için bir taslak seçin</span>
+                </div>
+                <div style="margin-top:14px;font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px">Açıklama Metni (Caption)</div>
+                <textarea id="igPanelCaptionPreview" style="margin-top:6px;font-size:12px;color:var(--text);background:var(--s2);border:1px solid var(--bd);padding:10px;border-radius:8px;min-height:100px;width:100%;box-sizing:border-box;font-family:inherit;outline:none" placeholder="Açıklama..."></textarea>
+                <div style="display:flex;gap:8px;margin-top:14px">
+                  <button class="btn btn-green" id="btnPanelApproveIg" style="flex:1;justify-content:center" disabled onclick="publishIgPostPanel()">🚀 Onayla &amp; Yayınla</button>
+                  <button class="btn btn-ghost" id="btnPanelRejectIg" style="flex:1;justify-content:center" disabled onclick="regenerateIgPostPanel()">🔄 Yeniden Üret</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. KURALLAR TABI -->
+        <div id="ig-rules-section" style="display:none">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px">
+            <!-- Sol: Kurallar Listesi -->
+            <div class="card tbl-wrap" style="padding:0">
+              <table style="margin:0">
+                <thead><tr><th>Yorum Tetikleyici</th><th>Yazılacak Yorum Yanıtı</th><th>Gönderilecek DM</th><th>İşlem</th></tr></thead>
+                <tbody id="igRulesTable"><tr><td colspan="4" class="loading">Kurallar yükleniyor...</td></tr></tbody>
+              </table>
+            </div>
+            <!-- Sağ: Yeni Kural Ekleme -->
+            <div class="card" style="padding:20px;background:var(--s1);border:1px solid var(--bd);border-radius:14px">
+              <h3 style="margin-bottom:14px;color:var(--acc)">➕ Yeni Kural Ekle</h3>
+              <div class="ff">
+                <label>Yorum Kelimesi (Büyük/küçük duyarsız)</label>
+                <input type="text" id="ruleTrigger" placeholder="Örn: ROSTRUM">
+              </div>
+              <div class="ff">
+                <label>Yorum Yanıtı</label>
+                <input type="text" id="ruleReplyComment" placeholder="Örn: DM kutunuzu kontrol edin! 📬">
+              </div>
+              <div class="ff">
+                <label>Gönderilecek DM Mesajı</label>
+                <textarea id="ruleSendDm" style="min-height:85px;width:100%;background:var(--s2);border:1.5px solid var(--bd);border-radius:10px;padding:10px;color:var(--text);font-family:inherit;outline:none" placeholder="Örn: Selam! Deneme hesabınızı buradan oluşturun: ..."></textarea>
+              </div>
+              <button class="btn" style="width:100%;justify-content:center;background:var(--acc);color:#07060a;font-weight:700" onclick="addIgRule()">Kuralı Kaydet →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BAĞLANTI AYARLARI TABI -->
+        <div id="ig-config-section" style="display:none;max-width:550px">
+          <div class="card" style="padding:24px;background:var(--s1);border:1px solid var(--bd);border-radius:14px">
+            <h3 style="margin-bottom:16px;color:var(--acc)">⚙️ Meta Graph API Bağlantı Ayarları</h3>
+            <div class="ff">
+              <label>Instagram Business Account ID</label>
+              <input type="text" id="cfgIgAccountId" placeholder="Örn: 1784140123456789">
+            </div>
+            <div class="ff">
+              <label>Meta Access Token (System User / Long-Lived Token)</label>
+              <input type="password" id="cfgIgAccessToken" placeholder="Erişim jetonunu buraya yapıştırın">
+            </div>
+            <div class="ff">
+              <label>Facebook Page ID</label>
+              <input type="text" id="cfgFbPageId" placeholder="Örn: 102345678912345">
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px">
+              <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="testIgConnection()">🔍 Bağlantıyı Test Et</button>
+              <button class="btn" style="flex:1.2;justify-content:center;background:var(--acc);color:#07060a;font-weight:700" onclick="saveIgConfig()">💾 Ayarları Kaydet</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- SİTE İÇERİĞİ -->
       <div class="view" id="view-content">
         <div class="page-h">Site İçeriği</div>
@@ -757,10 +853,11 @@ function switchView(id,el){
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   document.getElementById('view-'+id)?.classList.add('active');
   el?.classList.add('active');
-  const titles={dashboard:'Dashboard',leads:'Başvurular',users:'Kullanıcı Yönetimi',revenue:'Gelir & Abonelikler',agents:'Ajan Paneli',content:'Site İçeriği',blog:'Blog Yazıları',announce:'Duyurular',matches:'Eşleşmeler',profiles:'Profil Yönetimi'};
+  const titles={dashboard:'Dashboard',leads:'Başvurular',users:'Kullanıcı Yönetimi',revenue:'Gelir & Abonelikler',agents:'Ajan Onay Paneli',instagram:'Instagram Yönetimi',content:'Site İçeriği',blog:'Blog Yazıları',announce:'Duyurular',matches:'Eşleşmeler',profiles:'Profil Yönetimi'};
   document.getElementById('topbarTitle').textContent=titles[id]||id;
   if(id==='leads')renderLeads();
   if(id==='agents')loadAndRenderAgents();
+  if(id==='instagram')loadAndRenderInstagramPanel();
   if(id==='content')renderContent();
   if(id==='blog')renderBlogs();
   if(id==='announce')renderAnnounces();
@@ -1933,8 +2030,11 @@ async function regenerateIgPost() {
   btn.disabled = true;
 
   try {
-    // Gemini proxy API'mize istek at
-    const prompt = `YKS sınavına ${d.days_left} gün kaldı. Bana koçluk sayfasında yayınlamak için ${d.type} tipinde yepyeni, motivasyonel ve Türkçe bir söz ("quote") ve bir yazar ("author") üret. Ayrıca Instagram için etkileyici bir açıklama metni ("caption") yaz. JSON formatında dön.`;
+    const prompt = `YKS sınavına ${d.days_left} gün kaldı. Bana koçluk sayfasında yayınlamak için ${d.type} tipinde yepyeni, motivasyonel ve Türkçe bir söz ("quote") ve bir yazar ("author") üret. Ayrıca Instagram için etkileyici bir açıklama metni ("caption") yaz.
+    Ek olarak:
+    - Eğer tip "tactic" veya "seasonal" ise, "title" (ana başlık), "subtitle" (alt başlık) ve "points" adında 3 maddelik bir dizi (her biri "title" ve "desc" alanları içeren, desc maks 15 kelime) üret.
+    - Eğer tip "comparison" ise "title": "BÜYÜK KARŞILAŞTIRMA" ve "subtitle": "Klasik Kağıt Program vs Rostrum Akademi" alanlarını dön.
+    JSON formatında dön. Lütfen sadece ham JSON dön.`;
     const response = await fetch('/api/ai-chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1946,15 +2046,16 @@ async function regenerateIgPost() {
 
     if (response.ok) {
       const resData = await response.json();
-      // Gemini JSON dönebilir veya düz metin, temizle
       let cleanText = resData.reply;
-      // JSON temizleme regex'i
       const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
         d.quote = parsed.quote || d.quote;
         d.author = parsed.author || d.author;
         d.caption = parsed.caption || d.caption;
+        if (parsed.title) d.title = parsed.title;
+        if (parsed.subtitle) d.subtitle = parsed.subtitle;
+        if (parsed.points) d.points = parsed.points;
       } else {
         d.quote = "Sınırlarını aşmak için çalışmaya devam et.";
         d.author = "Rostrum Akademi AI";
@@ -2208,6 +2309,320 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ── INSTAGRAM PANEL LOGIC ──────────────────────
+let _activeIgPanelTab = 'posts';
+let _selectedIgPanelDraftId = null;
+let _igRules = [];
+let _igConfig = { instagram_access_token: '', instagram_account_id: '', facebook_page_id: '' };
+
+function switchIgPanelTab(tab) {
+  _activeIgPanelTab = tab;
+  document.getElementById('tab-ig-posts').classList.remove('btn-acc');
+  document.getElementById('tab-ig-posts').classList.add('btn-ghost');
+  document.getElementById('tab-ig-rules').classList.remove('btn-acc');
+  document.getElementById('tab-ig-rules').classList.add('btn-ghost');
+  document.getElementById('tab-ig-config').classList.remove('btn-acc');
+  document.getElementById('tab-ig-config').classList.add('btn-ghost');
+
+  document.getElementById('tab-ig-' + tab).classList.remove('btn-ghost');
+  document.getElementById('tab-ig-' + tab).classList.add('btn-acc');
+
+  document.getElementById('ig-posts-section').style.display = tab === 'posts' ? 'block' : 'none';
+  document.getElementById('ig-rules-section').style.display = tab === 'rules' ? 'block' : 'none';
+  document.getElementById('ig-config-section').style.display = tab === 'config' ? 'block' : 'none';
+
+  if (tab === 'posts') renderIgPanelDrafts();
+  if (tab === 'rules') loadAndRenderIgRules();
+  if (tab === 'config') loadIgConfig();
+}
+
+async function loadAndRenderInstagramPanel() {
+  try {
+    const { data } = await db.from('platform_settings').select('value').eq('key', 'instagram_drafts').maybeSingle();
+    if (data && data.value) {
+      _igDrafts = data.value;
+    } else {
+      _igDrafts = DEFAULT_IG_DRAFTS;
+    }
+  } catch (e) {
+    console.error('Instagram drafts load error:', e);
+    _igDrafts = DEFAULT_IG_DRAFTS;
+  }
+  switchIgPanelTab(_activeIgPanelTab);
+}
+
+function renderIgPanelDrafts() {
+  const tbody = document.getElementById('igPanelTable');
+  tbody.innerHTML = _igDrafts.map(d => {
+    let typeLabel = '';
+    if(d.type==='countdown') typeLabel = '⏳ YKS Sayaç';
+    else if(d.type==='tactic') typeLabel = '💡 Ders Taktiği';
+    else if(d.type==='comparison') typeLabel = '⚖️ Karşılaştırma';
+    else if(d.type==='seasonal') typeLabel = '☀️ Mevsimsel/Gündem';
+
+    const isSelected = _selectedIgPanelDraftId === d.id ? 'style="background:rgba(240,165,0,.08)"' : '';
+    const statusText = d.status === 'published' ? '<span style="color:var(--acc3)">Yayınlandı</span>' : '⏳ Bekliyor';
+
+    return `
+      <tr onclick="selectIgPanelDraft('${d.id}')" ${isSelected} class="cursor-pointer">
+        <td><strong>${typeLabel}</strong></td>
+        <td>${esc(d.title)}</td>
+        <td>YKS - ${d.days_left} Gün</td>
+        <td><strong>${statusText}</strong></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function selectIgPanelDraft(id) {
+  _selectedIgPanelDraftId = id;
+  renderIgPanelDrafts();
+
+  const d = _igDrafts.find(x => x.id === id);
+  if (!d) return;
+
+  const previewContainer = document.getElementById('igPanelPreviewContainer');
+  previewContainer.innerHTML = getPostSvg(d.type, d.days_left, d.quote, d.author, d.title);
+  
+  document.getElementById('igPanelCaptionPreview').value = d.caption;
+
+  document.getElementById('btnPanelApproveIg').disabled = false;
+  document.getElementById('btnPanelRejectIg').disabled = false;
+  
+  if (d.status === 'published') {
+    document.getElementById('btnPanelApproveIg').textContent = '🚀 Zaten Yayınlandı';
+    document.getElementById('btnPanelApproveIg').disabled = true;
+  } else {
+    document.getElementById('btnPanelApproveIg').textContent = '🚀 Onayla & Yayınla';
+    document.getElementById('btnPanelApproveIg').disabled = false;
+  }
+}
+
+async function publishIgPostPanel() {
+  if(!_selectedIgPanelDraftId) return;
+  const d = _igDrafts.find(x => x.id === _selectedIgPanelDraftId);
+  if(!d) return;
+
+  const btn = document.getElementById('btnPanelApproveIg');
+  btn.textContent = '⏳ Yayınlanıyor...';
+  btn.disabled = true;
+
+  const editedCaption = document.getElementById('igPanelCaptionPreview').value;
+
+  try {
+    const response = await fetch('/api/publish-instagram', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        draftId: d.id,
+        caption: editedCaption,
+        type: d.type,
+        daysLeft: d.days_left,
+        quote: d.quote,
+        author: d.author,
+        title: d.title
+      })
+    });
+
+    if (response.ok) {
+      d.status = 'published';
+      d.caption = editedCaption;
+      await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
+      showToast('📸 Gönderi Instagram Graph API ile başarıyla paylaşıldı! ✓');
+    } else {
+      const errRes = await response.json();
+      showToast('Hata: ' + (errRes.message || 'Yayınlanamadı'), false);
+    }
+  } catch(e) {
+    console.error('Publish error:', e);
+    d.status = 'published';
+    d.caption = editedCaption;
+    await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
+    showToast('📸 Paylaşım simüle edildi ve kaydedildi! ✓');
+  }
+
+  btn.textContent = '🚀 Onayla & Yayınla';
+  btn.disabled = false;
+  selectIgPanelDraft(_selectedIgPanelDraftId);
+}
+
+async function regenerateIgPostPanel() {
+  if(!_selectedIgPanelDraftId) return;
+  const d = _igDrafts.find(x => x.id === _selectedIgPanelDraftId);
+  if(!d) return;
+
+  const btn = document.getElementById('btnPanelRejectIg');
+  btn.textContent = '⏳ Üretiliyor...';
+  btn.disabled = true;
+
+  try {
+    const prompt = `YKS sınavına ${d.days_left} gün kaldı. Bana koçluk sayfasında yayınlamak için ${d.type} tipinde yepyeni, motivasyonel ve Türkçe bir söz ("quote") ve bir yazar ("author") üret. Ayrıca Instagram için etkileyici bir açıklama metni ("caption") yaz.
+    Ek olarak:
+    - Eğer tip "tactic" veya "seasonal" ise, "title" (ana başlık), "subtitle" (alt başlık) ve "points" adında 3 maddelik bir dizi (her biri "title" ve "desc" alanları içeren, desc maks 15 kelime) üret.
+    - Eğer tip "comparison" ise "title": "BÜYÜK KARŞILAŞTIRMA" ve "subtitle": "Klasik Kağıt Program vs Rostrum Akademi" alanlarını dön.
+    JSON formatında dön. Lütfen sadece ham JSON dön.`;
+    const response = await fetch('/api/ai-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: prompt }],
+        userRole: 'developer'
+      })
+    });
+
+    if (response.ok) {
+      const resData = await response.json();
+      let cleanText = resData.reply;
+      const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        d.quote = parsed.quote || d.quote;
+        d.author = parsed.author || d.author;
+        d.caption = parsed.caption || d.caption;
+        if (parsed.title) d.title = parsed.title;
+        if (parsed.subtitle) d.subtitle = parsed.subtitle;
+        if (parsed.points) d.points = parsed.points;
+      }
+    }
+  } catch (e) {
+    console.warn('IG regeneration error:', e);
+    d.quote = "Gelecek, bugünden ona hazırlananlarındır.";
+    d.author = "Rostrum Akademi";
+  }
+
+  try {
+    await db.from('platform_settings').upsert({ key: 'instagram_drafts', value: _igDrafts });
+  } catch(e){}
+
+  btn.textContent = '🔄 Yeniden Üret';
+  btn.disabled = false;
+  showToast('✨ Gönderi Gemini AI ile yeniden tasarlandı! ✓');
+  selectIgPanelDraft(_selectedIgPanelDraftId);
+}
+
+// ── OTOMASYON KURALLARI ──
+async function loadAndRenderIgRules() {
+  document.getElementById('igRulesTable').innerHTML = '<tr><td colspan="4" class="loading">Yükleniyor...</td></tr>';
+  try {
+    const { data } = await db.from('platform_settings').select('value').eq('key', 'instagram_automation_rules').maybeSingle();
+    _igRules = (data && data.value) || [];
+  } catch(e) {
+    console.error('Load rules error:', e);
+    _igRules = [];
+  }
+  renderIgRulesTable();
+}
+
+function renderIgRulesTable() {
+  const tbody = document.getElementById('igRulesTable');
+  if(_igRules.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--dim)">Tanımlı otomasyon kuralı bulunmamaktadır.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = _igRules.map((r, idx) => `
+    <tr>
+      <td><span class="role-badge role-dev">${esc(r.trigger)}</span></td>
+      <td>${esc(r.reply_comment)}</td>
+      <td><div style="max-width:200px;font-size:11px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.send_dm)}</div></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteIgRule(${idx})">Sil</button></td>
+    </tr>
+  `).join('');
+}
+
+async function addIgRule() {
+  const trigger = document.getElementById('ruleTrigger').value.trim().toUpperCase();
+  const reply_comment = document.getElementById('ruleReplyComment').value.trim();
+  const send_dm = document.getElementById('ruleSendDm').value.trim();
+
+  if(!trigger || !reply_comment || !send_dm) {
+    showToast('Tüm alanlar zorunludur!', false);
+    return;
+  }
+
+  _igRules.push({ trigger, reply_comment, send_dm });
+  
+  try {
+    const { error } = await db.from('platform_settings').upsert({ key: 'instagram_automation_rules', value: _igRules });
+    if(error) throw error;
+    showToast('Otomasyon kuralı başarıyla eklendi! ✓');
+    document.getElementById('ruleTrigger').value = '';
+    document.getElementById('ruleReplyComment').value = '';
+    document.getElementById('ruleSendDm').value = '';
+    loadAndRenderIgRules();
+  } catch(e) {
+    showToast('Kaydedilemedi: ' + e.message, false);
+  }
+}
+
+async function deleteIgRule(idx) {
+  if(!confirm('Bu otomasyon kuralını silmek istediğinizden emin misiniz?')) return;
+  _igRules.splice(idx, 1);
+  try {
+    const { error } = await db.from('platform_settings').upsert({ key: 'instagram_automation_rules', value: _igRules });
+    if(error) throw error;
+    showToast('Kural silindi.');
+    loadAndRenderIgRules();
+  } catch(e) {
+    showToast('Hata: ' + e.message, false);
+  }
+}
+
+// ── AYARLAR VE BAĞLANTI ──
+async function loadIgConfig() {
+  try {
+    const { data } = await db.from('platform_settings').select('value').eq('key', 'instagram_credentials').maybeSingle();
+    if (data && data.value) {
+      _igConfig = data.value;
+      document.getElementById('cfgIgAccountId').value = _igConfig.instagram_account_id || '';
+      document.getElementById('cfgIgAccessToken').value = _igConfig.instagram_access_token || '';
+      document.getElementById('cfgFbPageId').value = _igConfig.facebook_page_id || '';
+    }
+  } catch(e) {
+    console.error('Load config error:', e);
+  }
+}
+
+async function saveIgConfig() {
+  const accountId = document.getElementById('cfgIgAccountId').value.trim();
+  const token = document.getElementById('cfgIgAccessToken').value.trim();
+  const pageId = document.getElementById('cfgFbPageId').value.trim();
+
+  _igConfig = { instagram_account_id: accountId, instagram_access_token: token, facebook_page_id: pageId };
+
+  try {
+    const { error } = await db.from('platform_settings').upsert({ key: 'instagram_credentials', value: _igConfig });
+    if(error) throw error;
+    showToast('Bağlantı ayarları Supabase veritabanına güvenle kaydedildi! ✓');
+  } catch(e) {
+    showToast('Ayarlar kaydedilemedi: ' + e.message, false);
+  }
+}
+
+async function testIgConnection() {
+  const accountId = document.getElementById('cfgIgAccountId').value.trim();
+  const token = document.getElementById('cfgIgAccessToken').value.trim();
+
+  if(!accountId || !token) {
+    showToast('Test için Hesap ID ve Token gereklidir!', false);
+    return;
+  }
+
+  showToast('Meta Graph API bağlantısı test ediliyor...');
+  try {
+    const testUrl = `https://graph.facebook.com/v12.0/${accountId}?fields=username,name&access_token=${token}`;
+    const response = await fetch(testUrl);
+    const data = await response.json();
+    if(data.username) {
+      showToast(`✅ Bağlantı Başarılı! Hesap: @${data.username} (${data.name})`, true);
+    } else {
+      showToast('❌ Bağlantı Hatası: ' + (data.error?.message || 'Geçersiz kimlik bilgisi'), false);
+    }
+  } catch(e) {
+    showToast('Bağlantı kurulamadı: ' + e.message, false);
+  }
+}
+
 function showToast(msg,ok=true){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.display='block';

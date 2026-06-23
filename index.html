@@ -681,17 +681,17 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
 
   <div class="hero-eyebrow">
     <div class="live-dot"></div>
-    Zaman Kazandıran Eğitim Yönetim Sistemi
+    Eğitim Kurumları ve Koçlar İçin B2B SaaS Altyapısı
   </div>
 
   <h1>
     <span class="h1-plain">Eğitim Yönetiminde</span>
-    <span class="h1-grad">Zaman Kazandıran</span>
-    <span class="h1-outline">Yeni Nesil Sistem</span>
+    <span class="h1-grad">Dijital Dönüşüm</span>
+    <span class="h1-outline">Bulut Yazılımı</span>
   </h1>
 
   <p class="hero-desc">
-    Öğrenciler için AI ders asistanı, koçlar için akıllı planlama ve kurumlar için merkezi takip paneli. Hepsi tek bir premium platformda.
+    Koçluk işinizi ölçeklendirin. Öğrenciler için AI ders asistanı, koçlar için akıllı planlama ve kurumlar için merkezi CRM paneli. Hepsi tek bir premium platformda.
   </p>
 
   <div class="hero-cta">
@@ -712,11 +712,11 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   </div>
 
   <div class="hero-trust">
-    <div class="trust-item">Kredi kartı gerekmez</div>
-    <div class="trust-item">Kurulum yok</div>
-    <div class="trust-item">5 dakikada başla</div>
+    <div class="trust-item">Kurulum Gerektirmeyen Yazılım</div>
+    <div class="trust-item">Otomatik Ölçeklenen Kapasite</div>
+    <div class="trust-item">Kurumsal Veli Raporlaması</div>
     <div class="trust-item">İstediğinde iptal et</div>
-    <div class="trust-item">Veriler şifreli &amp; güvende</div>
+    <div class="trust-item">KVKK Uyumlu &amp; Veriler Şifreli</div>
   </div>
 
   <!-- Ticker -->
@@ -1949,11 +1949,30 @@ async function loadSiteContent(){
   }catch(e){ console.warn('loadSiteContent error:',e); }
 }
 
+// E-posta Tıklama Takibi
+async function trackEmailClick(){
+  try{
+    const urlParams = new URLSearchParams(window.location.search);
+    const leadId = urlParams.get('lead_id');
+    if(leadId){
+      const {error} = await _SB.from('leads').update({ email_clicked: true }).eq('id', leadId);
+      if(error) console.warn('trackEmailClick error:', error);
+      else console.log('Lead click tracked successfully:', leadId);
+    }
+  }catch(e){ console.warn('trackEmailClick error:', e); }
+}
+
 // Sayfa yüklenince çalıştır — DOM hazır olduktan sonra
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',loadSiteContent);
+  document.addEventListener('DOMContentLoaded',()=>{
+    loadSiteContent();
+    trackEmailClick();
+  });
 } else {
-  setTimeout(loadSiteContent, 100);
+  setTimeout(()=>{
+    loadSiteContent();
+    trackEmailClick();
+  }, 100);
 }
 
 // HERO COUNTER animate

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-BUTIK AKADEMI — SALES OUTREACH AGENT
-Bu script, Google ve Instagram üzerinden koç/dershane verisi toplayıp SQLite veritabanına kaydeder
+BUTIK AKADEMI — SALES OUTREACH AGENT (SUPABASE VERSION)
+Bu script, Google ve Instagram üzerinden koç/dershane verisi toplayıp Supabase veritabanına kaydeder
 ve Gemini API kullanarak her adaya özel Türkçe satış e-postası (cold email) üretir.
 """
 
 import os
 import sys
-import sqlite3
 import json
 import urllib.request
 import urllib.parse
@@ -17,39 +16,42 @@ from datetime import datetime
 sys.stdout.reconfigure(encoding='utf-8') if hasattr(sys.stdout, 'reconfigure') else None
 
 # ── YAPILANDIRMA ──────────────────────────────────────────
-DB_PATH = os.path.join(os.path.dirname(__file__), "leads.db")
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://imyhenrwmsmyikpollur.supabase.co")
+# Anon key / Service role key
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
-# Örnek Arama Anahtar Kelimeleri
-KEYWORDS = ["yks koçluğu", "öğrenci koçu", "lgs koçluk", "butik dershane"]
+# ── REST API İSTEK YARDIMCISI ──────────────────────────────
+def make_supabase_request(path, method="GET", payload=None, extra_headers=None):
+    url = f"{SUPABASE_URL}/rest/v1/{path}"
+    headers = {
+        "apikey": SUPABASE_KEY,
+        "Authorization": f"Bearer {SUPABASE_KEY}",
+        "Content-Type": "application/json"
+    }
+    if extra_headers:
+        headers.update(extra_headers)
 
-# ── VERİTABANI BAŞLATMA ────────────────────────────────────
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS leads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT,
-            instagram TEXT,
-            website TEXT,
-            source TEXT,
-            notes TEXT,
-            status TEXT DEFAULT 'pending', -- pending, drafted, sent, replied, failed
-            pitch_text TEXT,
-            created_at TEXT
-        )
-    """)
-    conn.commit()
-    conn.close()
+    data = None
+    if payload is not None:
+        data = json.dumps(payload).encode('utf-8')
+
+    req = urllib.request.Request(url, data=data, headers=headers, method=method)
+    try:
+        with urllib.request.urlopen(req) as response:
+            res_content = response.read().decode('utf-8')
+            return json.loads(res_content) if res_content else []
+    except Exception as e:
+        print(f"[Supabase Error] HTTP Request to {path} failed: {e}")
+        return None
 
 # ── MOCK ARAMA VE VERİ TOPLAMA (LEAD FINDER) ────────────────
-# Gerçek API anahtarı olmadığında çalışacak yüksek kaliteli yerel veri seti
 def find_leads_mock():
     mock_data = [
         {
-            "name": "Emin Koçluk & Eğitim Danışmanlığı",
+            "first_name": "Emin",
+            "last_name": "Koc",
+            "brand_name": "Emin Koçluk & Eğitim Danışmanlığı",
             "email": "info@eminkocluk.com",
             "instagram": "@eminkocluk",
             "website": "https://www.eminkocluk.com",
@@ -57,7 +59,9 @@ def find_leads_mock():
             "notes": "Instagram'da 15k takipçisi var. Bireysel YKS koçluğu yapıyor ve YKS derece öğrencilerini hedefliyor."
         },
         {
-            "name": "Yeşil Koç Akademi",
+            "first_name": "Yesil",
+            "last_name": "Koc",
+            "brand_name": "Yeşil Koç Akademi",
             "email": "iletisim@yesilkoc.com",
             "instagram": "@yesilkoc",
             "website": "https://www.yesilkoc.com",
@@ -65,7 +69,9 @@ def find_leads_mock():
             "notes": "LGS ve YKS koçluk hizmeti veren butik bir kurum. 5 kişilik bir koç kadrosu var."
         },
         {
-            "name": "Hedef Merkez Dershaneleri",
+            "first_name": "Hedef",
+            "last_name": "Merkez",
+            "brand_name": "Hedef Merkez Dershaneleri",
             "email": "hedefmerkez@gmail.com",
             "instagram": "@hedefmerkez",
             "website": "",
@@ -73,7 +79,9 @@ def find_leads_mock():
             "notes": "Ankara'da yerel butik dershane. Web sitesi yok, kayıtlar için WhatsApp ve DM kullanıyorlar."
         },
         {
-            "name": "Duru Eğitim Danışmanlığı",
+            "first_name": "Duru",
+            "last_name": "Danismanlik",
+            "brand_name": "Duru Eğitim Danışmanlığı",
             "email": "duru.danismanlik@outlook.com",
             "instagram": "@durukoc",
             "website": "https://www.durukocluk.com",
@@ -82,23 +90,19 @@ def find_leads_mock():
         }
     ]
     
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
     added_count = 0
     for lead in mock_data:
-        # E-posta mükerrerlik kontrolü
-        cursor.execute("SELECT id FROM leads WHERE email = ?", (lead["email"],))
-        if cursor.fetchone() is None:
-            cursor.execute("""
-                INSERT INTO leads (name, email, instagram, website, source, notes, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
-            """, (lead["name"], lead["email"], lead["instagram"], lead["website"], lead["source"], lead["notes"], datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        # Supabase'de e-posta ile kayıt var mı kontrol et
+        path = f"leads?email=eq.{urllib.parse.quote(lead['email'])}&select=id"
+        existing = make_supabase_request(path)
+        
+        if existing == []:
+            # Kayıt yoksa Supabase'e ekle
+            make_supabase_request("leads", method="POST", payload=lead, extra_headers={"Prefer": "return=minimal"})
+            print(f"-> {lead['brand_name']} başarıyla Supabase leads tablosuna eklendi.")
             added_count += 1
             
-    conn.commit()
-    conn.close()
-    print(f"[Lead Finder] {added_count} yeni potansiyel koç veritabanına eklendi.")
+    print(f"[Lead Finder] {added_count} yeni potansiyel koç Supabase'e kaydedildi.")
 
 # ── GEMINI İLE KİŞİSELLEŞTİRİLMİŞ TEKLİF ÜRETME (DRAFTING) ────
 def generate_pitch(lead_name, lead_notes, lead_instagram):
@@ -153,59 +157,48 @@ Lütfen doğrudan Türkçe yazılmış e-posta metnini ver.
 
 # ── TÜM ADAYLARA TEKLİF DRAFTI OLUŞTURMA ────────────────────
 def draft_all_leads():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT id, name, notes, instagram FROM leads WHERE status = 'pending'")
-    pending_leads = cursor.fetchall()
+    # Durumu 'pending' olan adayları seç
+    path = "leads?status=eq.pending&select=id,first_name,last_name,brand_name,notes,instagram"
+    pending_leads = make_supabase_request(path)
     
     if not pending_leads:
         print("[Draft] İşlenecek bekleyen aday bulunamadı.")
-        conn.close()
         return
 
     print(f"[Draft] {len(pending_leads)} aday için teklif metni üretiliyor...")
     
-    for lead_id, name, notes, instagram in pending_leads:
+    for lead in pending_leads:
+        name = f"{lead['first_name']} {lead.get('last_name') or ''}".strip() or lead['brand_name']
         print(f"-> {name} için taslak üretiliyor...")
-        pitch = generate_pitch(name, notes, instagram)
+        pitch = generate_pitch(name, lead.get('notes') or '', lead.get('instagram') or '')
         if pitch:
-            cursor.execute("""
-                UPDATE leads 
-                SET pitch_text = ?, status = 'drafted' 
-                WHERE id = ?
-            """, (pitch, lead_id))
-            print(f"   [✓] Taslak oluşturuldu.")
+            update_path = f"leads?id=eq.{lead['id']}"
+            make_supabase_request(update_path, method="PATCH", payload={"pitch_text": pitch, "status": "drafted"}, extra_headers={"Prefer": "return=minimal"})
+            print(f"   [✓] Taslak oluşturuldu ve Supabase'e kaydedildi.")
         else:
             print(f"   [X] Taslak oluşturulamadı.")
             
-    conn.commit()
-    conn.close()
     print("[Draft] Taslak oluşturma işlemi tamamlandı.")
 
 # ── CRM VERİLERİNİ GÖSTERME (REPORT) ───────────────────────
 def show_crm():
-    if not os.path.exists(DB_PATH):
-        print("leads.db bulunamadı! Önce scripti çalıştırıp veri toplayın.")
-        return
-        
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name, email, instagram, status FROM leads")
-    rows = cursor.fetchall()
+    path = "leads?select=id,brand_name,email,instagram,status&order=created_at.desc"
+    rows = make_supabase_request(path)
     
-    print("\n" + "="*70)
-    print(f"{'ID':<4} | {'AD':<30} | {'E-POSTA':<30} | {'DURUM':<10}")
-    print("="*70)
+    if not rows:
+        print("leads tablosunda veri bulunamadı.")
+        return
+
+    print("\n" + "="*80)
+    print(f"{'ID':<38} | {'MARKA/AD':<25} | {'E-POSTA/IG':<25} | {'DURUM':<10}")
+    print("="*80)
     for row in rows:
-        print(f"{row[0]:<4} | {row[1][:28]:<30} | {(row[2] or row[3]):<30} | {row[4]:<10}")
-    print("="*70 + "\n")
-    conn.close()
+        email_or_ig = row.get("email") or row.get("instagram") or "—"
+        print(f"{row['id']:<38} | {row['brand_name'][:23]:<25} | {email_or_ig[:23]:<25} | {row['status']:<10}")
+    print("="*80 + "\n")
 
 # ── ANA ÇALIŞTIRMA BLOĞU ──────────────────────────────────
 if __name__ == "__main__":
-    init_db()
-    
     # Komut satırı argümanı kontrolü
     if len(sys.argv) > 1:
         cmd = sys.argv[1].lower()
@@ -220,7 +213,6 @@ if __name__ == "__main__":
         else:
             print("Kullanım: python outreach_agent.py [run | list | draft]")
     else:
-        # Varsayılan olarak tüm adımları çalıştır
         print("--- Rostrum Akademi Outreach Ajanı Başlatılıyor ---")
         find_leads_mock()
         draft_all_leads()

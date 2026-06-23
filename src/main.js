@@ -16,8 +16,16 @@ if (window.renderNetInputs) window.renderNetInputs();
 // Google OAuth redirect sonrası oturum doğrulaması
 if (window.checkOAuthSession) window.checkOAuthSession();
 
-// Sandbox/Demo modunda demo butonlarını göster ve otomatik Google Chooser Simulator aç
-if (window.location.search.includes('sandbox') || window.location.hash === '#sandbox') {
+// Sandbox/Demo modunda otomatik giriş yap veya demo butonlarını göster
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('sandbox') === 'true') {
+  if (window.simOAuthLogin) {
+    setTimeout(() => {
+      console.log('Sandbox auto-login triggered for demokoc...');
+      window.simOAuthLogin('demokoc');
+    }, 300);
+  }
+} else if (window.location.search.includes('sandbox') || window.location.hash === '#sandbox') {
   const demoWrap = document.getElementById('demoQuickWrap');
   if (demoWrap) demoWrap.style.display = 'flex';
   if (window.showGoogleSimulator) {

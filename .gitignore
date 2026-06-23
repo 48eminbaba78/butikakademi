@@ -1,2 +1,8 @@
 .vercel
 /dist
+node_modules
+scratch
+__*.js
+_*.js
+_*.mjs
+test_ss
