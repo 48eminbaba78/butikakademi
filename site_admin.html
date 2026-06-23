@@ -1814,7 +1814,7 @@ const DEFAULT_IG_DRAFTS = [
     quote: "Sıcak Havada Odaklanma",
     author: "Sıcak Havada Odaklanma",
     status: "pending",
-    caption: "Yaz sıcağında ders çalışmak işkenceye mi dönüşüyor? ☀️ İşte odaklanmanı %100 artıracak yaz taktikleri:\n1. Sabah 06:00-09:00 arası en verimli saatlerdir, erken kalkın.\n2. Çalışma masanızda soğuk su ve sadeleştirilmiş bir ortam bulundurun.\n3. 25 dk çalışma - 5 dk mola (Pomodoro) sistemiyle beyninizi serin tutun.\n\nSıcaklar hayallerinize engel olmasın! ❄️\n\n#yazkampi #derscalismagunlugu #ykshazirlik #yks2026 #rostrumakademi"
+    caption: "Yaz sıcağında ders çalışmak işkenceye mi dönüşüyor? ☀️ İşte odaklanmanı %100 artıracak yaz taktikleri:\n1. Sabah 06:00-09:00 arası en verimli saatlerdir, erken kalkın.\n2. Çalışma masanızda soğuk su ve sadeleştirilmiş bir ortam bulundurun.\n3. 25 dk çalışma - 5 dk mola (Pomodoro) sistemiyle beyninizi serin tutun.\n\nSıcaklar hayallerinize engel olmasın! ❄️\n\n#yazkampi #derscalismagunlugu #ykshazirlik #yks2027 #rostrumakademi"
   }
 ];
 
@@ -1920,6 +1920,40 @@ function getPostSvg(d) {
   }
 
   return `${hdr}${ftr}`;
+}
+
+function getStorySvg(d) {
+  const { days_left, quote, author, title, caption } = d;
+  const lines = (quote||'').split(' ').reduce((acc, w) => {
+    const last = acc[acc.length-1] || '';
+    if ((last+' '+w).length > 22) { acc.push(w); } else { acc[acc.length-1] = last ? last+' '+w : w; }
+    return acc;
+  }, ['']).slice(0,5);
+  const txts = lines.map((l,i) => `<text x="540" y="${980+i*70}" text-anchor="middle" fill="#f0eaf8" font-family="Arial,Helvetica,sans-serif" font-size="46" font-weight="600">${l}</text>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" width="100%" height="100%">
+    <rect width="1080" height="1920" fill="#07060a"/>
+    <defs>
+      <radialGradient id="sg1" cx="80%" cy="15%" r="55%"><stop offset="0%" stop-color="#f0a500" stop-opacity="0.18"/><stop offset="100%" stop-color="#07060a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="sg2" cx="20%" cy="85%" r="50%"><stop offset="0%" stop-color="#c084fc" stop-opacity="0.14"/><stop offset="100%" stop-color="#07060a" stop-opacity="0"/></radialGradient>
+      <linearGradient id="sgrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f0a500"/><stop offset="100%" stop-color="#c084fc"/></linearGradient>
+    </defs>
+    <rect width="1080" height="1920" fill="url(#sg1)"/>
+    <rect width="1080" height="1920" fill="url(#sg2)"/>
+    <text x="540" y="140" text-anchor="middle" fill="#f0eaf8" font-family="Arial,Helvetica,sans-serif" font-size="22" font-weight="800" letter-spacing="6">ROSTRUM AKADEMİ</text>
+    <circle cx="540" cy="165" r="5" fill="#f0a500"/>
+    <circle cx="540" cy="660" r="220" fill="none" stroke="#2d2a3a" stroke-width="8"/>
+    <circle cx="540" cy="660" r="220" fill="none" stroke="url(#sgrad)" stroke-width="14" stroke-dasharray="1382" stroke-dashoffset="345" stroke-linecap="round"/>
+    <text x="540" y="598" text-anchor="middle" fill="#f0eaf8" font-family="Arial,Helvetica,sans-serif" font-size="150" font-weight="900">${days_left}</text>
+    <text x="540" y="688" text-anchor="middle" fill="#a09ab8" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="700" letter-spacing="6">GUN KALDI</text>
+    <text x="540" y="820" text-anchor="middle" fill="#f0eaf8" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="700">${(title||'YKS 2027').toUpperCase()}</text>
+    <rect x="200" y="860" width="680" height="2" fill="url(#sgrad)" rx="1"/>
+    <text x="540" y="940" text-anchor="middle" fill="#f0a500" font-family="Georgia,serif" font-size="160" fill-opacity="0.15">"</text>
+    ${txts}
+    <text x="540" y="${1040+lines.length*70}" text-anchor="middle" fill="#a09ab8" font-family="Arial,Helvetica,sans-serif" font-size="28" font-style="italic">— ${author||'Rostrum Akademi'}</text>
+    <rect x="240" y="1680" width="600" height="80" rx="40" fill="url(#sgrad)"/>
+    <text x="540" y="1730" text-anchor="middle" fill="#07060a" font-family="Arial,Helvetica,sans-serif" font-size="26" font-weight="900">rostrumakademi.app</text>
+    <text x="540" y="1820" text-anchor="middle" fill="#a09ab8" font-family="Arial,Helvetica,sans-serif" font-size="20">14 gun ucretsiz deneyin</text>
+  </svg>`;
 }
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -2031,10 +2065,12 @@ async function publishIgPostPanel(isStory = false) {
 
   try {
     // Görsel tarayıcıda canvas ile üret (font sorunu olmaz)
-    const svgEl = document.querySelector('#igPanelPreviewContainer svg');
-    if (!svgEl) throw new Error('Önizleme SVG bulunamadı. Lütfen bir taslak seçin.');
+    // Story için ayrı 1080x1920 SVG kullan, post için mevcut önizleme SVG
+    const W = 1080, H = isStory ? 1920 : 1080;
+    const svgStr = isStory
+      ? new XMLSerializer().serializeToString(new DOMParser().parseFromString(getStorySvg(d), 'image/svg+xml').documentElement)
+      : (() => { const el = document.querySelector('#igPanelPreviewContainer svg'); if (!el) throw new Error('Önizleme SVG bulunamadı.'); return new XMLSerializer().serializeToString(el); })();
 
-    const svgStr = new XMLSerializer().serializeToString(svgEl);
     const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
     const svgUrl = URL.createObjectURL(svgBlob);
 
@@ -2042,15 +2078,15 @@ async function publishIgPostPanel(isStory = false) {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        canvas.width = 1080; canvas.height = 1080;
+        canvas.width = W; canvas.height = H;
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#07060a';
-        ctx.fillRect(0, 0, 1080, 1080);
-        ctx.drawImage(img, 0, 0, 1080, 1080);
+        ctx.fillRect(0, 0, W, H);
+        ctx.drawImage(img, 0, 0, W, H);
         URL.revokeObjectURL(svgUrl);
         resolve(canvas.toDataURL('image/jpeg', 0.95).split(',')[1]);
       };
-      img.onerror = (e) => { URL.revokeObjectURL(svgUrl); reject(new Error('Görsel render hatası')); };
+      img.onerror = () => { URL.revokeObjectURL(svgUrl); reject(new Error('Görsel render hatası')); };
       img.src = svgUrl;
     });
 
@@ -2111,50 +2147,67 @@ async function regenerateIgPostPanel() {
       })
     });
 
-    if (response.ok) {
-      const resData = await response.json();
-      let cleanText = resData.reply;
-      const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        d.quote = parsed.quote || d.quote;
-        d.author = parsed.author || d.author;
-        d.caption = parsed.caption || d.caption;
-        if (parsed.title) d.title = parsed.title;
-        if (parsed.subtitle) d.subtitle = parsed.subtitle;
-        if (parsed.points) d.points = parsed.points;
-      }
+    if (!response.ok) throw new Error('API ' + response.status);
+    const resData = await response.json();
+    if (resData.error) throw new Error(resData.error);
+    let cleanText = resData.reply || '';
+    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      d.quote = parsed.quote || d.quote;
+      d.author = parsed.author || d.author;
+      d.caption = parsed.caption || d.caption;
+      if (parsed.title) d.title = parsed.title;
+      if (parsed.subtitle) d.subtitle = parsed.subtitle;
+      if (parsed.points) d.points = parsed.points;
     }
   } catch (e) {
-    console.warn('IG regeneration error (Offline Mode Simulation):', e);
-    // Vercel backend olmadan yerel test için offline fallback havuzu
+    console.warn('IG regeneration — offline fallback:', e.message);
     const fallbacks = [
       {
-        quote: "Başarı, hazırlık ve fırsatın buluştuğu noktadır.",
-        author: "Rostrum 2027",
-        caption: "YKS 2027'ye hazırlanan öğrencilerinizin netlerini uçurmaya hazır mısınız? 🚀 Rostrum Akademi'nin yapay zeka destekli koçluk paneli ile tanışın. Kağıt programları çöpe atın, dijitalleşin! 💡\n\n#yks2027 #ykskocluk #rostrumakademi #tytayt",
-        title: "DİJİTAL KOÇLUK"
-      },
-      {
-        quote: "Öğrencini tanı, başarıyı tasarla.",
-        author: "Koçluk Vizyonu",
-        caption: "YKS 2027 maratonu uzun. Öğrencilerinizin TYT/AYT deneme analizlerini saniyeler içinde yapıp onlara özel eksik konu listeleri çıkarmak istemez misiniz? 🎯 Rostrum Akademi ile veli ve öğrenci takibi artık çok kolay!\n\n#yks2027 #ykskocluk #eğitim #rostrumakademi",
-        title: "ANALİZ GÜCÜ"
-      },
-      {
-        quote: "Gelecek, bugünden ona hazırlananlarındır.",
+        quote: "İyi bir koç öğrencilerini, harika bir koç zamanını yönetir.",
         author: "Rostrum Akademi",
-        caption: "Öğrencileriniz YKS 2027 hedeflerine doğru koşarken, siz onların ilerlemesini anlık takip edin. Rostrum Akademi SaaS çözümü ile kurumsal kimliğinizi güçlendirin! 🏆 Hemen 14 günlük ücretsiz denemeye başlayın.\n\n#yks2027 #rostrumakademi #koclukyazilimi #tytayt",
-        title: "HEDEFE DOĞRU"
+        caption: "YKS 2027'ye hazırlık sürecinde koçluk işinizi dijitalleştirin! 🚀 Rostrum Akademi ile haftalık programları saniyeler içinde oluşturun, öğrencilerinizin netlerini anlık takip edin.\n\n#rostrumakademi #ykskocluk #yks2027 #edtech",
+        title: "DİJİTAL KOÇLUK",
+        subtitle: "Zamanı Koçunuza Geri Kazandırın",
+        points: [
+          { title: "Süreci Otomatikleştirin", desc: "Haftalık planları saniyeler içinde oluşturun, zaman kazanın." },
+          { title: "Veli İletişimini Çözün", desc: "Tek tıkla PDF raporlarla velilere profesyonel sunum yapın." },
+          { title: "Kapasitenizi Artırın", desc: "Dijital altyapı ile daha fazla öğrenciye üst düzey koçluk verin." }
+        ]
+      },
+      {
+        quote: "Başarı, doğru strateji ile doğru zamanda buluştuğunda gelir.",
+        author: "Rostrum Akademi",
+        caption: "YKS 2027 maratonu uzun. Öğrencilerinizin TYT/AYT deneme analizlerini saniyeler içinde yapın. 🎯 Rostrum Akademi ile veli ve öğrenci takibi artık çok kolay!\n\n#yks2027 #ykskocluk #rostrumakademi #tytayt",
+        title: "ANALİZ GÜCÜ",
+        subtitle: "Veriye Dayalı Koçluk Sistemi",
+        points: [
+          { title: "Net Takibi", desc: "Her deneme sonrası TYT/AYT netlerini otomatik kaydedin." },
+          { title: "Eksik Konu Analizi", desc: "Yapay zeka hangi konulara odaklanılacağını belirler." },
+          { title: "Veli Raporu", desc: "PDF raporla veliye haftalık ilerlemeyi gönderin." }
+        ]
+      },
+      {
+        quote: "Kurumsallaşmak, koçluk kalitesini artırmanın ilk adımıdır.",
+        author: "Rostrum Akademi",
+        caption: "Koçluk işinizi büyütmek ve haftada 10 saat kazanmak için Rostrum Akademi'yi keşfedin. 14 gün ücretsiz deneyin! 🏆\n\n#yks2027 #rostrumakademi #koclukyazilimi #tytayt",
+        title: "KURUMSAL KOÇLUK",
+        subtitle: "Daha Az Efor, Daha Fazla Öğrenci",
+        points: [
+          { title: "Program Yönetimi", desc: "Tüm öğrencilerin haftalık planları tek panelden." },
+          { title: "Mesaj Şablonları", desc: "Velilere hızlı, profesyonel mesajlar gönderin." },
+          { title: "Gelir Takibi", desc: "Ödemeler ve abonelikler otomatik kayıt altında." }
+        ]
       }
     ];
     const rnd = fallbacks[Math.floor(Math.random() * fallbacks.length)];
     d.quote = rnd.quote;
     d.author = rnd.author;
     d.caption = rnd.caption;
-    if(d.type === 'tactic' || d.type === 'seasonal') {
-       d.title = rnd.title;
-    }
+    d.title = rnd.title;
+    d.subtitle = rnd.subtitle;
+    d.points = rnd.points;
   }
 
   try {
