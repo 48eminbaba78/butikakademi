@@ -556,6 +556,8 @@ tr:hover td{background:var(--s2);}
             style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(230,237,243,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Otomasyon Kuralları</button>
           <button id="tab-ig-config" onclick="switchIgPanelTab('config')"
             style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(230,237,243,0.4);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Bağlantı Ayarları</button>
+          <button id="tab-ig-manual" onclick="switchIgPanelTab('manual')"
+            style="padding:10px 20px;background:none;border:none;border-bottom:2px solid transparent;color:rgba(244,162,97,0.7);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-left:auto">✦ Manuel Post</button>
         </div>
 
         <!-- 1. GÖNDERİLER TABI -->
@@ -753,6 +755,150 @@ tr:hover td{background:var(--s2);}
             </div>
           </div>
         </div>
+
+        <!-- 4. MANUEL POST TABI -->
+        <div id="ig-manual-section" style="display:none;overflow:hidden;flex:1">
+          <!-- Sol: Oluşturma formu -->
+          <div style="flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:18px;max-width:640px">
+
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#e6edf3;margin-bottom:4px">Koç olarak paylaş</div>
+              <div style="font-size:12px;color:rgba(230,237,243,0.4)">Fikrinin içeriğini gir, AI carousel'a dönüştürür, sen yayınla.</div>
+            </div>
+
+            <!-- Kime konuşuyorsun -->
+            <div>
+              <div style="font-size:10px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Kime konuşuyorsun?</div>
+              <div style="display:flex;gap:8px">
+                <button id="mp-persona-ogrenci" onclick="setManualPersona('ogrenci')"
+                  style="flex:1;padding:8px;background:rgba(244,162,97,0.15);border:0.5px solid rgba(244,162,97,0.5);border-radius:7px;font-size:12px;color:#F4A261;font-weight:600;cursor:pointer;font-family:inherit">🎓 Öğrenciye</button>
+                <button id="mp-persona-koc" onclick="setManualPersona('koc')"
+                  style="flex:1;padding:8px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;font-size:12px;color:rgba(230,237,243,0.4);cursor:pointer;font-family:inherit">👨‍🏫 Koça</button>
+              </div>
+            </div>
+
+            <!-- İçerik tonu -->
+            <div>
+              <div style="font-size:10px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">İçerik tonu</div>
+              <div style="display:flex;gap:8px">
+                <button id="mp-tone-empati" onclick="setManualTone('empati')"
+                  style="flex:1;padding:7px;background:rgba(244,162,97,0.12);border:0.5px solid rgba(244,162,97,0.4);border-radius:7px;font-size:11px;color:#F4A261;font-weight:600;cursor:pointer;font-family:inherit">💙 Empati</button>
+                <button id="mp-tone-taktik" onclick="setManualTone('taktik')"
+                  style="flex:1;padding:7px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;font-size:11px;color:rgba(230,237,243,0.4);cursor:pointer;font-family:inherit">⚡ Taktik</button>
+                <button id="mp-tone-zeka" onclick="setManualTone('zeka')"
+                  style="flex:1;padding:7px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;font-size:11px;color:rgba(230,237,243,0.4);cursor:pointer;font-family:inherit">🧠 YKS Zekası</button>
+              </div>
+            </div>
+
+            <!-- Koçun fikri -->
+            <div>
+              <div style="font-size:10px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Ne anlatmak istiyorsun?</div>
+              <textarea id="mpIdeaInput" rows="5"
+                style="width:100%;background:#161b22;border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px;font-size:13px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
+                placeholder="Koç olarak gözlemlediğin bir şeyi yaz. Örn: 'Öğrenciler denemeyi analiz etmiyor, sadece puan bakıyor. Bunu carousel'a dönüştürelim.'"></textarea>
+            </div>
+
+            <!-- Üret butonu -->
+            <button id="mpGenerateBtn" onclick="generateManualPost()"
+              style="width:100%;padding:13px;background:#F4A261;border:none;border-radius:8px;font-size:13px;font-weight:700;color:#0D1117;cursor:pointer;font-family:inherit;letter-spacing:.3px">
+              AI ile Carousel Oluştur →
+            </button>
+
+            <!-- Üretilen içerik (gizli başta) -->
+            <div id="mpGeneratedSection" style="display:none;flex-direction:column;gap:14px">
+              <div style="height:0.5px;background:rgba(255,255,255,0.08)"></div>
+              <div style="font-size:10px;font-weight:700;color:rgba(244,162,97,0.6);text-transform:uppercase;letter-spacing:.6px">Oluşturulan İçerik</div>
+
+              <div>
+                <div style="font-size:10px;color:rgba(230,237,243,0.3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Caption</div>
+                <textarea id="mpCaptionEdit" rows="4"
+                  style="width:100%;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:10px;font-size:12px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"></textarea>
+              </div>
+
+              <div>
+                <div style="font-size:10px;color:rgba(230,237,243,0.3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px">Hashtag'ler</div>
+                <textarea id="mpHashtagEdit" rows="2"
+                  style="width:100%;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:10px;font-size:11px;color:#60a0e0;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box"></textarea>
+              </div>
+
+              <div>
+                <div style="font-size:10px;color:rgba(230,237,243,0.3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Slaytlar (düzenlenebilir)</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;gap:8px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:rgba(244,162,97,0.15);border:0.5px solid rgba(244,162,97,0.3);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#F4A261;flex-shrink:0;margin-top:1px">01</div>
+                    <textarea id="mpSlide0" rows="2" onchange="updateManualPreview()" oninput="updateManualPreview()"
+                      style="flex:1;background:#161b22;border:0.5px solid rgba(244,162,97,0.2);border-radius:7px;padding:8px;font-size:11px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box" placeholder="Kanca — kaydırma durdurucu soru"></textarea>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(230,237,243,0.3);flex-shrink:0;margin-top:1px">02</div>
+                    <textarea id="mpSlide1" rows="3" onchange="updateManualPreview()" oninput="updateManualPreview()"
+                      style="flex:1;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:8px;font-size:11px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box" placeholder="Geliştirme — başlık + maddeler (her madde yeni satırda)"></textarea>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(230,237,243,0.3);flex-shrink:0;margin-top:1px">03</div>
+                    <textarea id="mpSlide2" rows="3" onchange="updateManualPreview()" oninput="updateManualPreview()"
+                      style="flex:1;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:8px;font-size:11px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box" placeholder="Genişletme — devam maddeler"></textarea>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(230,237,243,0.3);flex-shrink:0;margin-top:1px">04</div>
+                    <textarea id="mpSlide3" rows="2" onchange="updateManualPreview()" oninput="updateManualPreview()"
+                      style="flex:1;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:8px;font-size:11px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box" placeholder="İçgörü — aklında kalacak tek cümle"></textarea>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:flex-start">
+                    <div style="width:28px;height:28px;background:rgba(244,162,97,0.08);border:0.5px solid rgba(244,162,97,0.2);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(244,162,97,0.5);flex-shrink:0;margin-top:1px">05</div>
+                    <textarea id="mpSlide4" rows="2" onchange="updateManualPreview()" oninput="updateManualPreview()"
+                      style="flex:1;background:#161b22;border:0.5px solid rgba(244,162,97,0.15);border-radius:7px;padding:8px;font-size:11px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box" placeholder="CTA — net aksiyon (URL otomatik eklenir)"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sağ: Carousel önizleme + yayınla -->
+          <div style="width:320px;flex-shrink:0;background:#0a0d10;border-left:0.5px solid rgba(255,255,255,0.07);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px">
+
+            <!-- Önizleme -->
+            <div style="background:#0D1B2A;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden">
+              <div style="padding:7px 12px;border-bottom:0.5px solid rgba(255,255,255,0.05)">
+                <span style="font-size:9px;font-weight:700;color:rgba(244,162,97,0.55);letter-spacing:1.2px;text-transform:uppercase">CAROUSEL ÖNİZLEME</span>
+              </div>
+              <div id="mpPreviewContainer" style="width:100%;aspect-ratio:1;background:#0D1117;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                <span style="font-size:11px;color:rgba(230,237,243,0.2);text-align:center;padding:16px;line-height:1.6">İçerik oluşturunca<br>carousel önizlenir</span>
+              </div>
+            </div>
+
+            <!-- Slayt nav -->
+            <div style="display:flex;gap:5px">
+              <button onclick="selectMpSlide(0)" id="mp-slide-btn-0"
+                style="flex:1;padding:5px 3px;background:rgba(244,162,97,0.12);border:0.5px solid #F4A261;border-radius:5px;font-size:9px;color:#F4A261;cursor:pointer;font-family:inherit;text-align:center;line-height:1.5">01<br>Kanca</button>
+              <button onclick="selectMpSlide(1)" id="mp-slide-btn-1"
+                style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.08);border-radius:5px;font-size:9px;color:rgba(230,237,243,0.3);cursor:pointer;font-family:inherit;text-align:center;line-height:1.5">02<br>İçerik</button>
+              <button onclick="selectMpSlide(2)" id="mp-slide-btn-2"
+                style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.08);border-radius:5px;font-size:9px;color:rgba(230,237,243,0.3);cursor:pointer;font-family:inherit;text-align:center;line-height:1.5">03<br>İçerik</button>
+              <button onclick="selectMpSlide(3)" id="mp-slide-btn-3"
+                style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.08);border-radius:5px;font-size:9px;color:rgba(230,237,243,0.3);cursor:pointer;font-family:inherit;text-align:center;line-height:1.5">04<br>İçgörü</button>
+              <button onclick="selectMpSlide(4)" id="mp-slide-btn-4"
+                style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.08);border-radius:5px;font-size:9px;color:rgba(230,237,243,0.3);cursor:pointer;font-family:inherit;text-align:center;line-height:1.5">05<br>CTA</button>
+            </div>
+
+            <!-- Tasarım notu -->
+            <div id="mpDesignNote" style="display:none;background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:7px;padding:10px 12px;font-size:11px;color:rgba(230,237,243,0.4);line-height:1.5"></div>
+
+            <!-- Yayınla -->
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:auto">
+              <button id="mpPublishPost" onclick="publishManualPost(false)" disabled
+                style="width:100%;padding:13px;background:rgba(61,186,143,0.08);border:0.5px solid rgba(61,186,143,0.2);border-radius:8px;font-size:13px;font-weight:700;color:rgba(61,186,143,0.35);cursor:not-allowed;font-family:inherit">
+                🚀 Carousel Yayınla
+              </button>
+              <button id="mpPublishStory" onclick="publishManualPost(true)" disabled
+                style="width:100%;padding:11px;background:rgba(155,149,224,0.06);border:0.5px solid rgba(155,149,224,0.15);border-radius:8px;font-size:13px;font-weight:600;color:rgba(155,149,224,0.35);cursor:not-allowed;font-family:inherit">
+                📱 Hikaye Yayınla
+              </button>
+              <div style="font-size:10px;color:rgba(230,237,243,0.2);text-align:center">Üretilen içerik taslak listesine kaydedilmez</div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- SİTE İÇERİĞİ -->
@@ -2084,6 +2230,189 @@ function getStorySvg(d) {
   </svg>`;
 }
 
+// ══════════════════════════════════════════════════════════════
+// CAROUSEL SVG TEMPLATES — algı odaklı, kaydırma durdurucu
+// ══════════════════════════════════════════════════════════════
+
+function _svgLines(text, maxW, fontSize) {
+  const ratio = 0.53;
+  const maxChars = Math.floor(maxW / (fontSize * ratio));
+  const words = (text || '').split(' ');
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    const test = line ? line + ' ' + w : w;
+    if (test.length > maxChars && line) { lines.push(line); line = w; }
+    else { line = test; }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function _svgEsc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function _carouselFooter(n, total) {
+  return `
+    <rect x="0" y="1072" width="1080" height="2" fill="rgba(244,162,97,0.22)" rx="1"/>
+    <text x="60" y="1056" font-size="22" fill="rgba(230,237,243,0.18)" font-family="Arial,system-ui,sans-serif">rostrumakademi.app</text>
+    <text x="1020" y="1056" font-size="22" fill="rgba(230,237,243,0.18)" font-family="Arial,system-ui,sans-serif" text-anchor="end">${String(n+1).padStart(2,'0')}/${String(total).padStart(2,'0')}</text>`;
+}
+
+function _carouselHeader() {
+  return `<text x="60" y="64" font-size="19" fill="rgba(244,162,97,0.6)" font-family="Arial,system-ui,sans-serif" font-weight="700" letter-spacing="2.5">ROSTRUM AKADEMİ</text>`;
+}
+
+// SLAYT 1 — KANCA: Büyük metin, merkezi, scroll durdurucu
+function carouselSlide_Hook(headline, n, total) {
+  const h = _svgEsc(headline);
+  const lines = _svgLines(h, 900, 76);
+  const lineH = 94;
+  const totalH = lines.length * lineH;
+  const startY = 510 - totalH / 2;
+
+  const textEls = lines.map((l, i) =>
+    `<text x="540" y="${startY + i * lineH}" font-size="76" font-weight="800" fill="#e6edf3" font-family="Arial,system-ui,sans-serif" text-anchor="middle">${_svgEsc(l)}</text>`
+  ).join('');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="hbg${n}" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0%" stop-color="#0f1420"/><stop offset="100%" stop-color="#0D1117"/></linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#hbg${n})"/>
+  ${_carouselHeader()}
+  <rect x="60" y="${startY - 44}" width="70" height="3" fill="#F4A261" rx="1.5"/>
+  ${textEls}
+  <text x="540" y="${startY + totalH + 58}" font-size="24" fill="rgba(244,162,97,0.42)" font-family="Arial,system-ui,sans-serif" text-anchor="middle" font-weight="500">→ kaydır</text>
+  ${_carouselFooter(n, total)}
+</svg>`;
+}
+
+// SLAYT 2-3 — İÇERİK: Sol hizalı, madde listesi
+function carouselSlide_Content(headline, points, n, total) {
+  const numStr = String(n + 1).padStart(2, '0');
+  const hLines = _svgLines(_svgEsc(headline), 880, 42);
+  const titleEls = hLines.map((l, i) =>
+    `<text x="110" y="${188 + i * 52}" font-size="42" font-weight="700" fill="#e6edf3" font-family="Arial,system-ui,sans-serif">${_svgEsc(l)}</text>`
+  ).join('');
+
+  let py = 188 + hLines.length * 52 + 52;
+  const ptEls = (points || []).slice(0, 4).map((pt, i) => {
+    const [title, desc] = Array.isArray(pt) ? pt : (typeof pt === 'object' ? [pt.title||'', pt.desc||''] : [String(pt), '']);
+    const barH = desc ? 80 : 46;
+    const el = `
+      <rect x="110" y="${py - 34}" width="4" height="${barH}" fill="#F4A261" rx="2"/>
+      <text x="128" y="${py}" font-size="30" font-weight="700" fill="#e6edf3" font-family="Arial,system-ui,sans-serif">${_svgEsc(title)}</text>
+      ${desc ? `<text x="128" y="${py + 36}" font-size="24" fill="rgba(230,237,243,0.5)" font-family="Arial,system-ui,sans-serif">${_svgEsc(String(desc).substring(0,62))}</text>` : ''}`;
+    py += desc ? 116 : 74;
+    return el;
+  }).join('');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <rect width="1080" height="1080" fill="#0D1117"/>
+  <text x="920" y="600" font-size="520" font-weight="900" fill="rgba(244,162,97,0.035)" font-family="Arial,system-ui,sans-serif" text-anchor="middle">${numStr}</text>
+  ${_carouselHeader()}
+  <rect x="110" y="110" width="54" height="3" fill="#F4A261" rx="1.5"/>
+  ${titleEls}
+  ${ptEls}
+  ${_carouselFooter(n, total)}
+</svg>`;
+}
+
+// SLAYT 4 — İÇGÖRÜ: Alıntı biçimi, akılda kalacak cümle
+function carouselSlide_Insight(quote, n, total) {
+  const lines = _svgLines(_svgEsc(quote), 880, 44);
+  const lineH = 58;
+  const totalH = lines.length * lineH;
+  const startY = 490 - totalH / 2;
+  const textEls = lines.map((l, i) =>
+    `<text x="540" y="${startY + i * lineH}" font-size="44" fill="#e6edf3" font-family="Arial,system-ui,sans-serif" text-anchor="middle" font-style="italic">${_svgEsc(l)}</text>`
+  ).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <radialGradient id="rig${n}" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="#0f1a2e"/><stop offset="100%" stop-color="#090c12"/></radialGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#rig${n})"/>
+  <text x="40" y="500" font-size="480" fill="rgba(244,162,97,0.05)" font-family="Georgia,serif">"</text>
+  ${_carouselHeader()}
+  ${textEls}
+  <rect x="390" y="${startY + totalH + 34}" width="300" height="2" fill="rgba(244,162,97,0.35)" rx="1"/>
+  <text x="540" y="${startY + totalH + 72}" font-size="22" fill="rgba(244,162,97,0.45)" font-family="Arial,system-ui,sans-serif" text-anchor="middle" letter-spacing="1">— Rostrum Akademi</text>
+  ${_carouselFooter(n, total)}
+</svg>`;
+}
+
+// SLAYT 5 — CTA: Amber vurgulu, URL büyük ve belirgin
+function carouselSlide_CTA(ctaText, n, total) {
+  const lines = _svgLines(_svgEsc(ctaText), 900, 50);
+  const lineH = 64;
+  const totalH = lines.length * lineH;
+  const startY = 400 - totalH / 2;
+  const textEls = lines.map((l, i) =>
+    `<text x="540" y="${startY + i * lineH}" font-size="50" font-weight="600" fill="#e6edf3" font-family="Arial,system-ui,sans-serif" text-anchor="middle">${_svgEsc(l)}</text>`
+  ).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <linearGradient id="ctabg${n}" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#1c0e02"/><stop offset="100%" stop-color="#0D1117"/></linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#ctabg${n})"/>
+  <rect x="0" y="0" width="1080" height="4" fill="#F4A261"/>
+  ${_carouselHeader()}
+  ${textEls}
+  <text x="540" y="${startY + totalH + 80}" font-size="54" font-weight="800" fill="#F4A261" font-family="Arial,system-ui,sans-serif" text-anchor="middle">rostrumakademi.app</text>
+  <text x="540" y="${startY + totalH + 148}" font-size="26" fill="rgba(244,162,97,0.42)" font-family="Arial,system-ui,sans-serif" text-anchor="middle">→ Profildeki bağlantıya tıkla</text>
+  <rect x="0" y="1072" width="1080" height="4" fill="#F4A261"/>
+  <text x="1020" y="1056" font-size="22" fill="rgba(230,237,243,0.18)" font-family="Arial,system-ui,sans-serif" text-anchor="end">${String(n+1).padStart(2,'0')}/${String(total).padStart(2,'0')}</text>
+</svg>`;
+}
+
+// Ana carousel slayt fonksiyonu — slide tipine göre doğru template'i çağırır
+function getCarouselSlideSvg(slideData, n, total) {
+  if (!slideData) return carouselSlide_Hook('', n, total || 5);
+  total = total || 5;
+  const type = slideData.type || (n === 0 ? 'hook' : n === 3 ? 'insight' : n === 4 ? 'cta' : 'content');
+  if (type === 'hook') return carouselSlide_Hook(slideData.headline || slideData.text || '', n, total);
+  if (type === 'insight') return carouselSlide_Insight(slideData.quote || slideData.headline || slideData.text || '', n, total);
+  if (type === 'cta') return carouselSlide_CTA(slideData.cta_text || slideData.headline || slideData.text || '', n, total);
+  return carouselSlide_Content(slideData.headline || slideData.text || '', slideData.points || [], n, total);
+}
+
+// Metin dizisini carousel yapısına çevirir (mevcut story_slides için)
+function parseCarouselSlides(slides) {
+  if (!slides || slides.length === 0) return [];
+  const types = ['hook', 'content', 'content', 'insight', 'cta'];
+  return slides.map((s, i) => {
+    const raw = s?.text || (typeof s === 'string' ? s : '');
+    const type = types[i] || 'content';
+    if (type === 'content') {
+      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length > 1) {
+        return { type, headline: lines[0], points: lines.slice(1).map(l => [l.replace(/^[-•→*]\s*/, ''), '']) };
+      }
+    }
+    return { type, headline: raw, quote: raw, cta_text: raw };
+  });
+}
+
+// SVG → JPEG base64 (canvas yoluyla, sunucu fontunu atlatır)
+async function svgToJpegBase64(svgStr, W, H) {
+  const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0D1117'; ctx.fillRect(0, 0, W, H);
+      ctx.drawImage(img, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.92).split(',')[1]);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('SVG render hatası')); };
+    img.src = url;
+  });
+}
+
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
@@ -2123,23 +2452,26 @@ function igTypeLabel(type) {
 
 function switchIgPanelTab(tab) {
   _activeIgPanelTab = tab;
-  ['posts','rules','config'].forEach(t => {
+  ['posts','rules','config','manual'].forEach(t => {
     const btn = document.getElementById('tab-ig-' + t);
+    if (!btn) return;
     if (t === tab) {
-      btn.style.color = '#e6edf3';
+      btn.style.color = t === 'manual' ? '#F4A261' : '#e6edf3';
       btn.style.borderBottomColor = '#F4A261';
-      btn.style.fontWeight = '600';
+      btn.style.fontWeight = '700';
     } else {
-      btn.style.color = 'rgba(230,237,243,0.4)';
+      btn.style.color = t === 'manual' ? 'rgba(244,162,97,0.4)' : 'rgba(230,237,243,0.4)';
       btn.style.borderBottomColor = 'transparent';
-      btn.style.fontWeight = '500';
+      btn.style.fontWeight = t === 'manual' ? '600' : '500';
     }
   });
   document.getElementById('ig-posts-section').style.display = tab === 'posts' ? 'flex' : 'none';
   document.getElementById('ig-rules-section').style.display = tab === 'rules' ? 'block' : 'none';
   document.getElementById('ig-config-section').style.display = tab === 'config' ? 'block' : 'none';
+  document.getElementById('ig-manual-section').style.display = tab === 'manual' ? 'flex' : 'none';
   if (tab === 'rules') loadAndRenderIgRules();
   if (tab === 'config') loadIgConfig();
+  if (tab === 'manual') initManualPostTab();
 }
 
 async function loadAndRenderInstagramPanel() {
@@ -2260,10 +2592,18 @@ function selectIgPost(id) {
   const p = _igPosts.find(x => x.id === id);
   if (!p) return;
 
-  // Önizleme
-  const d = p.preview_data || { type: p.content_type, days_left: _igMemory?.yks_days_remaining || 360 };
-  d.type = d.type || p.content_type;
-  document.getElementById('igPanelPreviewContainer').innerHTML = getPostSvg(d);
+  // Önizleme — carousel slayt 0 önce dene, yoksa eski post SVG
+  const slides = Array.isArray(p.story_slides) ? p.story_slides : [];
+  const carouselSlides = parseCarouselSlides(slides);
+  const previewContainer = document.getElementById('igPanelPreviewContainer');
+  if (carouselSlides.length > 0) {
+    const svgStr = getCarouselSlideSvg(carouselSlides[0], 0, carouselSlides.length);
+    previewContainer.innerHTML = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}" style="width:100%;height:100%;object-fit:cover"/>`;
+  } else {
+    const d = p.preview_data || { type: p.content_type, days_left: _igMemory?.yks_days_remaining || 360 };
+    d.type = d.type || p.content_type;
+    previewContainer.innerHTML = getPostSvg(d);
+  }
 
   // Caption + hashtag
   const fullCaption = p.caption || '';
@@ -2276,8 +2616,6 @@ function selectIgPost(id) {
     document.getElementById('igHashtagDisplay').textContent = p.hashtags || '—';
   }
 
-  // Story slides
-  const slides = Array.isArray(p.story_slides) ? p.story_slides : [];
   document.getElementById('igStorySlideText').value = slides[0]?.text || slides[0] || '';
   selectStorySlide(0);
 
@@ -2332,11 +2670,22 @@ function enablePublishBtns(enable) {
 function selectStorySlide(n) {
   _selectedStorySlide = n;
   const p = _igPosts.find(x => x.id === _selectedIgPostId);
-  const slides = p?.story_slides || [];
-  const text = slides[n]?.text || slides[n] || '';
+  const rawSlides = p?.story_slides || [];
+  const text = rawSlides[n]?.text || rawSlides[n] || '';
   document.getElementById('igStorySlideText').value = text;
+
+  // Carousel preview güncelle
+  const carouselSlides = parseCarouselSlides(rawSlides);
+  if (carouselSlides.length > 0) {
+    const idx = Math.min(n, carouselSlides.length - 1);
+    const svgStr = getCarouselSlideSvg(carouselSlides[idx], idx, carouselSlides.length);
+    document.getElementById('igPanelPreviewContainer').innerHTML =
+      `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}" style="width:100%;height:100%;object-fit:cover"/>`;
+  }
+
   for (let i = 0; i < 5; i++) {
     const btn = document.getElementById('slide-btn-' + i);
+    if (!btn) continue;
     if (i === n) {
       btn.style.borderColor = '#F4A261';
       btn.style.color = '#F4A261';
@@ -2379,35 +2728,43 @@ async function publishIgPost(isStory = false) {
 
   const d = p.preview_data || { type: p.content_type, days_left: _igMemory?.yks_days_remaining || 360 };
   d.type = d.type || p.content_type;
-  const caption = document.getElementById('igPanelCaptionPreview').value + '\n\n' + (document.getElementById('igHashtagDisplay').textContent || '');
+  const captionText = (document.getElementById('igPanelCaptionPreview')?.value || '').trim();
+  const hashtagText = (document.getElementById('igHashtagDisplay')?.textContent || '').trim();
+  const caption = captionText + (hashtagText && hashtagText !== '—' ? '\n\n' + hashtagText : '');
 
   try {
-    const W = 1080, H = isStory ? 1920 : 1080;
-    const svgStr = isStory
-      ? new XMLSerializer().serializeToString(new DOMParser().parseFromString(getStorySvg(d), 'image/svg+xml').documentElement)
-      : (() => { const el = document.querySelector('#igPanelPreviewContainer svg'); if (!el) throw new Error('Önizleme SVG bulunamadı'); return new XMLSerializer().serializeToString(el); })();
+    const rawSlides = Array.isArray(p.story_slides) ? p.story_slides : [];
+    const carouselSlides = parseCarouselSlides(rawSlides);
 
-    const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    const imageBase64 = await new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = W; canvas.height = H;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#07060a'; ctx.fillRect(0, 0, W, H);
-        ctx.drawImage(img, 0, 0, W, H);
-        URL.revokeObjectURL(svgUrl);
-        resolve(canvas.toDataURL('image/jpeg', 0.95).split(',')[1]);
-      };
-      img.onerror = () => { URL.revokeObjectURL(svgUrl); reject(new Error('Görsel render hatası')); };
-      img.src = svgUrl;
-    });
+    let fetchBody;
+    if (isStory) {
+      // Hikaye: tek görsel (slayt 0)
+      const svgStr = carouselSlides.length > 0
+        ? getCarouselSlideSvg(carouselSlides[0], 0, carouselSlides.length)
+        : getStorySvg(d);
+      const imageBase64 = await svgToJpegBase64(svgStr, 1080, carouselSlides.length > 0 ? 1080 : 1920);
+      fetchBody = { caption: '', imageBase64, isStory: true };
+    } else if (carouselSlides.length > 1) {
+      // Carousel post
+      btn.textContent = '⏳ Görseller hazırlanıyor...';
+      showToast(`${carouselSlides.length} slayt hazırlanıyor...`);
+      const base64Slides = [];
+      for (let i = 0; i < carouselSlides.length; i++) {
+        const svgStr = getCarouselSlideSvg(carouselSlides[i], i, carouselSlides.length);
+        base64Slides.push(await svgToJpegBase64(svgStr, 1080, 1080));
+      }
+      fetchBody = { caption, slides: base64Slides, isCarousel: true };
+    } else {
+      // Tek görsel post
+      const svgStr = getCarouselSlideSvg(carouselSlides[0] || { type: 'hook', headline: d.quote || '' }, 0, 1);
+      const imageBase64 = await svgToJpegBase64(svgStr, 1080, 1080);
+      fetchBody = { caption, imageBase64 };
+    }
 
     btn.textContent = '⏳ Yayınlanıyor...';
     const response = await fetch('/api/publish-instagram', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ caption: isStory ? '' : caption, imageBase64, isStory })
+      body: JSON.stringify(fetchBody)
     });
 
     if (response.ok) {
@@ -2656,6 +3013,363 @@ Sadece ham JSON döndür, başka açıklama ekleme.`;
   btn.textContent = '↺ Yeniden Üret';
   btn.disabled = false;
   showToast('✨ İçerik yeniden üretildi ✓');
+}
+
+// ════════════════════════════════════════════════════
+// MANUEL POST — Koçun kendi sesini eklediği ekran
+// ════════════════════════════════════════════════════
+
+let _mpPersona = 'ogrenci';
+let _mpTone = 'empati';
+let _mpCurrentSlide = 0;
+let _mpSlides = [];
+let _mpGenerated = false;
+
+function initManualPostTab() {
+  // Zaten başlatıldıysa tekrar init etme
+  _mpGenerated = false;
+  enableMpPublish(false);
+}
+
+function setManualPersona(p) {
+  _mpPersona = p;
+  ['ogrenci','koc'].forEach(x => {
+    const btn = document.getElementById('mp-persona-' + x);
+    if (!btn) return;
+    if (x === p) {
+      btn.style.background = 'rgba(244,162,97,0.15)';
+      btn.style.borderColor = 'rgba(244,162,97,0.5)';
+      btn.style.color = '#F4A261';
+    } else {
+      btn.style.background = 'none';
+      btn.style.borderColor = 'rgba(255,255,255,0.1)';
+      btn.style.color = 'rgba(230,237,243,0.4)';
+    }
+  });
+}
+
+function setManualTone(t) {
+  _mpTone = t;
+  const colors = { empati: '#60a0e0', taktik: '#F4A261', zeka: '#3dba8f' };
+  ['empati','taktik','zeka'].forEach(x => {
+    const btn = document.getElementById('mp-tone-' + x);
+    if (!btn) return;
+    if (x === t) {
+      btn.style.background = `rgba(${x === 'empati' ? '96,160,224' : x === 'taktik' ? '244,162,97' : '61,186,143'},0.12)`;
+      btn.style.borderColor = (colors[x] || '#F4A261') + '55';
+      btn.style.color = colors[x] || '#F4A261';
+    } else {
+      btn.style.background = 'none';
+      btn.style.borderColor = 'rgba(255,255,255,0.1)';
+      btn.style.color = 'rgba(230,237,243,0.4)';
+    }
+  });
+}
+
+function parseManualSlides() {
+  const getVal = id => (document.getElementById(id)?.value || '').trim();
+  const types = ['hook','content','content','insight','cta'];
+  _mpSlides = [0,1,2,3,4].map(i => {
+    const raw = getVal('mpSlide' + i);
+    const type = types[i];
+    if (type === 'content') {
+      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length > 1) {
+        return { type, headline: lines[0], points: lines.slice(1).map(l => [l.replace(/^[-•→*]\s*/,''), '']) };
+      }
+      return { type, headline: raw, points: [] };
+    }
+    return { type, headline: raw, quote: raw, cta_text: raw };
+  });
+}
+
+function updateManualPreview() {
+  parseManualSlides();
+  renderMpSlide(_mpCurrentSlide);
+}
+
+function renderMpSlide(n) {
+  _mpCurrentSlide = n;
+  const container = document.getElementById('mpPreviewContainer');
+  if (!container) return;
+
+  const slide = _mpSlides[n];
+  if (!slide || (!slide.headline && !slide.quote && !slide.cta_text)) {
+    container.innerHTML = `<span style="font-size:11px;color:rgba(230,237,243,0.2);text-align:center;padding:16px;line-height:1.6">Slayt ${n+1} boş</span>`;
+    return;
+  }
+
+  const svgStr = getCarouselSlideSvg(slide, n, 5);
+  container.innerHTML = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}" style="width:100%;height:100%;object-fit:cover" loading="lazy"/>`;
+
+  // Nav butonlarını güncelle
+  for (let i = 0; i < 5; i++) {
+    const btn = document.getElementById('mp-slide-btn-' + i);
+    if (!btn) continue;
+    if (i === n) {
+      btn.style.background = 'rgba(244,162,97,0.12)';
+      btn.style.borderColor = '#F4A261';
+      btn.style.color = '#F4A261';
+    } else {
+      btn.style.background = 'none';
+      btn.style.borderColor = 'rgba(255,255,255,0.08)';
+      btn.style.color = 'rgba(230,237,243,0.3)';
+    }
+  }
+}
+
+function selectMpSlide(n) {
+  parseManualSlides();
+  renderMpSlide(n);
+}
+
+function enableMpPublish(yes) {
+  const post = document.getElementById('mpPublishPost');
+  const story = document.getElementById('mpPublishStory');
+  if (!post || !story) return;
+  if (yes) {
+    post.disabled = false;
+    post.style.background = 'rgba(61,186,143,0.15)';
+    post.style.borderColor = 'rgba(61,186,143,0.4)';
+    post.style.color = '#3dba8f';
+    post.style.cursor = 'pointer';
+    story.disabled = false;
+    story.style.background = 'rgba(155,149,224,0.1)';
+    story.style.borderColor = 'rgba(155,149,224,0.3)';
+    story.style.color = '#9b95e0';
+    story.style.cursor = 'pointer';
+  } else {
+    post.disabled = true;
+    post.style.background = 'rgba(61,186,143,0.08)';
+    post.style.borderColor = 'rgba(61,186,143,0.2)';
+    post.style.color = 'rgba(61,186,143,0.35)';
+    post.style.cursor = 'not-allowed';
+    story.disabled = true;
+    story.style.background = 'rgba(155,149,224,0.06)';
+    story.style.borderColor = 'rgba(155,149,224,0.15)';
+    story.style.color = 'rgba(155,149,224,0.35)';
+    story.style.cursor = 'not-allowed';
+  }
+}
+
+async function generateManualPost() {
+  const idea = (document.getElementById('mpIdeaInput')?.value || '').trim();
+  if (!idea) {
+    showToast('Lütfen ne anlatmak istediğini yaz.', false);
+    return;
+  }
+
+  const btn = document.getElementById('mpGenerateBtn');
+  btn.textContent = '⏳ Üretiliyor...';
+  btn.disabled = true;
+
+  const personaLabel = _mpPersona === 'ogrenci' ? 'YKS öğrencileri' : 'YKS koçları';
+  const toneLabel = _mpTone === 'empati' ? 'Empati — öğrencinin veya koçun gerçek hissini yakala, problem noktasına dokunfue' :
+    _mpTone === 'taktik' ? 'Taktik — somut, aksiyon alınabilir, numaralı adımlar veya liste' :
+    'YKS Zekası — veri, istatistik veya beklenmedik bir gerçekle başla';
+
+  const prompt = `Sen Rostrum Akademi'nin Instagram içerik yazarısın. Koçun verdiği fikri 5 slaytlık carousel'a çevireceksin.
+
+KİMİZ: Rostrum Akademi, Türkiye'deki bağımsız YKS koçlarına özel dijital yönetim platformudur.
+Hedef kitle: ${personaLabel}.
+İçerik tonu: ${toneLabel}.
+
+TON KURALLARI:
+- Klişe yasak: "Başarıya ulaş", "Hayallerinin peşinden git" → ASLA yazma
+- Rakamlarla düşün: "Haftada 3 saat" > "Çok zaman kazanırsın"
+- "En iyi platform" gibi kanıtlanmamış iddia yasak
+- İngilizce jargon (dashboard, feature) yasak → Türkçe kullan
+- "Bizi takip et" yasak → "Erken erişim listesine katıl" de
+
+SLAYT YAPISI:
+Slayt 01 — Kanca: Kaydırma durdurucu. Soru, çarpıcı stat veya keskin gözlem. Tek cümle, max 12 kelime.
+Slayt 02 — Geliştirme: 3-4 madde (her biri kısa başlık). Problem veya çözümü somutlaştır.
+Slayt 03 — Devam: 2-3 madde daha veya konuyu derinleştir. Başlık + maddeler.
+Slayt 04 — İçgörü: Aklında kalacak tek cümle. Alıntı formatı. Max 15 kelime.
+Slayt 05 — CTA: Net aksiyon. "Erken erişim açık" veya "Koçluk işini sistemleştir". Max 10 kelime (URL otomatik eklenir).
+
+KOÇUN FİKRİ: "${idea}"
+
+GÖREV: Bu fikre dayanarak 5 slaytlık carousel üret.
+
+JSON formatında döndür:
+{
+  "hook": "slayt 1 metni (tek cümle, max 12 kelime)",
+  "slide2": {
+    "headline": "slayt 2 başlığı (max 8 kelime)",
+    "points": [
+      {"title": "Madde 1 başlığı (max 5 kelime)", "desc": "kısa açıklama (max 10 kelime)"},
+      {"title": "Madde 2", "desc": "..."},
+      {"title": "Madde 3", "desc": "..."}
+    ]
+  },
+  "slide3": {
+    "headline": "slayt 3 başlığı",
+    "points": [
+      {"title": "...", "desc": "..."},
+      {"title": "...", "desc": "..."}
+    ]
+  },
+  "insight": "slayt 4 içgörüsü (tek cümle, alıntı formatı, max 15 kelime)",
+  "cta": "slayt 5 CTA metni (max 10 kelime)",
+  "caption": "post açıklaması (hashtag hariç, 3-5 paragraf)",
+  "hashtags": "#ykskoçu #özelkoç #yks2027 ... (6-9 hashtag)"
+}
+Sadece ham JSON döndür.`;
+
+  try {
+    const response = await fetch('/api/ai-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: prompt }], userRole: 'developer' })
+    });
+    if (!response.ok) throw new Error('API ' + response.status);
+    const resData = await response.json();
+    if (resData.error) throw new Error(resData.error);
+
+    const jsonMatch = (resData.reply || '').match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSON parse edilemedi');
+    const p = JSON.parse(jsonMatch[0]);
+
+    // Textareaları doldur
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    setVal('mpSlide0', p.hook || '');
+    const fmtSlide = (s) => {
+      if (!s) return '';
+      let txt = s.headline || '';
+      if (s.points && s.points.length) {
+        txt += '\n' + s.points.map(pt => `• ${pt.title || pt}${pt.desc ? ': ' + pt.desc : ''}`).join('\n');
+      }
+      return txt;
+    };
+    setVal('mpSlide1', fmtSlide(p.slide2));
+    setVal('mpSlide2', fmtSlide(p.slide3));
+    setVal('mpSlide3', p.insight || '');
+    setVal('mpSlide4', p.cta || '');
+    setVal('mpCaptionEdit', p.caption || '');
+    setVal('mpHashtagEdit', p.hashtags || '');
+
+    if (p.design_note || p.tasarim_notu) {
+      const dn = document.getElementById('mpDesignNote');
+      if (dn) { dn.textContent = p.design_note || p.tasarim_notu; dn.style.display = 'block'; }
+    }
+
+    // Slaytları parse et ve preview'u güncelle
+    parseManualSlides();
+    renderMpSlide(0);
+
+    // Üretilen section'ı göster
+    const genSec = document.getElementById('mpGeneratedSection');
+    if (genSec) genSec.style.display = 'flex';
+
+    _mpGenerated = true;
+    enableMpPublish(true);
+    showToast('✨ Carousel içeriği oluşturuldu ✓');
+
+  } catch (e) {
+    console.warn('Manuel post AI hatası — offline fallback:', e.message);
+    // Offline fallback
+    const fb = _mpTone === 'taktik' ? {
+      hook: 'Deneme sonrası 10 dakika bu analizi yapın.',
+      slide2: { headline: 'Denemeyi Doğru Okumak', points: [{title:'Konu analizi',desc:'Hangi ünite en çok düşürdü?'},{title:'Zaman analizi',desc:'Hangi bölümde vakit kaybetti?'},{title:'Hata tipi',desc:'Bilgi mi yoksa dikkat hatası mı?'}] },
+      slide3: { headline: 'Sonraki Adım', points: [{title:'Öncelik belirle',desc:'En kritik konuyu 3 güne yay.'},{title:'Mini deneme',desc:'Hafta ortasında 1 bölüm sınavı yap.'}] },
+      insight: 'Analiz edilmeyen deneme, tekrar eden hatanın kaynağıdır.',
+      cta: 'Takip sistemi kurmak için erken erişime katıl',
+      caption: `${idea}\n\nDeneme bittiğinde pek çok öğrenci sadece puanına bakıyor. Oysa asıl değer analizde.\n\nRostrum Akademi ile öğrenci netleri otomatik kaydedilir, koç hangi konunun sorun çıkardığını anında görür.\n\n→ Erken erişim için bağlantı profilde.`,
+      hashtags: '#ykskoçu #özelkoç #yks2027 #tytpuanı #aytpuanı #ykshazırlık #sınavkoçu'
+    } : _mpTone === 'zeka' ? {
+      hook: 'YKS\'de ilk 3 net farkı yüzde kaç yaratıyor?',
+      slide2: { headline: 'Sayılar Ne Diyor?', points: [{title:'TYT için',desc:'Net ortalaması fark yaratan eşik: 100.'},{title:'AYT için',desc:'İlk %1\'lik dilim: bölüme göre 35-45 net.'},{title:'Haftalık fark',desc:'4 net artış = yaklaşık 5.000 sıra.'}] },
+      slide3: { headline: 'Koçun Rolü', points: [{title:'Erken tespat',desc:'Düşüşü 3. haftada görüp müdahale et.'},{title:'Konu takibi',desc:'Hangi ünite kaç net düşürdü, sistem gösterir.'}] },
+      insight: 'Doğru veriyi zamanında gören koç, sınavı öğrenciden önce yönetir.',
+      cta: 'Veri odaklı koçluğa erken erişim açık',
+      caption: `${idea}\n\nYKS\'de birkaç net, binlerce sıralama anlamına gelir. Koç bu farkı görebildiği kadar müdahale edebilir.\n\nRostrum Akademi, her deneme sonrası TYT/AYT netlerini otomatik kaydeder, düşüşü işaretler.\n\n→ Erken erişim için bağlantı profilde.`,
+      hashtags: '#ykskoçu #özelkoç #yks2027 #tytpuanı #aytpuanı #sınavkoçu #ykshazırlık'
+    } : {
+      hook: 'Öğrencin sana bir şey söylemiyor.',
+      slide2: { headline: 'Öğrencinin Söylemediği', points: [{title:'Sıkıştım',desc:'Ama koçu üzmek istemez.'},{title:'Kaybettim',desc:'Programın nerede olduğunu bilmiyor.'},{title:'Yoruldum',desc:'Ama devam etmek zorunda hissediyor.'}] },
+      slide3: { headline: 'Koç Ne Yapabilir?', points: [{title:'Haftada bir kez sor',desc:'\"Bu hafta en zor ne oldu?\"'},{title:'Sistemi kurabil',desc:'Takip varsa kaçıp gidemez.'}] },
+      insight: 'Öğrencinin sessizliği bazen yardım istediğinin işaretidir.',
+      cta: 'Öğrencini yakından takip et — erken erişim açık',
+      caption: `${idea}\n\nÇoğu öğrenci zorlandığında koçuna söylemez. Üzmek istemez, zayıf görünmek istemez.\n\nSistematik takip burada devreye girer. Rostrum Akademi\'de haftalık net verisi, program uyumu ve motivasyon notları tek yerden izlenir.\n\n→ Erken erişim için bağlantı profilde.`,
+      hashtags: '#ykskoçu #özelkoç #yks2027 #öğrencitakibi #sınavmotivasyonu #ykshazırlık'
+    };
+
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    const fmtSlide = (s) => {
+      if (!s) return '';
+      let txt = s.headline || '';
+      if (s.points && s.points.length) {
+        txt += '\n' + s.points.map(pt => `• ${pt.title || pt}${pt.desc ? ': ' + pt.desc : ''}`).join('\n');
+      }
+      return txt;
+    };
+    setVal('mpSlide0', fb.hook);
+    setVal('mpSlide1', fmtSlide(fb.slide2));
+    setVal('mpSlide2', fmtSlide(fb.slide3));
+    setVal('mpSlide3', fb.insight);
+    setVal('mpSlide4', fb.cta);
+    setVal('mpCaptionEdit', fb.caption);
+    setVal('mpHashtagEdit', fb.hashtags);
+
+    parseManualSlides();
+    renderMpSlide(0);
+    const genSec = document.getElementById('mpGeneratedSection');
+    if (genSec) genSec.style.display = 'flex';
+    _mpGenerated = true;
+    enableMpPublish(true);
+    showToast('✨ İçerik oluşturuldu (çevrimdışı) ✓');
+  }
+
+  btn.textContent = 'AI ile Carousel Oluştur →';
+  btn.disabled = false;
+}
+
+async function publishManualPost(isStory) {
+  if (!_mpGenerated || _mpSlides.length === 0) return;
+
+  const caption = (document.getElementById('mpCaptionEdit')?.value || '').trim();
+  const hashtags = (document.getElementById('mpHashtagEdit')?.value || '').trim();
+  const fullCaption = caption + (hashtags ? '\n\n' + hashtags : '');
+
+  const btn = document.getElementById(isStory ? 'mpPublishStory' : 'mpPublishPost');
+  const origText = btn.textContent;
+  btn.textContent = '⏳ Yayınlanıyor...';
+  btn.disabled = true;
+
+  try {
+    // Tüm slaytları canvas ile JPEG'e çevir
+    showToast('Görseller hazırlanıyor...');
+    const base64Slides = [];
+    for (let i = 0; i < _mpSlides.length; i++) {
+      const svgStr = getCarouselSlideSvg(_mpSlides[i], i, _mpSlides.length);
+      const b64 = await svgToJpegBase64(svgStr, 1080, 1080);
+      base64Slides.push(b64);
+    }
+
+    const body = isStory
+      ? { imageBase64: base64Slides[0], caption: fullCaption, isStory: true }
+      : { slides: base64Slides, caption: fullCaption, isCarousel: true };
+
+    const res = await fetch('/api/publish-instagram', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error || data.message || 'Yayın hatası');
+
+    showToast(isStory ? '📱 Hikaye yayınlandı ✓' : '🚀 Carousel yayınlandı ✓');
+    enableMpPublish(false);
+    _mpGenerated = false;
+  } catch (e) {
+    showToast('Yayın başarısız: ' + e.message, false);
+    btn.disabled = false;
+    btn.textContent = origText;
+    enableMpPublish(true);
+  }
+
+  btn.textContent = origText;
 }
 
 // ── OTOMASYON KURALLARI ──
