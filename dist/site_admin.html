@@ -3041,9 +3041,16 @@ let _mpSlides = [];
 let _mpGenerated = false;
 
 function initManualPostTab() {
-  // Zaten başlatıldıysa tekrar init etme
-  _mpGenerated = false;
-  enableMpPublish(false);
+  // Mevcut içerik varsa butonları açık bırak
+  const hasContent = (document.getElementById('mpSlide0')?.value || '').trim().length > 0;
+  if (hasContent) {
+    _mpGenerated = true;
+    enableMpPublish(true);
+    const genSec = document.getElementById('mpGeneratedSection');
+    if (genSec) genSec.style.display = 'flex';
+    parseManualSlides();
+    renderMpSlide(_mpCurrentSlide);
+  }
 }
 
 function setManualPersona(p) {
@@ -3341,7 +3348,11 @@ Sadece ham JSON döndür.`;
 }
 
 async function publishManualPost(isStory) {
-  if (!_mpGenerated || _mpSlides.length === 0) return;
+  parseManualSlides();
+  if (!_mpGenerated && _mpSlides.every(s => !(s.headline || s.quote || s.cta_text))) {
+    showToast('Önce içerik oluşturun veya slayt metinlerini doldurun.', false);
+    return;
+  }
 
   const caption = (document.getElementById('mpCaptionEdit')?.value || '').trim();
   const hashtags = (document.getElementById('mpHashtagEdit')?.value || '').trim();
