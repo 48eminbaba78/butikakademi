@@ -628,78 +628,71 @@ tr:hover td{background:var(--s2);}
 
           </div>
 
-          <!-- SAĞ PANEL (320px sabit) -->
-          <div style="width:320px;flex-shrink:0;background:#0a0d10;border-left:0.5px solid rgba(255,255,255,0.07);overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px">
+          <!-- SAĞ PANEL (320px sabit) — flex column, scroll yok, her şey görünür -->
+          <div style="width:320px;flex-shrink:0;background:#0a0d10;border-left:0.5px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;overflow:hidden">
 
-            <!-- Önizleme Kartı -->
-            <div style="background:#0D1B2A;border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;overflow:hidden">
-              <div style="padding:7px 12px;border-bottom:0.5px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:space-between">
-                <span style="font-size:9px;font-weight:700;color:rgba(244,162,97,0.55);letter-spacing:1.2px;text-transform:uppercase">ROSTRUM AKADEMİ</span>
-                <span style="font-size:9px;color:rgba(230,237,243,0.18)">1:1</span>
+            <!-- Önizleme (sabit yükseklik, hep görünür) -->
+            <div style="flex-shrink:0;background:#0D1B2A;border-bottom:0.5px solid rgba(255,255,255,0.07)">
+              <div style="padding:5px 12px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:9px;font-weight:700;color:rgba(244,162,97,0.55);letter-spacing:1.2px;text-transform:uppercase">Carousel Önizleme</span>
+                <div style="display:flex;gap:4px">
+                  <button onclick="selectStorySlide(0)" id="slide-btn-0" style="width:22px;height:18px;background:rgba(244,162,97,0.15);border:0.5px solid #F4A261;border-radius:3px;font-size:8px;color:#F4A261;cursor:pointer;font-family:inherit">01</button>
+                  <button onclick="selectStorySlide(1)" id="slide-btn-1" style="width:22px;height:18px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:3px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit">02</button>
+                  <button onclick="selectStorySlide(2)" id="slide-btn-2" style="width:22px;height:18px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:3px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit">03</button>
+                  <button onclick="selectStorySlide(3)" id="slide-btn-3" style="width:22px;height:18px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:3px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit">04</button>
+                  <button onclick="selectStorySlide(4)" id="slide-btn-4" style="width:22px;height:18px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:3px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit">05</button>
+                </div>
               </div>
-              <div id="igPanelPreviewContainer" style="width:100%;aspect-ratio:1;background:#07060a;display:flex;align-items:center;justify-content:center;overflow:hidden">
-                <span style="font-size:11px;color:rgba(230,237,243,0.2);text-align:center;padding:16px;line-height:1.6">İçerik seçince<br>önizleme burada görünür</span>
+              <div id="igPanelPreviewContainer" style="width:100%;height:220px;background:#0D1117;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                <span style="font-size:11px;color:rgba(230,237,243,0.2);text-align:center;line-height:1.6">İçerik seçince<br>önizleme burada görünür</span>
               </div>
             </div>
 
-            <!-- İçerik Belleği -->
-            <div style="background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:8px;padding:11px 13px;display:flex;flex-direction:column;gap:7px">
-              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:1px">İçerik Belleği</div>
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11px;color:rgba(230,237,243,0.4)">Son yayın</span>
-                <span id="igMemLastType" style="font-size:11px;color:#e6edf3;font-weight:500">—</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11px;color:rgba(230,237,243,0.4)">Tema tekrar riski</span>
-                <span id="igMemRepeatRisk" style="font-size:11px;font-weight:600;color:#3dba8f">Yok</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <span style="font-size:11px;color:rgba(230,237,243,0.4)">Bu ay sosyal kanıt</span>
-                <span id="igMemSocialCount" style="font-size:11px;color:#e6edf3;font-weight:500">— / 1</span>
-              </div>
-            </div>
+            <!-- Kaydırılabilir kısım: caption + butonlar -->
+            <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px">
 
-            <!-- Caption -->
-            <div>
-              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px">Caption</div>
-              <textarea id="igPanelCaptionPreview"
-                style="width:100%;min-height:88px;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:9px;font-size:12px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;line-height:1.6"
-                placeholder="İçerik seçince caption burada görünür…"></textarea>
-              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin:8px 0 5px">Hashtag'ler</div>
-              <div id="igHashtagDisplay" style="font-size:11px;color:#60a0e0;line-height:1.8;background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 10px;word-break:break-word;min-height:30px">—</div>
-            </div>
-
-            <!-- Hikaye Slaytları -->
-            <div>
-              <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Hikaye Slaytları</div>
-              <div style="display:flex;gap:5px;margin-bottom:8px">
-                <button onclick="selectStorySlide(0)" id="slide-btn-0" style="flex:1;padding:5px 3px;background:none;border:0.5px solid #F4A261;border-radius:5px;font-size:8px;color:#F4A261;cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">01<br><span style="color:rgba(244,162,97,0.5)">Kanca</span></button>
-                <button onclick="selectStorySlide(1)" id="slide-btn-1" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">02<br>Geliştir</button>
-                <button onclick="selectStorySlide(2)" id="slide-btn-2" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">03<br>Genişlet</button>
-                <button onclick="selectStorySlide(3)" id="slide-btn-3" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">04<br>İçgörü</button>
-                <button onclick="selectStorySlide(4)" id="slide-btn-4" style="flex:1;padding:5px 3px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:5px;font-size:8px;color:rgba(230,237,243,0.38);cursor:pointer;font-family:inherit;text-align:center;line-height:1.4">05<br>CTA</button>
+              <!-- Caption -->
+              <div>
+                <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Caption</div>
+                <textarea id="igPanelCaptionPreview"
+                  style="width:100%;min-height:72px;background:#161b22;border:0.5px solid rgba(255,255,255,0.08);border-radius:7px;padding:8px;font-size:11px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;line-height:1.5"
+                  placeholder="İçerik seçince caption burada görünür…"></textarea>
               </div>
-              <textarea id="igStorySlideText"
-                style="width:100%;min-height:65px;background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 10px;font-size:12px;color:#e6edf3;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box"
-                placeholder="Slayt metnini seç…"></textarea>
-            </div>
 
-            <!-- Aksiyon Butonları -->
-            <div style="display:flex;flex-direction:column;gap:7px">
-              <div style="display:flex;gap:7px">
-                <button id="btnIgRegen" onclick="regenerateIgPost()" disabled
-                  style="flex:1;padding:9px;background:#161b22;border:0.5px solid rgba(255,255,255,0.12);border-radius:7px;font-size:12px;color:rgba(230,237,243,0.6);cursor:pointer;font-weight:500;font-family:inherit">↺ Yeniden Üret</button>
-                <button id="btnIgApprove" onclick="approveIgPost()" disabled
-                  style="flex:1;padding:9px;background:rgba(61,186,143,0.1);border:0.5px solid rgba(61,186,143,0.3);border-radius:7px;font-size:12px;color:#3dba8f;cursor:pointer;font-weight:600;font-family:inherit">✓ Onayla</button>
+              <!-- Hashtag + bellek (yan yana, kompakt) -->
+              <div style="display:flex;gap:8px;align-items:flex-start">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:9px;font-weight:700;color:rgba(230,237,243,0.3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px">Hashtag'ler</div>
+                  <div id="igHashtagDisplay" style="font-size:10px;color:#60a0e0;line-height:1.7;background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:7px;padding:7px 9px;word-break:break-word;min-height:28px">—</div>
+                </div>
+                <div style="flex-shrink:0;background:#161b22;border:0.5px solid rgba(255,255,255,0.07);border-radius:7px;padding:7px 9px;font-size:10px;line-height:1.8;min-width:90px">
+                  <div style="display:flex;justify-content:space-between"><span style="color:rgba(230,237,243,0.35)">Son</span><span id="igMemLastType" style="color:#e6edf3">—</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:rgba(230,237,243,0.35)">Risk</span><span id="igMemRepeatRisk" style="color:#3dba8f;font-weight:600">Yok</span></div>
+                  <div style="display:flex;justify-content:space-between"><span style="color:rgba(230,237,243,0.35)">Kanıt</span><span id="igMemSocialCount" style="color:#e6edf3">—/1</span></div>
+                </div>
               </div>
-              <div style="display:flex;gap:7px">
-                <button id="btnPanelApproveIg" onclick="publishIgPost(false)" disabled
-                  style="flex:1;padding:9px;background:rgba(61,186,143,0.06);border:0.5px solid rgba(61,186,143,0.15);border-radius:7px;font-size:12px;color:rgba(61,186,143,0.35);cursor:not-allowed;font-weight:600;font-family:inherit">🚀 Post Yayınla</button>
-                <button id="btnPanelStoryIg" onclick="publishIgPost(true)" disabled
-                  style="flex:1;padding:9px;background:rgba(155,149,224,0.06);border:0.5px solid rgba(155,149,224,0.15);border-radius:7px;font-size:12px;color:rgba(155,149,224,0.35);cursor:not-allowed;font-weight:600;font-family:inherit">📱 Hikaye</button>
-              </div>
-            </div>
 
+              <!-- Slayt metin editörü (gizli, kompakt) -->
+              <textarea id="igStorySlideText" style="display:none"
+                placeholder="Slayt metni…"></textarea>
+
+              <!-- Aksiyon Butonları -->
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:auto">
+                <div style="display:flex;gap:6px">
+                  <button id="btnIgRegen" onclick="regenerateIgPost()" disabled
+                    style="flex:1;padding:9px;background:#161b22;border:0.5px solid rgba(255,255,255,0.12);border-radius:7px;font-size:12px;color:rgba(230,237,243,0.6);cursor:pointer;font-weight:500;font-family:inherit">↺ Yeniden Üret</button>
+                  <button id="btnIgApprove" onclick="approveIgPost()" disabled
+                    style="flex:1;padding:9px;background:rgba(61,186,143,0.1);border:0.5px solid rgba(61,186,143,0.3);border-radius:7px;font-size:12px;color:#3dba8f;cursor:pointer;font-weight:600;font-family:inherit">✓ Onayla</button>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button id="btnPanelApproveIg" onclick="publishIgPost(false)" disabled
+                    style="flex:1;padding:9px;background:rgba(61,186,143,0.06);border:0.5px solid rgba(61,186,143,0.15);border-radius:7px;font-size:12px;color:rgba(61,186,143,0.35);cursor:not-allowed;font-weight:600;font-family:inherit">🚀 Post Yayınla</button>
+                  <button id="btnPanelStoryIg" onclick="publishIgPost(true)" disabled
+                    style="flex:1;padding:9px;background:rgba(155,149,224,0.06);border:0.5px solid rgba(155,149,224,0.15);border-radius:7px;font-size:12px;color:rgba(155,149,224,0.35);cursor:not-allowed;font-weight:600;font-family:inherit">📱 Hikaye</button>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
 
