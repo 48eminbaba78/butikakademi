@@ -20,7 +20,8 @@ export default defineConfig({
         site_admin: resolve(__dirname, 'site_admin.html'),
         terms: resolve(__dirname, 'terms.html'),
         test: resolve(__dirname, 'test.html'),
-        kaynak_yoneticisi: resolve(__dirname, 'kaynak_yoneticisi.html')
+        kaynak_yoneticisi: resolve(__dirname, 'kaynak_yoneticisi.html'),
+        nasil_yapilir: resolve(__dirname, 'nasil-yapilir.html')
       }
     }
   }

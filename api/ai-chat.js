@@ -4,6 +4,12 @@
 // Groq API proxy (llama-3.3-70b) — hızlı ve ücretsiz
 // ═══════════════════════════════════════════════════════════
 
+import { createClient } from '@supabase/supabase-js';
+
+const SB_URL = 'https://imyhenrwmsmyikpollur.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34';
+const db = createClient(SB_URL, SB_KEY);
+
 export default async function handler(req, res) {
   // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,7 +25,16 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Mesaj listesi boş olamaz.' });
     }
 
-    const GROQ_KEY = process.env.GROQ_API_KEY;
+    let GROQ_KEY = process.env.GROQ_API_KEY;
+    if (!GROQ_KEY) {
+      const { data: aiSettings } = await db
+        .from('platform_settings')
+        .select('value')
+        .eq('key', 'ai_settings')
+        .maybeSingle();
+      GROQ_KEY = aiSettings?.value?.groq_api_key;
+    }
+
     if (!GROQ_KEY) {
       return res.status(500).json({ error: 'AI API anahtarı yapılandırılmamış.' });
     }
@@ -44,7 +59,6 @@ export default async function handler(req, res) {
         messages: groqMessages,
         temperature: 0.7,
         max_tokens: 2048,
-        response_format: { type: 'json_object' },
       })
     });
 

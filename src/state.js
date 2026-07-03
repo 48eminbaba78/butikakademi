@@ -16,7 +16,8 @@ export const S = {
   activeStuId: null,
   msgThread: null,
   workspace: null,
-  studentSpeeds: []
+  studentSpeeds: [],
+  konuHaftaSoru: []
 };
 
 export const session = {
@@ -32,8 +33,7 @@ window.S = S;
 window.session = session;
 
 window._loginMode = 'email';
-window.COACH_PASS = 'koc123';
-window.STU_DEFAULT_PASS = 'ogrenci123';
+window.STU_DEFAULT_PASS = 'Rostrum' + Math.floor(1000 + Math.random() * 9000);
 window.DAYS_TR = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
 window.MONTHS_TR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
 
@@ -44,10 +44,32 @@ window.EXAM_DEFS = {
   'AYT-SOZ': ['Edebiyat', 'Tarih1', 'Tarih2', 'Coğrafya1', 'Coğrafya2', 'Felsefe', 'Din'],
 };
 
+// Soru sayısı limitleri (D+Y+B bu sayıyı geçemez)
+window.EXAM_SORU = {
+  TYT:       { Türkçe: 40, Matematik: 40, Fen: 20, Sosyal: 20 },
+  'AYT-SAY': { Matematik: 40, Fizik: 14, Kimya: 13, Biyoloji: 13 },
+  'AYT-EA':  { Matematik: 40, Edebiyat: 24, Tarih: 10, Coğrafya: 6 },
+  'AYT-SOZ': { Edebiyat: 24, Tarih1: 10, Tarih2: 11, Coğrafya1: 6, Coğrafya2: 11, Felsefe: 12, Din: 6 },
+};
+
+// Deneme dersi → KONU_LISTESI anahtarı
+window.EXAM_KONU_MAP = {
+  'TYT_Türkçe':       ['Dil Bilgisi'],
+  'TYT_Matematik':    ['TYT Matematik', 'Geometri'],
+  'TYT_Fen':          ['TYT Fizik', 'TYT Kimya', 'TYT Biyoloji'],
+  'TYT_Sosyal':       [],
+  'AYT-SAY_Matematik':['AYT Matematik', 'Geometri'],
+  'AYT-SAY_Fizik':    ['AYT Fizik'],
+  'AYT-SAY_Kimya':    ['AYT Kimya'],
+  'AYT-SAY_Biyoloji': ['AYT Biyoloji'],
+  'AYT-EA_Matematik': ['AYT Matematik', 'Geometri'],
+  'AYT-EA_Edebiyat':  ['Dil Bilgisi'],
+};
+
 window.SUBJECT_MAP = {
-  TYT: ['Türkçe', 'Matematik', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Felsefe', 'Din'],
-  'AYT-SAY': ['Matematik', 'Fizik', 'Kimya', 'Biyoloji'],
-  'AYT-EA': ['Matematik', 'Edebiyat', 'Tarih', 'Coğrafya', 'Felsefe'],
+  TYT: ['Türkçe', 'Matematik', 'Geometri', 'Fizik', 'Kimya', 'Biyoloji', 'Tarih', 'Coğrafya', 'Felsefe', 'Din'],
+  'AYT-SAY': ['Matematik', 'Geometri', 'Fizik', 'Kimya', 'Biyoloji'],
+  'AYT-EA': ['Matematik', 'Geometri', 'Edebiyat', 'Tarih', 'Coğrafya', 'Felsefe'],
   'AYT-SOZ': ['Edebiyat', 'Tarih1', 'Tarih2', 'Coğrafya1', 'Coğrafya2', 'Felsefe', 'Din'],
 };
 

@@ -1,6 +1,9 @@
 {
   "outputDirectory": "dist",
-  "buildCommand": "node -e \"console.log('No build step - serving pre-built dist/')\"",
+  "buildCommand": "npm run build",
+  "functions": {
+    "api/*.js": { "maxDuration": 60 }
+  },
   "rewrites": [
     { "source": "/admin/(.*)", "destination": "/admin/dist/index.html" }
   ],

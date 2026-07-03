@@ -44,7 +44,7 @@ async function waitForContainer(containerId, accessToken, maxAttempts = 12) {
   let statusCode = 'IN_PROGRESS';
   let attempts = 0;
   while (statusCode === 'IN_PROGRESS' && attempts < maxAttempts) {
-    await new Promise(r => setTimeout(r, 3000));
+    await new Promise(r => setTimeout(r, 2000));
     const res = await fetch(
       `https://graph.facebook.com/v20.0/${containerId}?fields=status_code&access_token=${accessToken}`
     );
@@ -118,7 +118,7 @@ export default async function handler(req, res) {
     if (isCarousel && slides && slides.length > 0) {
       console.log(`[API] Carousel başlatılıyor: ${slides.length} slayt`);
 
-      // Her slaytı yükle ve child container oluştur
+      // Her slaytı yükle ve child container oluştur (child'lar için bekleme yok)
       const childIds = [];
       for (let i = 0; i < slides.length; i++) {
         const imageUrl = await uploadImage(slides[i], `carousel-${ts}-slide${i+1}.jpg`);
@@ -127,7 +127,6 @@ export default async function handler(req, res) {
           image_url: imageUrl,
           is_carousel_item: true
         });
-        await waitForContainer(childId, accessToken);
         childIds.push(childId);
         console.log(`[API] Slayt ${i+1} child container: ${childId}`);
       }

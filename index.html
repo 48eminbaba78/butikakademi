@@ -402,6 +402,35 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
 .footer-bottom{max-width:1100px;margin:0 auto;border-top:1px solid var(--bd);padding-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
 .footer-copy{font-size:12px;color:var(--dim);}
 .footer-made{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.12);color:var(--acc);font-size:11px;font-weight:700;padding:4px 14px;border-radius:99px;}
+.footer-socials{display:flex;gap:10px;margin-top:16px;}
+.footer-socials a{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid var(--bd);color:var(--mid);text-decoration:none;transition:all .2s;font-size:16px;}
+.footer-socials a:hover{background:rgba(240,165,0,.12);border-color:rgba(240,165,0,.3);color:var(--acc);}
+
+/* INSTAGRAM SECTION */
+.ig-section{padding:72px 40px;background:linear-gradient(180deg,var(--bg) 0%,#0a0a0f 100%);border-top:1px solid var(--bd);}
+.ig-section-inner{max-width:1100px;margin:0 auto;}
+.ig-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:32px;flex-wrap:wrap;}
+.ig-title{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;line-height:1.15;}
+.ig-title span{color:var(--acc);}
+.ig-handle{font-size:14px;color:var(--dim);margin-top:6px;}
+.ig-follow-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:10px;font-size:13px;font-weight:700;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;text-decoration:none;white-space:nowrap;transition:opacity .2s;}
+.ig-follow-btn:hover{opacity:.85;}
+.ig-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+.ig-post{aspect-ratio:1;overflow:hidden;border-radius:10px;background:var(--s1);position:relative;cursor:pointer;}
+.ig-post img{width:100%;height:100%;object-fit:cover;transition:transform .4s;}
+.ig-post:hover img{transform:scale(1.06);}
+.ig-post-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;transition:opacity .25s;display:flex;align-items:center;justify-content:center;border-radius:10px;}
+.ig-post:hover .ig-post-overlay{opacity:1;}
+.ig-post-overlay-txt{color:#fff;font-size:11px;font-weight:600;text-align:center;padding:8px;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.ig-empty{grid-column:1/-1;text-align:center;padding:48px;color:var(--dim);font-size:14px;}
+@media(max-width:768px){
+  .ig-section{padding:52px 20px;}
+  .ig-title{font-size:24px;}
+  .ig-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:480px){
+  .ig-grid{grid-template-columns:repeat(2,1fr);}
+}
 
 /* SCROLL ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
@@ -451,6 +480,15 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   .prob-sol-grid{grid-template-columns:1fr;}
   .bento{grid-template-columns:1fr;}
   .bc-6,.bc-4,.bc-8,.bc-12{grid-column:span 1;}
+  .hero{padding:90px 20px 48px;}
+  .hero h1{letter-spacing:-1.5px;}
+  .hero-badges{display:none;}
+  .hero-cta{flex-direction:column;align-items:stretch;}
+  .btn-hero-main,.btn-hero-ghost{justify-content:center;padding:14px 24px;}
+  footer{padding:44px 20px 20px;}
+  .footer-grid{grid-template-columns:1fr;}
+  .ig-header{flex-direction:column;align-items:flex-start;gap:14px;}
+  .ig-follow-btn{align-self:stretch;justify-content:center;}
 }
 
 /* Role selector & features tabs */
@@ -651,8 +689,9 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   <div class="nav-center">
     <a href="#features">Özellikler</a>
     <a href="#how">Nasıl Çalışır</a>
-    <a href="#pricing">Fiyatlar</a>
+    <a href="#pricing" style="display:none">Fiyatlar</a>
     <a href="#faq">SSS</a>
+    <a href="https://www.instagram.com/rostrumakademi" target="_blank" rel="noopener" title="Instagram" style="display:flex;align-items:center;gap:5px;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.7'"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
   </div>
   <div class="nav-right">
     <button class="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Tema değiştir"><span id="themeIcon">☀️</span></button><a href="app.html" class="btn-ghost-sm">Giriş Yap</a>
@@ -680,8 +719,7 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
 
 
   <div class="hero-eyebrow">
-    <div class="live-dot"></div>
-    Eğitim Kurumları ve Koçlar İçin B2B SaaS Altyapısı
+    Türkiye'nin Zaman Kazandıran Eğitim Yönetim Sistemi
   </div>
 
   <h1>
@@ -1062,53 +1100,6 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
 
 </section>
 
-<!-- TESTIMONIALS -->
-<div class="testi-sec">
-  <div class="testi-inner">
-    <div class="reveal" style="text-align:center">
-      <div class="sec-chip" style="display:inline-block">Pilot Kullanıcı Görüşleri</div>
-      <div class="sec-h" style="text-align:center;margin-top:10px">Koçlarımızın İlk Deneyimleri</div>
-    </div>
-    <div class="testi-grid">
-      <div class="tc reveal">
-        <div class="tc-stars">★★★★★</div>
-        <div class="tc-text">"Rostrum Akademi ile koçluk sürecini tamamen dijitalleştirdik. Özellikle haftalık program planlama ve akıllı süre tahmini modülü, her bir öğrencime ayırdığım hazırlık süresini yarı yarıya azalttı."</div>
-        <div class="tc-author">
-          <div class="tc-av" style="background:#f0a500">AŞ</div>
-          <div>
-            <div class="tc-name">Ahmet Şahin</div>
-            <div class="tc-role">YKS Sayısal Koçu · İstanbul</div>
-            <div class="tc-verified">✓ Pilot Süreç Kullanıcısı</div>
-          </div>
-        </div>
-      </div>
-      <div class="tc reveal d1">
-        <div class="tc-stars">★★★★★</div>
-        <div class="tc-text">"Veliler gelişim grafiklerine bayılıyor. Eskiden WhatsApp üzerinden dağınık giden raporlar yerine, tek tuşla markalı PDF rapor gönderebiliyoruz. Kurumsal imajımız için harika bir adım oldu."</div>
-        <div class="tc-author">
-          <div class="tc-av" style="background:#60b4ff">EY</div>
-          <div>
-            <div class="tc-name">Elif Yılmaz</div>
-            <div class="tc-role">LGS/YKS Rehberlik Uzmanı · Ankara</div>
-            <div class="tc-verified">✓ Pilot Süreç Kullanıcısı</div>
-          </div>
-        </div>
-      </div>
-      <div class="tc reveal d2">
-        <div class="tc-stars">★★★★★</div>
-        <div class="tc-text">"Öğrencilerin kendi çalışma panellerinde hedeflerini görüp tamamlandı olarak işaretlemesi onları inanılmaz motive ediyor. Deneme takibi modülü sayesinde net artışlarını net analiz edebiliyoruz."</div>
-        <div class="tc-author">
-          <div class="tc-av" style="background:#3ecf8e">MD</div>
-          <div>
-            <div class="tc-name">Mustafa Demir</div>
-            <div class="tc-role">Matematik Eğitmeni &amp; Koç · İzmir</div>
-            <div class="tc-verified">✓ Pilot Süreç Kullanıcısı</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- HOW IT WORKS -->
 <section class="how-sec" id="how">
@@ -1141,8 +1132,8 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   </div>
 </section>
 
-<!-- PRICING -->
-<section class="pricing-sec" id="pricing">
+<!-- PRICING HIDDEN -->
+<section class="pricing-sec" id="pricing" style="display:none">
   <div class="pricing-inner">
     <div class="reveal" style="text-align:center">
       <div class="sec-chip" style="display:inline-block">Fiyatlandırma</div>
@@ -1295,12 +1286,6 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
         <div class="perk"><div class="perk-ico">▶️</div>YouTube playlist entegrasyonu</div>
         <div class="perk"><div class="perk-ico">📅</div>Zoom & Google Meet entegrasyonu</div>
       </div>
-      <div class="reg-social-proof">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="font-size:13px;color:var(--mid)"><strong style="color:var(--text)">+18 koç</strong> bu hafta platforma katıldı</div>
-          <div style="font-size:11px;color:var(--acc3);font-weight:700;background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.2);padding:3px 10px;border-radius:99px;">● Aktif</div>
-        </div>
-      </div>
     </div>
 
     <div class="reveal d1">
@@ -1335,14 +1320,14 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
             </select>
           </div>
 
-          <div class="ff" id="fieldPlan">
+          <div class="ff" id="fieldPlan" style="display:none">
             <label>Plan seçin</label>
             <div class="plan-pills">
-              <div class="plan-pill" onclick="selPlan(this,'starter')">
+              <div class="plan-pill sel" onclick="selPlan(this,'starter')">
                 <div class="pp-name">Başlangıç</div>
                 <div class="pp-price">Ücretsiz · 3 öğrenci</div>
               </div>
-              <div class="plan-pill sel" onclick="selPlan(this,'pro')">
+              <div class="plan-pill" onclick="selPlan(this,'pro')">
                 <div class="pp-name">Profesyonel ✦</div>
                 <div class="pp-price">₺299/ay · 20 öğrenci</div>
               </div>
@@ -1371,18 +1356,48 @@ footer{padding:60px 40px 28px;border-top:1px solid var(--bd);}
   </div>
 </section>
 
+<!-- INSTAGRAM -->
+<section class="ig-section">
+  <div class="ig-section-inner">
+    <div class="ig-header">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:10px">📸 @rostrumakademi</div>
+        <div class="ig-title">Her gün bir adım öne geç.<br><span>Bizi takip et, geride kalma.</span></div>
+        <div class="ig-handle" style="margin-top:12px;max-width:420px;line-height:1.6">YKS ipuçları, çalışma taktikleri, başarı hikayeleri ve koçluk dünyasından ilham verici içerikler — her gün yayında.</div>
+        <div style="display:flex;gap:20px;margin-top:16px;flex-wrap:wrap">
+          <div style="font-size:12px;color:var(--mid)"><span style="font-weight:800;color:var(--text);font-size:15px">Haftalık</span><br>içerik paylaşımı</div>
+          <div style="font-size:12px;color:var(--mid)"><span style="font-weight:800;color:var(--text);font-size:15px">Gerçek</span><br>öğrenci başarıları</div>
+          <div style="font-size:12px;color:var(--mid)"><span style="font-weight:800;color:var(--text);font-size:15px">Ücretsiz</span><br>koçluk tavsiyeleri</div>
+        </div>
+      </div>
+      <a href="https://www.instagram.com/rostrumakademi" target="_blank" rel="noopener" class="ig-follow-btn" style="flex-shrink:0">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        Şimdi Takip Et
+      </a>
+    </div>
+    <div class="ig-grid" id="igFeedGrid">
+      <div class="ig-empty">⏳ Yükleniyor...</div>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-grid">
     <div>
       <div class="fl-logo">ROSTRUM<b>AKADEMİ</b></div>
       <div class="fl-tagline">Türkiye'nin zaman kazandıran eğitim yönetim sistemi. Her öğrenciye kişisel, her koça profesyonel.</div>
+      <div class="footer-socials">
+        <a href="https://www.instagram.com/rostrumakademi" target="_blank" rel="noopener" title="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+      </div>
     </div>
     <div>
       <div class="footer-col-h">Platform</div>
       <div class="footer-links">
         <a href="#features">Özellikler</a>
-        <a href="#pricing">Fiyatlar</a>
+        <a href="#pricing" style="display:none">Fiyatlar</a>
         <a href="#how">Nasıl Çalışır</a>
         <a href="#faq">SSS</a>
       </div>
@@ -1965,14 +1980,41 @@ async function trackEmailClick(){
 // Sayfa yüklenince çalıştır — DOM hazır olduktan sonra
 if(document.readyState==='loading'){
   document.addEventListener('DOMContentLoaded',()=>{
-    loadSiteContent();
-    trackEmailClick();
+    Promise.all([loadSiteContent(), trackEmailClick(), loadIgFeed()]);
   });
 } else {
   setTimeout(()=>{
-    loadSiteContent();
-    trackEmailClick();
-  }, 100);
+    Promise.all([loadSiteContent(), trackEmailClick(), loadIgFeed()]);
+  }, 0);
+}
+
+// ── INSTAGRAM FEED ──────────────────────────────
+async function loadIgFeed() {
+  const grid = document.getElementById('igFeedGrid');
+  if (!grid) return;
+  try {
+    const { data } = await _SB.from('platform_settings').select('value').eq('key', 'ig_public_feed').maybeSingle();
+    const posts = data?.value?.posts;
+    if (!posts || posts.length === 0) {
+      grid.innerHTML = `<div class="ig-empty">
+        <div style="font-size:28px;margin-bottom:10px">📸</div>
+        <div style="font-weight:700;margin-bottom:6px">@rostrumakademi</div>
+        <a href="https://www.instagram.com/rostrumakademi" target="_blank" rel="noopener" class="ig-follow-btn" style="display:inline-flex;margin-top:4px">Instagram'da Takip Et</a>
+      </div>`;
+      return;
+    }
+    grid.innerHTML = posts.map(p => `
+      <a href="${p.url}" target="_blank" rel="noopener" class="ig-post">
+        <img src="${p.image}" alt="Instagram post" loading="lazy">
+        <div class="ig-post-overlay">
+          <div class="ig-post-overlay-txt">${(p.caption||'').replace(/[<>]/g,'')}</div>
+        </div>
+      </a>`).join('');
+  } catch(_) {
+    grid.innerHTML = `<div class="ig-empty">
+      <a href="https://www.instagram.com/rostrumakademi" target="_blank" rel="noopener" class="ig-follow-btn">📸 @rostrumakademi — Takip Et</a>
+    </div>`;
+  }
 }
 
 // HERO COUNTER animate

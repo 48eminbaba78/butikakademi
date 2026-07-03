@@ -63,6 +63,7 @@ body{font-family:'Geist',sans-serif;background:var(--bg);color:var(--text);min-h
 .content{padding:24px;}
 .view{display:none;}
 .view.active{display:block;}
+#view-instagram.active{display:flex;}
 
 /* COMPONENTS */
 .page-h{font-size:22px;font-weight:800;margin-bottom:4px;}
@@ -230,8 +231,8 @@ tr:hover td{background:var(--s2);}
           <div class="stat"><div class="stat-val" id="st-approved" style="color:var(--acc3)">—</div><div class="stat-lbl">Onaylanan</div></div>
           <div class="stat"><div class="stat-val" id="st-posts" style="color:var(--acc4)">—</div><div class="stat-lbl">Blog Yazısı</div></div>
           <div class="stat"><div class="stat-val" id="st-announce" style="color:var(--acc2)">—</div><div class="stat-lbl">Aktif Duyuru</div></div>
-          <div class="stat"><div class="stat-val" id="st-active-visitors" style="color:var(--acc3)">18</div><div class="stat-lbl">Canlı Ziyaretçi</div></div>
-          <div class="stat"><div class="stat-val" id="st-latency" style="color:var(--acc4)">14ms</div><div class="stat-lbl">Sunucu Gecikmesi</div></div>
+          <div class="stat"><div class="stat-val" id="st-coaches" style="color:var(--acc3)">—</div><div class="stat-lbl">Toplam Koç</div></div>
+          <div class="stat"><div class="stat-val" id="st-students" style="color:var(--acc4)">—</div><div class="stat-lbl">Toplam Öğrenci</div></div>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
@@ -250,114 +251,32 @@ tr:hover td{background:var(--s2);}
           </div>
         </div>
 
-        <!-- CANLI ANALİTİK & TRAFİK -->
-        <div class="sh" style="margin-top:24px;"><div style="font-size:15px;font-weight:800;color:var(--acc)">⚡ Canlı Analitik &amp; Trafik</div></div>
-        <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:20px;">
-          <!-- SVG VISITOR CHART -->
-          <div class="card">
-            <div class="sh">
-              <div style="font-size:13px;font-weight:700">📈 Günlük Ziyaretçi Grafiği (Son 7 Gün)</div>
-              <div style="font-size:11px;color:var(--dim)">Toplam: 12,450 Ziyaretçi</div>
-            </div>
-            <div style="height:160px;display:flex;align-items:center;justify-content:center;margin-top:10px;">
-              <svg width="100%" height="100%" viewBox="0 0 400 150" preserveAspectRatio="none" style="overflow:visible;">
-                <defs>
-                  <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="var(--acc)" stop-opacity="0.3"></stop>
-                    <stop offset="100%" stop-color="var(--acc)" stop-opacity="0.05"></stop>
-                  </linearGradient>
-                </defs>
-                <!-- Grid Lines -->
-                <line x1="10" y1="20" x2="390" y2="20" stroke="var(--bd)" stroke-width="0.5" stroke-dasharray="3,3" />
-                <line x1="10" y1="60" x2="390" y2="60" stroke="var(--bd)" stroke-width="0.5" stroke-dasharray="3,3" />
-                <line x1="10" y1="100" x2="390" y2="100" stroke="var(--bd)" stroke-width="0.5" stroke-dasharray="3,3" />
-                <line x1="10" y1="130" x2="390" y2="130" stroke="var(--bd)" stroke-width="0.5" />
-                
-                <!-- Path Area -->
-                <path d="M 10 130 Q 70 80, 130 95 T 250 40 T 310 60 T 390 10 L 390 130 Z" fill="url(#chartGrad)" />
-                <!-- Path Line -->
-                <path d="M 10 130 Q 70 80, 130 95 T 250 40 T 310 60 T 390 10" fill="none" stroke="var(--acc)" stroke-width="2.5" />
-                
-                <!-- Dots -->
-                <circle cx="10" cy="130" r="4" fill="var(--acc)" />
-                <circle cx="70" cy="80" r="4" fill="var(--acc)" />
-                <circle cx="130" cy="95" r="4" fill="var(--acc)" />
-                <circle cx="190" cy="70" r="4" fill="var(--acc)" />
-                <circle cx="250" cy="40" r="4" fill="var(--acc)" />
-                <circle cx="310" cy="60" r="4" fill="var(--acc)" />
-                <circle cx="390" cy="10" r="4" fill="var(--acc)" />
-                
-                <!-- Tooltips/Texts -->
-                <text x="70" y="65" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="middle">1,240</text>
-                <text x="130" y="80" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="middle">1,020</text>
-                <text x="250" y="25" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="middle">2,890</text>
-                <text x="390" y="25" fill="var(--text)" font-size="8" font-family="inherit" text-anchor="end">4,120</text>
-              </svg>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:10px;padding:0 5px;">
-              <span>Pzt</span><span>Sal</span><span>Çar</span><span>Per</span><span>Cum</span><span>Cmt</span><span>Paz (Bugün)</span>
+        <!-- GERÇEK VERİ ÖZETİ -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
+          <div class="card" style="border-color:rgba(240,165,0,.2)">
+            <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📋 Başvuru Dağılımı</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Bekleyen</span><span id="ds-pending" style="font-weight:700;color:var(--acc)">—</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Onaylanan</span><span id="ds-approved" style="font-weight:700;color:var(--acc3)">—</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">İletişimde</span><span id="ds-contacted" style="font-weight:700;color:var(--acc4)">—</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Reddedilen</span><span id="ds-rejected" style="font-weight:700;color:var(--red)">—</span></div>
             </div>
           </div>
-          
-          <!-- LIVE TRAFFIC LOG -->
-          <div class="card">
-            <div class="sh">
-              <div style="font-size:13px;font-weight:700">🖥️ Canlı Trafik Log Simülatörü</div>
-              <div style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:8px;height:8px;background:var(--acc3);border-radius:50%;animation:pulse 1.3s infinite;"></span><span style="font-size:11px;color:var(--acc3)">Canlı</span></div>
-            </div>
-            <div id="trafficLogContainer" style="height:160px;overflow-y:auto;background:var(--s2);border:1px solid var(--bd);border-radius:10px;font-family:'Courier New',Courier,monospace;font-size:11px;color:#85e89d;padding:10px;margin-top:10px;display:flex;flex-direction:column;gap:4px;">
-              <div>[13:14:02] Ziyaretçi: /index.html [200 OK] (IP: 176.234.*.*)</div>
-              <div>[13:14:15] Ziyaretçi: /koc_bul.html [200 OK] (IP: 85.105.*.*)</div>
-              <div>[13:14:38] Başvuru Formu: match_requests tablosuna ekleme yapıldı.</div>
+          <div class="card" style="border-color:rgba(62,207,142,.2)">
+            <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">👥 Kullanıcı Özeti</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Toplam Koç</span><span id="ds-coaches" style="font-weight:700;color:var(--acc3)">—</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Toplam Öğrenci</span><span id="ds-students" style="font-weight:700;color:var(--acc4)">—</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Bu Hafta Yeni</span><span id="ds-new-week" style="font-weight:700;color:var(--acc2)">—</span></div>
             </div>
           </div>
-        </div>
-
-        <!-- POPULAR PAGES TABLE -->
-        <div class="card" style="margin-bottom:20px;">
-          <div class="sh"><div style="font-size:13px;font-weight:700">🌐 En Çok Ziyaret Edilen Sayfalar</div></div>
-          <div class="tbl-wrap">
-            <table style="font-size:12px;">
-              <thead>
-                <tr>
-                  <th>SAYFA ADRESI</th>
-                  <th>GÖRÜNTÜLENME</th>
-                  <th>TEKİL ZİYARETÇİ</th>
-                  <th>ORTALAMA SÜRE</th>
-                  <th>HEMEN ÇIKMA ORANI</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><a href="index.html" target="_blank" style="color:var(--acc4);text-decoration:none">/index.html (Ana Sayfa)</a></td>
-                  <td>5,420</td>
-                  <td>4,120</td>
-                  <td>1dk 45sn</td>
-                  <td style="color:var(--acc3)">28.4%</td>
-                </tr>
-                <tr>
-                  <td><a href="koc_bul.html" target="_blank" style="color:var(--acc4);text-decoration:none">/koc_bul.html (Koç Bulucu)</a></td>
-                  <td>3,840</td>
-                  <td>2,950</td>
-                  <td>3dk 12sn</td>
-                  <td style="color:var(--acc3)">15.2%</td>
-                </tr>
-                <tr>
-                  <td><a href="blog.html" target="_blank" style="color:var(--acc4);text-decoration:none">/blog.html (Akademik Blog)</a></td>
-                  <td>2,150</td>
-                  <td>1,840</td>
-                  <td>2dk 30sn</td>
-                  <td style="color:var(--acc3)">42.1%</td>
-                </tr>
-                <tr>
-                  <td><a href="app.html" target="_blank" style="color:var(--acc4);text-decoration:none">/app.html (Koçluk Portalı)</a></td>
-                  <td>1,040</td>
-                  <td>850</td>
-                  <td>18dk 45sn</td>
-                  <td style="color:var(--acc3)">4.8%</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="card" style="border-color:rgba(192,132,252,.2)">
+            <div style="font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🤝 Eşleşmeler</div>
+            <div id="ds-matches-loading" style="display:flex;flex-direction:column;gap:6px;font-size:13px">
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Bekleyen</span><span id="ds-match-pending" style="font-weight:700;color:var(--acc)">—</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Eşleştirildi</span><span id="ds-match-matched" style="font-weight:700;color:var(--acc4)">—</span></div>
+              <div style="display:flex;justify-content:space-between"><span style="color:var(--mid)">Tamamlandı</span><span id="ds-match-done" style="font-weight:700;color:var(--acc3)">—</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -532,7 +451,7 @@ tr:hover td{background:var(--s2);}
       </div>
 
       <!-- INSTAGRAM YÖNETİM & OTOMASYON PANELİ -->
-      <div class="view" id="view-instagram" style="padding:0;display:flex;flex-direction:column;height:calc(100vh - 60px);overflow:hidden">
+      <div class="view" id="view-instagram" style="padding:0;flex-direction:column;height:calc(100vh - 60px);overflow:hidden">
 
         <!-- IG TOPBAR -->
         <div style="display:flex;align-items:center;gap:16px;padding:12px 24px;background:#0D1117;border-bottom:0.5px solid rgba(255,255,255,0.08);flex-shrink:0">
@@ -746,6 +665,27 @@ tr:hover td{background:var(--s2);}
               <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="testIgConnection()">🔍 Bağlantıyı Test Et</button>
               <button class="btn" style="flex:1.2;justify-content:center;background:var(--acc);color:#07060a;font-weight:700" onclick="saveIgConfig()">💾 Ayarları Kaydet</button>
             </div>
+            <div style="margin-top:12px;padding:14px;background:rgba(62,207,142,.06);border:1px solid rgba(62,207,142,.2);border-radius:10px">
+              <div style="font-size:12px;font-weight:700;color:#3ecf8e;margin-bottom:6px">🌐 Ana Sayfa Instagram Beslemesi</div>
+              <div style="font-size:11px;color:rgba(230,237,243,.5);margin-bottom:10px">Son 6 gönderiyi çekip ana sayfada göstermek için besleyi güncelle. Token kaydedilmiş olmalı.</div>
+              <button class="btn" style="width:100%;justify-content:center;background:rgba(62,207,142,.15);color:#3ecf8e;border:1px solid rgba(62,207,142,.3);font-weight:700" onclick="refreshPublicIgFeed()">🔄 Ana Sayfa Beslemesini Güncelle</button>
+              <div id="igFeedRefreshStatus" style="font-size:11px;margin-top:8px;color:rgba(230,237,243,.4)"></div>
+            </div>
+            
+            <div class="card" style="padding:24px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;margin-top:20px">
+              <h3 style="margin-bottom:16px;color:var(--acc)">🤖 Yapay Zeka (Groq & Gemini) Bağlantı Ayarları</h3>
+              <div class="ff">
+                <label>Groq API Key</label>
+                <input type="password" id="cfgGroqApiKey" placeholder="gsk_...">
+              </div>
+              <div class="ff">
+                <label>Gemini API Key (Arayüz Fallback)</label>
+                <input type="password" id="cfgGeminiApiKey" placeholder="AIzaSy...">
+              </div>
+              <div style="display:flex;gap:10px;margin-top:20px">
+                <button class="btn" style="width:100%;justify-content:center;background:var(--acc);color:#07060a;font-weight:700" onclick="saveAiConfig()">💾 Yapay Zeka Ayarlarını Kaydet</button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -781,6 +721,27 @@ tr:hover td{background:var(--s2);}
                 <button id="mp-tone-zeka" onclick="setManualTone('zeka')"
                   style="flex:1;padding:7px;background:none;border:0.5px solid rgba(255,255,255,0.1);border-radius:7px;font-size:11px;color:rgba(230,237,243,0.4);cursor:pointer;font-family:inherit">🧠 YKS Zekası</button>
               </div>
+            </div>
+
+            <!-- Fotoğraf yükle bölümü -->
+            <div style="border: 1.5px dashed rgba(244,162,97,0.25); border-radius: 12px; padding: 18px; background: rgba(255,255,255,0.01)">
+              <div style="font-size:10px;font-weight:700;color:rgba(244,162,97,0.7);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">📁 VEYA FOTOĞRAF YÜKLE (AI AÇIKLAMA ÜRET)</div>
+              <div style="display:flex;gap:12px;align-items:center">
+                <input type="file" id="mpImageUpload" accept="image/*" onchange="handleMpImageUpload(this)" style="display:none">
+                <button onclick="document.getElementById('mpImageUpload').click()"
+                  style="padding:10px 16px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;font-size:12px;color:#e6edf3;cursor:pointer;font-family:inherit;font-weight:700;display:flex;align-items:center;gap:6px">
+                  <span>📷 Fotoğraf Seç</span>
+                </button>
+                <span id="mpImageName" style="font-size:11px;color:rgba(230,237,243,0.4)">Seçilen dosya yok</span>
+              </div>
+              <div id="mpImagePreviewContainer" style="display:none;margin-top:12px;position:relative;width:120px;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+                <img id="mpImagePreview" style="width:100%;height:100%;object-fit:cover">
+                <button onclick="removeMpImage()" style="position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.75);border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:bold">×</button>
+              </div>
+              <button id="mpGenerateFromImageBtn" onclick="generateCaptionFromImage()"
+                style="display:none;width:100%;padding:11px;background:#60b4ff;border:none;border-radius:8px;font-size:12px;font-weight:700;color:#07060a;cursor:pointer;font-family:inherit;margin-top:12px;letter-spacing:.3px">
+                🤖 Görseli Yapay Zeka ile Analiz Et & Açıklama Üret →
+              </button>
             </div>
 
             <!-- Koçun fikri -->
@@ -1059,7 +1020,6 @@ async function init(){
   await Promise.all([loadLeads(),loadContent(),loadBlogs(),loadAnnounces()]);
   renderDashboard();
   document.getElementById('lastSync').textContent='Son sync: '+new Date().toLocaleTimeString('tr-TR');
-  initTrafficSimulator();
 }
 async function syncAll(){await init();showToast('Yenilendi ✓');}
 
@@ -1614,11 +1574,40 @@ async function deleteAnnounce(id){
 
 // ── DASHBOARD ────────────────────────────────
 function renderDashboard(){
-  document.getElementById('st-leads').textContent=_leads.length;
-  document.getElementById('st-pending').textContent=_leads.filter(l=>l.status==='pending').length+' bekliyor';
-  document.getElementById('st-approved').textContent=_leads.filter(l=>l.status==='approved').length;
-  document.getElementById('st-posts').textContent=_blogs.filter(b=>b.published).length;
-  document.getElementById('st-announce').textContent=_announces.filter(a=>a.active).length;
+  const setEl=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+
+  setEl('st-leads',    _leads.length);
+  setEl('st-pending',  _leads.filter(l=>l.status==='pending').length+' bekliyor');
+  setEl('st-approved', _leads.filter(l=>l.status==='approved').length);
+  setEl('st-posts',    _blogs.filter(b=>b.published).length);
+  setEl('st-announce', _announces.filter(a=>a.active).length);
+
+  // Başvuru dağılım özeti (gerçek veri)
+  setEl('ds-pending',   _leads.filter(l=>l.status==='pending').length);
+  setEl('ds-approved',  _leads.filter(l=>l.status==='approved').length);
+  setEl('ds-contacted', _leads.filter(l=>l.status==='contacted').length);
+  setEl('ds-rejected',  _leads.filter(l=>l.status==='rejected').length);
+
+  // Kullanıcı özeti + üst stat kartları (Supabase'den gerçek veri)
+  db.from('users').select('id,role,created_at').then(({data})=>{
+    const users=data||[];
+    const coaches=users.filter(u=>u.role==='coach');
+    const students=users.filter(u=>u.role==='student');
+    const weekAgo=new Date(Date.now()-7*24*3600*1000).toISOString();
+    setEl('st-coaches',  coaches.length);
+    setEl('st-students', students.length);
+    setEl('ds-coaches',  coaches.length);
+    setEl('ds-students', students.length);
+    setEl('ds-new-week', users.filter(u=>u.created_at>weekAgo).length);
+  });
+
+  // Eşleşme özeti (Supabase'den gerçek veri)
+  db.from('match_requests').select('status').then(({data})=>{
+    const m=data||[];
+    setEl('ds-match-pending', m.filter(x=>x.status==='pending').length);
+    setEl('ds-match-matched', m.filter(x=>x.status==='matched').length);
+    setEl('ds-match-done',    m.filter(x=>x.status==='completed').length);
+  });
 
   // Son 5 başvuru
   const recent=_leads.slice(0,5);
@@ -2255,106 +2244,109 @@ function _carouselHeader() {
   return `<text x="60" y="64" font-size="19" fill="rgba(244,162,97,0.6)" font-family="Arial,system-ui,sans-serif" font-weight="700" letter-spacing="2.5">ROSTRUM AKADEMİ</text>`;
 }
 
-// SLAYT 1 — KANCA: Büyük metin, merkezi, scroll durdurucu
+// SLAYT 1 — KANCA
 function carouselSlide_Hook(headline, n, total) {
-  const h = _svgEsc(headline);
-  const lines = _svgLines(h, 900, 76);
-  const lineH = 94;
+  const lines = _svgLines(_svgEsc(headline), 860, 82);
+  const lineH = 104;
   const totalH = lines.length * lineH;
-  const startY = 510 - totalH / 2;
-
+  const startY = 520 - totalH / 2;
   const textEls = lines.map((l, i) =>
-    `<text x="540" y="${startY + i * lineH}" font-size="76" font-weight="800" fill="#e6edf3" font-family="Arial,system-ui,sans-serif" text-anchor="middle">${_svgEsc(l)}</text>`
+    `<text x="540" y="${startY + i * lineH}" font-size="82" font-weight="900" fill="#FFFFFF" font-family="Arial Black,Arial,sans-serif" text-anchor="middle" letter-spacing="-1">${_svgEsc(l)}</text>`
   ).join('');
-
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
   <defs>
-    <linearGradient id="hbg${n}" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0%" stop-color="#0f1420"/><stop offset="100%" stop-color="#0D1117"/></linearGradient>
+    <linearGradient id="hbg${n}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a0e1a"/><stop offset="100%" stop-color="#0D1117"/></linearGradient>
+    <linearGradient id="hamb${n}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#F4A261"/><stop offset="100%" stop-color="#e07b39"/></linearGradient>
   </defs>
   <rect width="1080" height="1080" fill="url(#hbg${n})"/>
+  <rect x="0" y="0" width="8" height="1080" fill="url(#hamb${n})"/>
+  <rect x="0" y="0" width="1080" height="8" fill="url(#hamb${n})" opacity="0.3"/>
   ${_carouselHeader()}
-  <rect x="60" y="${startY - 44}" width="70" height="3" fill="#F4A261" rx="1.5"/>
+  <rect x="60" y="${startY - 52}" width="90" height="5" fill="#F4A261" rx="2.5"/>
   ${textEls}
-  <text x="540" y="${startY + totalH + 58}" font-size="24" fill="rgba(244,162,97,0.42)" font-family="Arial,system-ui,sans-serif" text-anchor="middle" font-weight="500">→ kaydır</text>
+  <rect x="60" y="${startY + totalH + 28}" width="1080" height="1" fill="rgba(244,162,97,0.12)"/>
+  <text x="60" y="${startY + totalH + 72}" font-size="22" fill="rgba(244,162,97,0.55)" font-family="Arial,sans-serif" font-weight="600" letter-spacing="3">KAYDIR →</text>
   ${_carouselFooter(n, total)}
 </svg>`;
 }
 
-// SLAYT 2-3 — İÇERİK: Sol hizalı, madde listesi
+// SLAYT 2-3 — İÇERİK
 function carouselSlide_Content(headline, points, n, total) {
   const numStr = String(n + 1).padStart(2, '0');
-  const hLines = _svgLines(_svgEsc(headline), 880, 42);
+  const hLines = _svgLines(_svgEsc(headline), 860, 44);
   const titleEls = hLines.map((l, i) =>
-    `<text x="110" y="${188 + i * 52}" font-size="42" font-weight="700" fill="#e6edf3" font-family="Arial,system-ui,sans-serif">${_svgEsc(l)}</text>`
+    `<text x="80" y="${172 + i * 56}" font-size="44" font-weight="800" fill="#F4A261" font-family="Arial Black,Arial,sans-serif">${_svgEsc(l)}</text>`
   ).join('');
 
-  let py = 188 + hLines.length * 52 + 52;
+  let py = 172 + hLines.length * 56 + 56;
   const ptEls = (points || []).slice(0, 4).map((pt, i) => {
     const [title, desc] = Array.isArray(pt) ? pt : (typeof pt === 'object' ? [pt.title||'', pt.desc||''] : [String(pt), '']);
-    const barH = desc ? 80 : 46;
     const el = `
-      <rect x="110" y="${py - 34}" width="4" height="${barH}" fill="#F4A261" rx="2"/>
-      <text x="128" y="${py}" font-size="30" font-weight="700" fill="#e6edf3" font-family="Arial,system-ui,sans-serif">${_svgEsc(title)}</text>
-      ${desc ? `<text x="128" y="${py + 36}" font-size="24" fill="rgba(230,237,243,0.5)" font-family="Arial,system-ui,sans-serif">${_svgEsc(String(desc).substring(0,62))}</text>` : ''}`;
-    py += desc ? 116 : 74;
+      <rect x="80" y="${py - 32}" width="1080" height="${desc ? 96 : 58}" fill="rgba(244,162,97,0.06)" rx="6"/>
+      <rect x="80" y="${py - 32}" width="4" height="${desc ? 96 : 58}" fill="#F4A261" rx="2"/>
+      <text x="104" y="${py}" font-size="30" font-weight="700" fill="#e6edf3" font-family="Arial,sans-serif">${_svgEsc(title)}</text>
+      ${desc ? `<text x="104" y="${py + 38}" font-size="24" fill="rgba(230,237,243,0.45)" font-family="Arial,sans-serif">${_svgEsc(String(desc).substring(0,64))}</text>` : ''}`;
+    py += desc ? 120 : 76;
     return el;
   }).join('');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
   <rect width="1080" height="1080" fill="#0D1117"/>
-  <text x="920" y="600" font-size="520" font-weight="900" fill="rgba(244,162,97,0.035)" font-family="Arial,system-ui,sans-serif" text-anchor="middle">${numStr}</text>
+  <text x="1040" y="700" font-size="480" font-weight="900" fill="rgba(244,162,97,0.04)" font-family="Arial Black,sans-serif" text-anchor="end">${numStr}</text>
   ${_carouselHeader()}
-  <rect x="110" y="110" width="54" height="3" fill="#F4A261" rx="1.5"/>
+  <rect x="80" y="118" width="860" height="1" fill="rgba(244,162,97,0.15)"/>
   ${titleEls}
   ${ptEls}
   ${_carouselFooter(n, total)}
 </svg>`;
 }
 
-// SLAYT 4 — İÇGÖRÜ: Alıntı biçimi, akılda kalacak cümle
+// SLAYT 4 — İÇGÖRÜ
 function carouselSlide_Insight(quote, n, total) {
-  const lines = _svgLines(_svgEsc(quote), 880, 44);
-  const lineH = 58;
+  const lines = _svgLines(_svgEsc(quote), 860, 48);
+  const lineH = 66;
   const totalH = lines.length * lineH;
-  const startY = 490 - totalH / 2;
+  const startY = 510 - totalH / 2;
   const textEls = lines.map((l, i) =>
-    `<text x="540" y="${startY + i * lineH}" font-size="44" fill="#e6edf3" font-family="Arial,system-ui,sans-serif" text-anchor="middle" font-style="italic">${_svgEsc(l)}</text>`
+    `<text x="540" y="${startY + i * lineH}" font-size="48" fill="#FFFFFF" font-family="Arial,sans-serif" text-anchor="middle" font-weight="600">${_svgEsc(l)}</text>`
   ).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
   <defs>
-    <radialGradient id="rig${n}" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="#0f1a2e"/><stop offset="100%" stop-color="#090c12"/></radialGradient>
+    <radialGradient id="rig${n}" cx="30%" cy="70%" r="70%"><stop offset="0%" stop-color="#1a0f05"/><stop offset="100%" stop-color="#080b10"/></radialGradient>
   </defs>
   <rect width="1080" height="1080" fill="url(#rig${n})"/>
-  <text x="40" y="500" font-size="480" fill="rgba(244,162,97,0.05)" font-family="Georgia,serif">"</text>
+  <text x="60" y="560" font-size="600" fill="rgba(244,162,97,0.07)" font-family="Georgia,serif" font-weight="900">"</text>
   ${_carouselHeader()}
+  <rect x="60" y="${startY - 60}" width="5" height="${totalH + 40}" fill="#F4A261" rx="2.5"/>
   ${textEls}
-  <rect x="390" y="${startY + totalH + 34}" width="300" height="2" fill="rgba(244,162,97,0.35)" rx="1"/>
-  <text x="540" y="${startY + totalH + 72}" font-size="22" fill="rgba(244,162,97,0.45)" font-family="Arial,system-ui,sans-serif" text-anchor="middle" letter-spacing="1">— Rostrum Akademi</text>
+  <rect x="80" y="${startY + totalH + 32}" width="200" height="2" fill="rgba(244,162,97,0.4)" rx="1"/>
+  <text x="80" y="${startY + totalH + 70}" font-size="22" fill="rgba(244,162,97,0.5)" font-family="Arial,sans-serif" letter-spacing="2">— ROSTRUM AKADEMİ</text>
   ${_carouselFooter(n, total)}
 </svg>`;
 }
 
-// SLAYT 5 — CTA: Amber vurgulu, URL büyük ve belirgin
+// SLAYT 5 — CTA
 function carouselSlide_CTA(ctaText, n, total) {
-  const lines = _svgLines(_svgEsc(ctaText), 900, 50);
-  const lineH = 64;
+  const lines = _svgLines(_svgEsc(ctaText), 860, 56);
+  const lineH = 74;
   const totalH = lines.length * lineH;
-  const startY = 400 - totalH / 2;
+  const startY = 380 - totalH / 2;
   const textEls = lines.map((l, i) =>
-    `<text x="540" y="${startY + i * lineH}" font-size="50" font-weight="600" fill="#e6edf3" font-family="Arial,system-ui,sans-serif" text-anchor="middle">${_svgEsc(l)}</text>`
+    `<text x="540" y="${startY + i * lineH}" font-size="56" font-weight="800" fill="#FFFFFF" font-family="Arial Black,Arial,sans-serif" text-anchor="middle">${_svgEsc(l)}</text>`
   ).join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
   <defs>
-    <linearGradient id="ctabg${n}" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#1c0e02"/><stop offset="100%" stop-color="#0D1117"/></linearGradient>
+    <linearGradient id="ctabg${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0D1117"/><stop offset="100%" stop-color="#100a02"/></linearGradient>
   </defs>
   <rect width="1080" height="1080" fill="url(#ctabg${n})"/>
-  <rect x="0" y="0" width="1080" height="4" fill="#F4A261"/>
+  <rect x="0" y="0" width="1080" height="6" fill="#F4A261"/>
   ${_carouselHeader()}
   ${textEls}
-  <text x="540" y="${startY + totalH + 80}" font-size="54" font-weight="800" fill="#F4A261" font-family="Arial,system-ui,sans-serif" text-anchor="middle">rostrumakademi.com</text>
-  <text x="540" y="${startY + totalH + 148}" font-size="26" fill="rgba(244,162,97,0.42)" font-family="Arial,system-ui,sans-serif" text-anchor="middle">→ Profildeki bağlantıya tıkla</text>
-  <rect x="0" y="1072" width="1080" height="4" fill="#F4A261"/>
-  <text x="1020" y="1056" font-size="22" fill="rgba(230,237,243,0.18)" font-family="Arial,system-ui,sans-serif" text-anchor="end">${String(n+1).padStart(2,'0')}/${String(total).padStart(2,'0')}</text>
+  <rect x="60" y="${startY + totalH + 44}" width="960" height="80" fill="#F4A261" rx="8"/>
+  <text x="540" y="${startY + totalH + 98}" font-size="40" font-weight="900" fill="#0D1117" font-family="Arial Black,Arial,sans-serif" text-anchor="middle">rostrumakademi.com</text>
+  <text x="540" y="${startY + totalH + 196}" font-size="26" fill="rgba(244,162,97,0.5)" font-family="Arial,sans-serif" text-anchor="middle" letter-spacing="1">↑ PROFİLDEKİ BAĞLANTIYA TIKla</text>
+  <rect x="0" y="1074" width="1080" height="6" fill="#F4A261"/>
+  <text x="1000" y="1052" font-size="22" fill="rgba(230,237,243,0.2)" font-family="Arial,sans-serif" text-anchor="end">${String(n+1).padStart(2,'0')}/${String(total).padStart(2,'0')}</text>
 </svg>`;
 }
 
@@ -2463,7 +2455,7 @@ function switchIgPanelTab(tab) {
   document.getElementById('ig-config-section').style.display = tab === 'config' ? 'block' : 'none';
   document.getElementById('ig-manual-section').style.display = tab === 'manual' ? 'flex' : 'none';
   if (tab === 'rules') loadAndRenderIgRules();
-  if (tab === 'config') loadIgConfig();
+  if (tab === 'config') { loadIgConfig(); loadAiConfig(); }
   if (tab === 'manual') initManualPostTab();
 }
 
@@ -2618,7 +2610,7 @@ function selectIgPost(id) {
     document.getElementById('igHashtagDisplay').textContent = p.hashtags || '—';
   }
 
-  document.getElementById('igStorySlideText').value = slides[0]?.text || slides[0] || '';
+  document.getElementById('igStorySlideText').value = rawSlides[0]?.text || rawSlides[0] || '';
   selectStorySlide(0);
 
   // İçerik belleği
@@ -2672,7 +2664,7 @@ function enablePublishBtns(enable) {
 function selectStorySlide(n) {
   _selectedStorySlide = n;
   const p = _igPosts.find(x => x.id === _selectedIgPostId);
-  const rawSlides = p?.story_slides || [];
+  const rawSlides = Array.isArray(p?.story_slides) ? p.story_slides : [];
   const text = rawSlides[n]?.text || rawSlides[n] || '';
   document.getElementById('igStorySlideText').value = text;
 
@@ -2749,7 +2741,20 @@ async function publishIgPost(isStory = false) {
 
   try {
     const rawSlides = Array.isArray(p.story_slides) ? p.story_slides : [];
-    const carouselSlides = parseCarouselSlides(rawSlides);
+    let carouselSlides = parseCarouselSlides(rawSlides);
+
+    // story_slides yoksa preview_data'dan carousel üret
+    if (carouselSlides.length === 0) {
+      const hook = d.quote || p.caption?.split('\n')[0]?.substring(0, 80) || 'YKS koçluğunda yeni bir dönem';
+      const pts = (d.points || []).map(pt => [pt.title || String(pt), pt.desc || '']);
+      carouselSlides = [
+        { type: 'hook', headline: hook },
+        { type: 'content', headline: d.title || 'Neden Önemli?', points: pts.slice(0, 3) },
+        { type: 'content', headline: d.subtitle || 'Çözüm', points: pts.slice(3, 5) },
+        { type: 'insight', quote: d.quote || hook },
+        { type: 'cta', cta_text: 'Erken erişim açık — rostrumakademi.com' }
+      ];
+    }
 
     let fetchBody;
     if (isStory) {
@@ -2759,8 +2764,18 @@ async function publishIgPost(isStory = false) {
         : getStorySvg(d);
       const imageBase64 = await svgToJpegBase64(svgStr, 1080, carouselSlides.length > 0 ? 1080 : 1920);
       fetchBody = { caption: '', imageBase64, isStory: true };
+    } else if (carouselSlides.length > 1) {
+      // Carousel: tüm slaytları base64'e çevir ve slides dizisi olarak gönder
+      const slides = [];
+      for (let i = 0; i < carouselSlides.length; i++) {
+        btn.textContent = `⏳ Slayt ${i+1}/${carouselSlides.length}...`;
+        const svgStr = getCarouselSlideSvg(carouselSlides[i], i, carouselSlides.length);
+        const slideBase64 = await svgToJpegBase64(svgStr, 1080, 1080);
+        slides.push(slideBase64);
+      }
+      fetchBody = { caption, slides, isCarousel: true };
     } else {
-      // Tek görsel post
+      // Tek görsel post (fallback)
       const svgStr = getCarouselSlideSvg(carouselSlides[0] || { type: 'hook', headline: d.quote || '' }, 0, 1);
       const imageBase64 = await svgToJpegBase64(svgStr, 1080, 1080);
       fetchBody = { caption, imageBase64 };
@@ -2787,7 +2802,14 @@ async function publishIgPost(isStory = false) {
       showToast(isStory ? '📱 Hikaye paylaşıldı! ✓' : '📸 Post Instagram\'da yayınlandı! ✓');
     } else {
       const err = await response.json();
-      showToast('Hata: ' + (err.message || 'Yayınlanamadı'), false);
+      const msg = err.message || 'Yayınlanamadı';
+      if (msg.includes('API access blocked') || msg.includes('access')) {
+        showToast('Instagram API erişimi engellendi. Bağlantı Ayarları → Token yenileyin veya Meta uygulamasının instagram_content_publish iznini kontrol edin.', false);
+      } else if (msg.includes('kimlik') || msg.includes('eksik')) {
+        showToast('Instagram kimlik bilgileri eksik. Bağlantı Ayarları sekmesinden girin.', false);
+      } else {
+        showToast('Hata: ' + msg, false);
+      }
     }
   } catch(e) {
     showToast('Hata: ' + e.message, false);
@@ -3030,6 +3052,132 @@ let _mpCurrentSlide = 0;
 let _mpSlides = [];
 let _mpGenerated = false;
 
+let _uploadedImageBase64 = null;
+
+function handleMpImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  document.getElementById('mpImageName').textContent = file.name;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64 = e.target.result.split(',')[1];
+    _uploadedImageBase64 = base64;
+
+    // Show preview and button
+    document.getElementById('mpImagePreview').src = e.target.result;
+    document.getElementById('mpImagePreviewContainer').style.display = 'block';
+    document.getElementById('mpGenerateFromImageBtn').style.display = 'block';
+
+    // Set preview in container
+    const previewContainer = document.getElementById('mpPreviewContainer');
+    if (previewContainer) {
+      previewContainer.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover" />`;
+    }
+
+    _mpGenerated = true;
+    enableMpPublish(true);
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeMpImage() {
+  _uploadedImageBase64 = null;
+  document.getElementById('mpImageUpload').value = '';
+  document.getElementById('mpImageName').textContent = 'Seçilen dosya yok';
+  document.getElementById('mpImagePreviewContainer').style.display = 'none';
+  document.getElementById('mpGenerateFromImageBtn').style.display = 'none';
+
+  // Restore container preview
+  const previewContainer = document.getElementById('mpPreviewContainer');
+  if (previewContainer) {
+    previewContainer.innerHTML = `<span style="font-size:11px;color:rgba(230,237,243,0.2);text-align:center;padding:16px;line-height:1.6">İçerik oluşturunca<br>carousel önizlenir</span>`;
+  }
+
+  _mpGenerated = false;
+  enableMpPublish(false);
+}
+
+async function generateCaptionFromImage() {
+  if (!_uploadedImageBase64) return;
+
+  const btn = document.getElementById('mpGenerateFromImageBtn');
+  const origText = btn.textContent;
+  btn.textContent = '⏳ Görsel Analiz Ediliyor...';
+  btn.disabled = true;
+
+  try {
+    // 1. Get Gemini Key from platform_settings
+    const { data } = await db.from('platform_settings').select('value').eq('key', 'ai_settings').maybeSingle();
+    const geminiKey = data?.value?.gemini_api_key;
+
+    if (!geminiKey) {
+      showToast('Hata: Gemini API Key tanımlı değil. Lütfen "Bağlantı Ayarları" sekmesinden kaydedin.', false);
+      return;
+    }
+
+    // 2. Call Gemini Vision model directly
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+    const prompt = `Görseldeki eğitim/öğretim içeriğini analiz et. Rostrum Akademi markasının YKS eğitim koçluğu hesabı için bu görselin altına gelecek ilgi çekici, bilgilendirici ve profesyonel bir Instagram post açıklaması (caption) ve en az 6 adet ilgili hashtag üret. Çıktı olarak sadece şu JSON formatını döndür, markdown içermesin:
+{
+  "caption": "açıklama metni",
+  "hashtags": "#hashtag1 #hashtag2 ..."
+}`;
+
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType: 'image/jpeg',
+                  data: _uploadedImageBase64
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
+      })
+    });
+
+    if (!resp.ok) {
+      throw new Error(`Gemini API Hatası: ${resp.status}`);
+    }
+
+    const resData = await resp.json();
+    const textReply = resData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // Parse json
+    const jsonMatch = textReply.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSON bulunamadı');
+    const p = JSON.parse(jsonMatch[0]);
+
+    // Fill form
+    const captionEl = document.getElementById('mpCaptionEdit');
+    const hashtagsEl = document.getElementById('mpHashtagEdit');
+    if (captionEl) captionEl.value = p.caption || '';
+    if (hashtagsEl) hashtagsEl.value = p.hashtags || '';
+
+    // Show generated section
+    document.getElementById('mpGeneratedSection').style.display = 'flex';
+    showToast('✨ Açıklama ve hashtag\'ler üretildi! ✓');
+  } catch (e) {
+    console.error('Image caption generation error:', e);
+    showToast('Hata: ' + e.message, false);
+  } finally {
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
+}
+
 function initManualPostTab() {
   // Mevcut içerik varsa butonları açık bırak
   const hasContent = (document.getElementById('mpSlide0')?.value || '').trim().length > 0;
@@ -3180,29 +3328,196 @@ async function generateManualPost() {
     _mpTone === 'taktik' ? 'Taktik — somut, aksiyon alınabilir, numaralı adımlar veya liste' :
     'YKS Zekası — veri, istatistik veya beklenmedik bir gerçekle başla';
 
-  const prompt = `Sen Rostrum Akademi'nin Instagram içerik yazarısın. Koçun verdiği fikri 5 slaytlık carousel'a çevireceksin.
+  const prompt = `Sen Rostrum Akademi'nin kıdemli Instagram içerik uzmanısın. Koçun verdiği fikri 5 slaytlık carousel'a çevireceksin.
 
-KİMİZ: Rostrum Akademi, Türkiye'deki bağımsız YKS koçlarına özel dijital yönetim platformudur.
+━━━ ROSTRUM AKADEMİ KİMDİR ━━━
+Türkiye'deki bağımsız YKS koçlarına özel dijital yönetim platformu. Koçlar genellikle 5-30 öğrenciyle çalışır; öğrenci takibi, veli raporlama, ders programı, deneme analizi gibi işleri WhatsApp, Excel ve kâğıtta yönetir. Rostrum Akademi bu kaosu tek bir panelde toplar.
+
+TEMEL ÖZELLİKLER:
+- Öğrenci paneli: net takibi, konu bazlı performans, TYT/AYT ayrı grafik
+- Haftalık program oluşturucu: sürükle-bırak, otomatik hatırlatma
+- Veli raporu: tek tıkla PDF veya mesaj
+- Deneme analizi: net, sıra, bölüm bazlı karşılaştırma
+- Eşleşme motoru: koç-öğrenci uyumu skoru
+- Gelir takibi: ücret, tahsilat, gecikme bildirimi
+
+━━━ TÜRKİYE YKS SİSTEMİ ━━━
+YKS = Yükseköğretim Kurumları Sınavı. İki aşama:
+
+TYT (Temel Yeterlilik Testi):
+- 120 soru, 135 dakika
+- Türkçe (40), Sosyal Bilimler (20), Matematik (40), Fen Bilimleri (20)
+- Tüm adaylar girer. Puan türü: SAY, SÖZ, EA, DİL için alt taban
+- TYT net × 1.0 katsayı ile puanlamaya girer
+
+AYT (Alan Yeterlilik Testi):
+- 80 soru, 180 dakika
+- SAY: Matematik (30), Fizik (14), Kimya (13), Biyoloji (13)
+- SÖZ: Edebiyat (24), Tarih (10+10), Coğrafya (6+6), Felsefe (12)
+- EA: Matematik (30), Edebiyat (24), Tarih (10), Coğrafya (6)
+- AYT net × 1.8 katsayı ile puanlamaya girer
+
+NET HESABI: Her doğru = +1, her 4 yanlış = -1 net.
+Puan = OBP (Ortaöğretim Başarı Puanı) × 0.12 + TYT × katsayı + AYT × katsayı
+
+KOÇLARIN GERÇEK SORUNLARI:
+- Öğrencinin hangi konuda takıldığını geç fark etmek
+- TYT-AYT dengesini kurmak (TYT artırdın AYT körleşti)
+- Veli baskısı: "Neden geriledi?" sorusuna hazırlıksız yakalanmak
+- Program yapmak, sonra öğrencinin uymadığını görmek
+- 15 öğrenciyle WhatsApp üzerinden takip: mesajlar karışıyor
+- Deneme sonrası hangi öğrenciye önce müdahale edeceğini bilememek
+- Sınava X gün kala paniği yönetmek (veli + öğrenci + koç)
+
+YKS TAKVİMİ:
+- Sınav Haziran ortası. Koçlar Eylül'de başlar, Kasım-Mart deneme yoğun dönem (ayda 2-4 deneme), Mart sonrası "net kapatma" baskısı, Mayıs panik modu, veli baskısı zirve.
+
+━━━ DERS BAZLI STRATEJİ ATLASI ━━━
+
+TYT TÜRKÇE (40 soru):
+- Paragraf soruları: 20 soru — EN KRİTİK alan
+- Dil bilgisi/yazım: 10 soru, Sözcük anlam: 10 soru
+- Ortalama süre bütçesi: 35-40 dakika
+- En yaygın hata: Soruyu sonuna kadar okumadan metne gitmek; kendi bilgisini metne eklemek
+- Taktik: Önce soru kökünü oku, sonra metni odaklı tara. Paragraf sorusu 2 dakikayı geçiyorsa hız problemi var.
+- High-ROI: Haftada 15-20 paragraf sorusu pratik = 1 ayda %50 hız artışı
+
+TYT MATEMATİK (40 soru):
+- Problem soruları: 12 soru — en hızlı net artırma alanı
+- Geometri: 10 soru (üçgen+çember her yıl çıkıyor)
+- Sayılar/Cebir: 18 soru
+- Ortalama süre bütçesi: 50-55 dakika
+- En yaygın hata: Güçlü öğrenci kolay sorularda acele okuma yapıp yanlış yapıyor
+- Taktik: 1. tur yapabileceklerin, 2. tur zor sorular — zaman baskısında geometriyi son bırak
+- Grafik-tablo yorumlama soruları = öğrencilerin en çok puan kaybettiği alt tür
+
+TYT SOSYAL BİLİMLER (20 soru = Tarih 5 + Coğrafya 5 + Felsefe 5 + Din 5):
+- Konu havuzu DAR ve sabittir — doğru çalışılırsa kısa sürede yüksek net
+- Tarih: Milli Mücadele, Atatürkçülük, İlk Türk devletleri her yıl çıkıyor
+- Coğrafya: İklim-bitki, nüfus-yerleşme, harita yorumlama — ezber değil veri okuma
+- Felsefe: Bilgi felsefesi (en çok), Ahlak felsefesi — senaryo tabanlı soru, ezber tutmaz
+- Taktik: Sosyal bilimler = sınavda en hızlı net artırılabilir bölüm (dar konu + çıkmış soru analizi yeterli)
+
+TYT FEN BİLİMLERİ (20 soru = Fizik 7 + Kimya 7 + Biyoloji 6):
+- Biyoloji: 14 saatlik verimli çalışma = 6 net artış (1 net / 2.3 saat) — EN YÜKSEK ROI
+- Konu daralmış, soru görsel/metin tabanlı — sadece video izlemek yetmez, soru çözdür
+- Kimya: Mol, asit-baz, organik zor ama soru havuzu sabit
+- Fizik: Temel kuvvet-hareket-elektrik; formül değil kavram soruları
+
+AYT SAY — MATEMATİK (30 soru + Geometri 10 soru = 40 soru toplam, 2x ağırlık):
+- Türev + İntegral: 8-10 soru arası — yüksek puan, öğrenilmesi gerekiyor
+- Fonksiyonlar, Trigonometri, Dizi-Seri: Sabit konu havuzu
+- Geometri: Üçgen-benzerlik + Çember her yıl çıkıyor (zorunlu), Analitik geometri orta risk
+- Taktik: "Türev-İntegral-Limit üçlüsü" AYT MAT'ın üçte birini oluşturuyor
+
+AYT FİZİK (14 soru):
+- Mekanik: 5-6 soru — en ağır konu grubu
+- Elektrik-Manyetizma: 3-4 soru
+- Dalgalar-Optik: 2-3 soru
+- Modern Fizik: 1-2 soru
+- Taktik: Mekaniği sağlamlaştır, modern fiziği ve dalgaları son bırakabilirsin
+
+AYT KİMYA (13 soru):
+- Organik Kimya + Denge + Asit-Baz = ağır konu grubu
+- Tüm konular zorunlu, kaçamak yoktur
+
+AYT BİYOLOJİ (13 soru):
+- Hücre, Genetik, Fizyoloji, Ekoloji
+- Genetik soruları YKS'de giderek ağırlaşıyor
+
+AYT EDEBİYAT (24 soru — SÖZ/EA için):
+- Divan Edebiyatı: ~%30 ağırlık — en çok soru çıkan alan
+- Cumhuriyet Dönemi: %25
+- Paragrafta Anlam (metin yorumlama): %27
+- Strateji sıralaması: Divan → Cumhuriyet → Paragraf Anlam → Şiir Bilgisi → Tanzimat
+
+━━━ COUNTERINTUITIVE GERÇEKLER (En iyi içerik bunlardan çıkar) ━━━
+- AYT Fizik'te 14 soru var. Sadece mekaniğe hâkim olsan 5-6 doğru yaparsın — bu üst %40'a sokar
+- TYT Biyoloji: 14 saatlik çalışma = 6 net. TYT Geometri: 14 saatte 2 net. Aynı süre, 3 kat fark.
+- "Deneme çözdüm" = Net artmaz. "Deneme analiz ettim" = Net artar. Fark bu kadar basit.
+- Paragraf sorusu zor değil — sadece yavaş. Hız kazanmak konu öğrenmekten daha uzun sürer.
+- TYT'de 4 yanlış = 1 net siliniyor. Emin olmadığın soruyu boş bırakmak matematiksel olarak daha akıllı.
+- Sosyal bilimler "boş geçilecek bölüm" değil — 20 soru, dar konu havuzu, hızlı net artışı.
+- Mart'tan sonra yeni konu öğrenmek yerine bildiklerini sağlamlaştırmak daha çok net getirir.
+- Öğrencinin 3 deneme üst üste aynı konuda hata yapması = Koç 1. denemede müdahale etmedi.
+
+━━━ KOÇLUK PRATİĞİ (gerçek senaryolar) ━━━
+- "Öğrencim çok çalışıyor ama net artmıyor" → Büyük ihtimal: yanlış analiz yapılmıyor, aynı hata tekrar ediliyor
+- "Veli panik mesajı attı" → Deneme sonrası veli aranmıyorsa, veli açıklama boşluğunu endişeyle dolduruyor
+- Koçların en çok ihmal ettiği: 3 deneme kıyaslaması. Tek denemeye bakınca trend görünmüyor.
+- Öğrenci deneme sonrası "anlattım" diyor, ama hata defteri yok — aynı soru tipi tekrarlıyor
+- TYT güçlü, AYT zayıf öğrenci: Yüzde 60'ı bu profilde — TYT fazla zaman harcanıyor
+
+OGM MATERYAL (ogmmateryal.eba.gov.tr):
+- MEB'in ücretsiz platformu: YKS Kampı videoları, kazanım bazlı soru bankası, mini denemeler
+- Koçluk için kullanımı: Eksik konuyu tespit et → OGM'de o kazanımı bul → soru çözdür
+- Avantajı: Kazanım bazlı — hangi alt konunun eksik olduğunu izole etmek mümkün
+- Öğrenciye tavsiye: Basılı kitap yerine OGM + çıkmış soru kombinasyonu güçlü alternatif
+
+━━━ HEDEF KİTLE ━━━
 Hedef kitle: ${personaLabel}.
 İçerik tonu: ${toneLabel}.
 
-TON KURALLARI:
-- Klişe yasak: "Başarıya ulaş", "Hayallerinin peşinden git" → ASLA yazma
-- Rakamlarla düşün: "Haftada 3 saat" > "Çok zaman kazanırsın"
-- "En iyi platform" gibi kanıtlanmamış iddia yasak
-- İngilizce jargon (dashboard, feature) yasak → Türkçe kullan
-- "Bizi takip et" yasak → "Erken erişim listesine katıl" de
+━━━ İÇERİK KALİTE KURALLARI ━━━
+
+YASAK İFADELER — bunları yaz, içerik çöpe gider:
+✗ "Tüm konuları öğren" → herkes bunu biliyor, değer sıfır
+✗ "Düzenli çalış", "Motive ol", "İnanç kaybetme" → motivasyon konuşmaları değil gerçek taktik
+✗ "Zaman yönetimi önemlidir" → ne kadar, nasıl, hangi ders için? Somutlaştır
+✗ "Başarıya ulaş", "Hayallerinin peşinden git" → klişe, kimse okumaz
+✗ "Daha fazla çalış" → bunu zaten yapıyor, AZ çalışıp FAZLA net almayı öğret
+✗ "En iyi platform", "Mükemmel sistem" → kanıtlanmamış iddia
+
+ZORUNLU STANDARTLAR — iyi içerik böyle görünür:
+✓ Karşıt sezgisel bilgi: Okuyucunun "bunu hiç böyle düşünmemiştim" demesi
+✓ Somut sayı: "AYT Fizik 14 soru — 8'i doğru = üst %30" > "Fizik önemlidir"
+✓ Gerçek senaryo: "Öğrencin TYT Matematik neti 18 ama AYT Matematik neti 6 — ne yaparsın?"
+✓ Koçun gözünden: "Yıllarca koçluk yapan biri olarak şunu fark ettim..."
+✓ Aksiyon alınabilir: Okuyucu postu kapatır kapamaz ne yapacağını bilmeli
+✓ Tek konuya odaklan: 5 slayt = 1 fikir derinlemesine, 5 fikir yüzeysel değil
 
 SLAYT YAPISI:
-Slayt 01 — Kanca: Kaydırma durdurucu. Soru, çarpıcı stat veya keskin gözlem. Tek cümle, max 12 kelime.
-Slayt 02 — Geliştirme: 3-4 madde (her biri kısa başlık). Problem veya çözümü somutlaştır.
-Slayt 03 — Devam: 2-3 madde daha veya konuyu derinleştir. Başlık + maddeler.
-Slayt 04 — İçgörü: Aklında kalacak tek cümle. Alıntı formatı. Max 15 kelime.
-Slayt 05 — CTA: Net aksiyon. "Erken erişim açık" veya "Koçluk işini sistemleştir". Max 10 kelime (URL otomatik eklenir).
+Slayt 01 — KANCA: Scroll durdurucu. Soru, şok edici istatistik veya koçun yaşadığı gerçek an. Max 10 kelime. Okuyucu "bu benim sorunum" demeli.
+Slayt 02 — PROBLEM DERİNLEŞTİRME: Neden bu sorun düşündüğünden büyük? 3 somut nokta, her biri gerçek sayı veya senaryo içermeli.
+Slayt 03 — ÇÖZÜM/TAKTİK: Spesifik, uygulanabilir adımlar. "Ne yapmalısın" değil "bu öğrenci şunu yaptı, şu oldu".
+Slayt 04 — İÇGÖRÜ: 1 cümle, akılda kalır, karşıt sezgisel. Alıntı formatı. "Daha çok değil, daha akıllıca" klişesi değil — gerçek bir YKS gözlemi.
+Slayt 05 — CTA: Rostrum Akademi'nin bu sorunu nasıl çözdüğü + erken erişim. Max 10 kelime.
+
+━━━ ÖRNEK: KÖTÜ vs İYİ ━━━
+
+FİKİR: "AYT Matematik taktikleri"
+
+❌ KÖTÜ (bunu yazarsan içerik değersizdir):
+slide2 headline: "AYT Matematik Taktikleri"
+points: ["Konu Dağılımı: Temel kavramlara odaklan", "Zaman Yönetimi: Sorulara öncelik ver", "Deneme Analizi: Zayıf noktaları belirle"]
+→ Bu cümleler hiçbir bilgi taşımıyor. Okuyucu "bunu zaten biliyorum" der ve geçer.
+
+✅ İYİ (bunu yaz):
+hook: "AYT Mat'ta 40 sorudan 10'u Türev-İntegral. Bunu bilmeden plan yapılmaz."
+slide2 headline: "40 Saatte 10 Net Garantisi"
+points: [
+  {"title": "Türev + İntegral önce", "desc": "40 saatte biter, 10 soru garantilenir — toplam netin üçte biri"},
+  {"title": "Geometri tuzağı", "desc": "Öğrenciler 15 saat harcar, sadece 3 soru çıkar — oran tutmuyor"},
+  {"title": "Fonksiyon soruları değişti", "desc": "2023'ten itibaren kalıp değil yorum ağırlıklı — ezber işe yaramıyor"}
+]
+slide3 headline: "Öğrencin Nerede Kaybediyor?"
+points: [
+  {"title": "İşlem hatası mı, bilgi mi?", "desc": "Aynı konudan 2. kez yanlış yaparsa artık bilgi eksikliği değil"},
+  {"title": "Geometride süre kanıyor", "desc": "Çözülemeyen soru = boş bırak, sonraki soruya geç"}
+]
+insight: "Türev-İntegral sağlamsa AYT Mat'ın üçte biri zaten garantide."
+cta: "Öğrenci net takibini sisteme taşı"
+
+━━━ BU ÖRNEKTEN ÇIKARILACAK DERS ━━━
+- Her madde bir GERÇEK BİLGİ taşımalı (sayı, konu adı, senaryo)
+- "Odaklan", "belirle", "yönet" gibi boş fiiller yasak — NE'YE odaklan, NEYLE belirle?
+- Slayt 2-3 maddelerinde mutlaka somut bir detay: süre, soru sayısı, tarih, senaryo
+
+━━━ ASIL GÖREV ━━━
 
 KOÇUN FİKRİ: "${idea}"
 
-GÖREV: Bu fikre dayanarak 5 slaytlık carousel üret.
+Şimdi bu fikir için yukarıdaki İYİ örnek kalitesinde bir carousel üret. Genel tavsiye verme. YKS verilerini, konu dağılımlarını, koçluk senaryolarını kullan.
 
 JSON formatında döndür:
 {
@@ -3239,9 +3554,19 @@ Sadece ham JSON döndür.`;
     const resData = await response.json();
     if (resData.error) throw new Error(resData.error);
 
-    const jsonMatch = (resData.reply || '').match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('JSON parse edilemedi');
-    const p = JSON.parse(jsonMatch[0]);
+    const rawReply = resData.reply || '';
+    const jsonMatch = rawReply.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSON bulunamadı');
+    let p;
+    try {
+      p = JSON.parse(jsonMatch[0]);
+    } catch(parseErr) {
+      // Bozuk JSON'u onar: iç tırnak işaretlerini düzelt
+      const fixed = jsonMatch[0]
+        .replace(/[“”]/g, '\\"')
+        .replace(/[‘’]/g, "'");
+      p = JSON.parse(fixed);
+    }
 
     // Textareaları doldur
     const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
@@ -3279,7 +3604,7 @@ Sadece ham JSON döndür.`;
     showToast('✨ Carousel içeriği oluşturuldu ✓');
 
   } catch (e) {
-    console.warn('Manuel post AI hatası — offline fallback:', e.message);
+    console.warn('Manuel post AI hatası:', e.message);
     // Offline fallback
     const fb = _mpTone === 'taktik' ? {
       hook: 'Deneme sonrası 10 dakika bu analizi yapın.',
@@ -3339,7 +3664,7 @@ Sadece ham JSON döndür.`;
 
 async function publishManualPost(isStory) {
   parseManualSlides();
-  if (!_mpGenerated && _mpSlides.every(s => !(s.headline || s.quote || s.cta_text))) {
+  if (!_uploadedImageBase64 && !_mpGenerated && _mpSlides.every(s => !(s.headline || s.quote || s.cta_text))) {
     showToast('Önce içerik oluşturun veya slayt metinlerini doldurun.', false);
     return;
   }
@@ -3354,21 +3679,69 @@ async function publishManualPost(isStory) {
   btn.disabled = true;
 
   try {
-    // Kanca slaytını (01) tek görsel olarak gönder — Meta carousel için ek izin gerekiyor
-    showToast('Görsel hazırlanıyor...');
-    const slideIndex = isStory ? Math.min(0, _mpSlides.length - 1) : 0;
-    const svgStr = getCarouselSlideSvg(_mpSlides[slideIndex] || { type: 'hook', headline: '' }, slideIndex, _mpSlides.length);
-    const imageBase64 = await svgToJpegBase64(svgStr, 1080, 1080);
+    showToast('Görseller hazırlanıyor...');
 
-    const body = { imageBase64, caption: isStory ? '' : fullCaption, isStory };
+    let body;
+    if (_uploadedImageBase64) {
+      if (isStory) {
+        body = { imageBase64: _uploadedImageBase64, caption: '', isStory: true };
+      } else {
+        body = { imageBase64: _uploadedImageBase64, caption: fullCaption };
+      }
+    } else if (isStory) {
+      // Hikaye: tüm slaytları ayrı ayrı story olarak yayınla
+      const total = _mpSlides.length;
+      for (let i = 0; i < total; i++) {
+        btn.textContent = `⏳ Hikaye ${i+1}/${total}...`;
+        const svgStr = getCarouselSlideSvg(_mpSlides[i] || { type: 'hook', headline: '' }, i, total);
+        const imageBase64 = await svgToJpegBase64(svgStr, 1080, 1080);
+        const stRes = await fetch('/api/publish-instagram', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64, caption: '', isStory: true })
+        });
+        const stData = await stRes.json();
+        if (!stRes.ok || stData.error) throw new Error(stData.message || stData.error || 'Hikaye yayın hatası');
+      }
+      showToast(`📱 ${total} hikaye yayınlandı ✓`);
+      enableMpPublish(false);
+      _mpGenerated = false;
+      btn.textContent = origText;
+      return;
+    } else if (_mpSlides.length > 1) {
+      // Carousel: tüm slaytları base64'e çevir
+      const slides = [];
+      for (let i = 0; i < _mpSlides.length; i++) {
+        btn.textContent = `⏳ Slayt ${i+1}/${_mpSlides.length}...`;
+        const svgStr = getCarouselSlideSvg(_mpSlides[i] || { type: 'hook', headline: '' }, i, _mpSlides.length);
+        const slideBase64 = await svgToJpegBase64(svgStr, 1080, 1080);
+        slides.push(slideBase64);
+      }
+      body = { caption: fullCaption, slides, isCarousel: true };
+    } else {
+      // Tek görsel
+      const svgStr = getCarouselSlideSvg(_mpSlides[0] || { type: 'hook', headline: '' }, 0, 1);
+      const imageBase64 = await svgToJpegBase64(svgStr, 1080, 1080);
+      body = { imageBase64, caption: fullCaption };
+    }
 
+    btn.textContent = '⏳ Yayınlanıyor...';
     const res = await fetch('/api/publish-instagram', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
     const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error || data.message || 'Yayın hatası');
+    if (!res.ok || data.error) {
+      const msg = data.error || data.message || 'Yayın hatası';
+      if (msg.includes('API access blocked') || msg.includes('access')) {
+        throw new Error('Instagram API erişimi engellendi. Bağlantı Ayarları → Token\'ınızı yenileyin veya Meta uygulamasının instagram_content_publish iznini kontrol edin.');
+      }
+      if (msg.includes('kimlik') || msg.includes('eksik')) {
+        throw new Error('Instagram kimlik bilgileri eksik. Bağlantı Ayarları sekmesinden girin.');
+      }
+      throw new Error(msg);
+    }
 
     showToast(isStory ? '📱 Hikaye yayınlandı ✓' : '🚀 Post yayınlandı ✓');
     enableMpPublish(false);
@@ -3478,6 +3851,64 @@ async function saveIgConfig() {
     showToast('Bağlantı ayarları Supabase veritabanına güvenle kaydedildi! ✓');
   } catch(e) {
     showToast('Ayarlar kaydedilemedi: ' + e.message, false);
+  }
+}
+
+async function loadAiConfig() {
+  try {
+    const { data } = await db.from('platform_settings').select('value').eq('key', 'ai_settings').maybeSingle();
+    if (data && data.value) {
+      document.getElementById('cfgGroqApiKey').value = data.value.groq_api_key || '';
+      document.getElementById('cfgGeminiApiKey').value = data.value.gemini_api_key || '';
+    }
+  } catch(e) {
+    console.error('Load AI config error:', e);
+  }
+}
+
+async function saveAiConfig() {
+  const groqKey = document.getElementById('cfgGroqApiKey').value.trim();
+  const geminiKey = document.getElementById('cfgGeminiApiKey').value.trim();
+
+  const payload = { groq_api_key: groqKey, gemini_api_key: geminiKey };
+
+  try {
+    const { error } = await db.from('platform_settings').upsert({ key: 'ai_settings', value: payload });
+    if(error) throw error;
+    showToast('Yapay zeka bağlantı ayarları kaydedildi! ✓');
+  } catch(e) {
+    showToast('Ayarlar kaydedilemedi: ' + e.message, false);
+  }
+}
+
+async function refreshPublicIgFeed() {
+  const statusEl = document.getElementById('igFeedRefreshStatus');
+  const { data: creds } = await db.from('platform_settings').select('value').eq('key', 'instagram_credentials').maybeSingle();
+  const token = creds?.value?.instagram_access_token;
+  const accountId = creds?.value?.instagram_account_id;
+  if (!token || !accountId) {
+    if (statusEl) statusEl.textContent = '❌ Önce token ve hesap ID kaydedin.';
+    return;
+  }
+  if (statusEl) statusEl.textContent = '⏳ Gönderiler çekiliyor...';
+  try {
+    const url = `https://graph.instagram.com/v20.0/${accountId}/media?fields=id,media_type,media_url,thumbnail_url,permalink,caption,timestamp&limit=6&access_token=${token}`;
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json.error) throw new Error(json.error.message);
+    const posts = (json.data || []).map(p => ({
+      id: p.id,
+      type: p.media_type,
+      image: p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url,
+      url: p.permalink,
+      caption: (p.caption || '').slice(0, 120),
+      ts: p.timestamp
+    }));
+    await db.from('platform_settings').upsert({ key: 'ig_public_feed', value: { posts, updated: new Date().toISOString() } }, { onConflict: 'key' });
+    if (statusEl) statusEl.textContent = `✅ ${posts.length} gönderi kaydedildi — ${new Date().toLocaleTimeString('tr-TR')}`;
+    showToast('Ana sayfa Instagram beslemesi güncellendi ✓');
+  } catch(e) {
+    if (statusEl) statusEl.textContent = '❌ Hata: ' + e.message;
   }
 }
 

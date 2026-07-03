@@ -4,7 +4,7 @@
 
 import { db } from './config.js';
 import { S, session } from './state.js';
-import { loadAllData } from './api.js';
+import { loadAllData, invalidateCache } from './api.js';
 import { showLoading, sha256, normalizeUsername, showToast } from './helpers.js';
 
 export function loginErr(msg) {
@@ -341,7 +341,7 @@ export async function finishLogin(rows) {
     window.setupShell();
     
     document.getElementById('aiChatBubble').style.display = 'flex';
-    if (session.role === 'coach' && S.workspace && !S.workspace.onboarding_done) {
+    if (session.role === 'coach' && (!S.workspace || !S.workspace.onboarding_done)) {
       window.switchTab('home');
       window.showOnboarding();
       return;
@@ -361,6 +361,7 @@ export async function finishLogin(rows) {
 export function doLogout() {
   if (window.destroyRealtime) window.destroyRealtime();
   db.auth.signOut().catch(() => {});
+  invalidateCache();
   
   session.role = null;
   session.studentId = null;

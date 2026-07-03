@@ -109,6 +109,7 @@ create table if not exists public.exams (
     date date not null,
     exam_type varchar(50) not null, -- YKS, LGS, KPSS, ALES
     nets jsonb not null default '{}'::jsonb, -- e.g., {"Matematik": 17.5, "Türkçe": 18.0}
+    exam_details jsonb,
     student_note text,
     coach_comment text,
     created_at timestamptz default now()
@@ -663,5 +664,22 @@ begin
   end loop;
 end;
 $$;
+
+
+-- ----------------------------------------------------------------------------
+-- 14. KONU HAFTA SORU TABLE (For Weekly Subject Question Targets)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.konu_hafta_soru (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  student_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  coach_id uuid NOT NULL,
+  subject text NOT NULL,
+  konu text NOT NULL,
+  hafta integer NOT NULL CHECK (hafta BETWEEN 1 AND 40),
+  sayi integer NOT NULL DEFAULT 0,
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE(student_id, subject, konu, hafta)
+);
+ALTER TABLE public.konu_hafta_soru ENABLE ROW LEVEL SECURITY;
 
 

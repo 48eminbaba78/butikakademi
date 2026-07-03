@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fiyatlar — Rostrum Akademi</title>
-<meta name="description" content="Rostrum Akademi abonelik planları. Koçlar ve kurumlar için esnek fiyatlandırma.">
+<title>Fiyatlar Yakında — Rostrum Akademi</title>
+<meta name="description" content="Rostrum Akademi fiyatlandırma bilgileri yakında açıklanacak.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -145,17 +145,19 @@ footer{border-top:1px solid var(--bd);padding:32px 40px;display:flex;align-items
   <a href="/" class="nav-logo">ROSTRUM<span>AKADEMİ</span></a>
   <div class="nav-links">
     <a href="/">Ana Sayfa</a>
-    <a href="/pricing.html">Fiyatlar</a>
     <a href="/app.html" class="nav-cta">Giriş Yap →</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-chip"><span class="chip-dot"></span> Şeffaf Fiyatlandırma</div>
-  <h1>Koçluğu <span>büyütmek için</span><br>doğru plan</h1>
-  <p>Gizli ücret yok. İstediğiniz zaman iptal. 14 gün ücretsiz deneyin.</p>
+<!-- YAKINDA SAYFASI -->
+<section class="hero" style="min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+  <div class="hero-chip"><span class="chip-dot"></span> Çok Yakında</div>
+  <h1>Fiyatlar <span>yakında</span><br>açıklanacak</h1>
+  <p>Fiyatlandırma bilgilerimiz hazırlanıyor. Erken erişim için kayıt olun.</p>
+  <a href="/app.html" style="display:inline-block;margin-top:32px;background:var(--acc);color:#07060a;border-radius:12px;padding:14px 32px;font-weight:700;font-size:15px;text-decoration:none">Platforma Giriş Yap →</a>
+</section>
 
+<div style="display:none">
   <div class="billing-toggle">
     <button class="bt-btn active" id="btnMonthly" onclick="setBilling('monthly')">Aylık</button>
     <button class="bt-btn" id="btnAnnual" onclick="setBilling('annual')">
@@ -402,10 +404,9 @@ function toggleFaq(btn) {
 }
 
 function startCheckout(plan) {
-  // Ödeme entegrasyonu (iyzico / PayTR) buraya eklenecek
-  // Şimdilik kayıt sayfasına yönlendir
-  window.location.href = '/app.html?plan=' + plan;
+  window.location.href = '/app.html';
 }
 </script>
+</div>
 </body>
 </html>

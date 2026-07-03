@@ -409,10 +409,18 @@
     <div class="form-field">
       <label>Sınav Grubu / Profil</label>
       <select id="applyProfile">
-        <option value="YKS">YKS (Üniversiteye Hazırlık)</option>
-        <option value="LGS">LGS (Lise Giriş Sınavı)</option>
-        <option value="KPSS">KPSS (Kamu Personeli Sınavı)</option>
-        <option value="ALES">ALES</option>
+        <optgroup label="YKS (Üniversiteye Hazırlık)">
+          <option value="YKS Sayısal">YKS — Sayısal (MF)</option>
+          <option value="YKS Sözel">YKS — Sözel (TM/TS)</option>
+          <option value="YKS Eşit Ağırlık">YKS — Eşit Ağırlık (TM)</option>
+          <option value="YKS Sadece TYT">YKS — Sadece TYT</option>
+        </optgroup>
+        <optgroup label="Diğer Sınavlar">
+          <option value="LGS">LGS (Lise Giriş Sınavı)</option>
+          <option value="KPSS">KPSS (Kamu Personeli Sınavı)</option>
+          <option value="ALES">ALES</option>
+          <option value="DGS">DGS</option>
+        </optgroup>
       </select>
     </div>
     
