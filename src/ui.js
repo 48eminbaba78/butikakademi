@@ -1149,7 +1149,7 @@ function renderProgram(){
         </div>
         <button class="tc-menu-btn" onclick="event.stopPropagation();showTaskMenu('${ds}',${ti},this)">⋯</button>
       </div>`).join('');
-    const shortDay = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][(ws+i)%7];
+    const shortDay = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][(ws+i)%7];
     dayCards+=`<div class="day-col ${isToday?'today':''}">
       <div class="day-hd">
         <div>
@@ -1207,8 +1207,9 @@ function openClearWeekModal(){
     const ds=fmtDate(d);
     const dayLabel=DAYS_TR[(ws+i)%7];
     const hasTasks=(S.tasks[`${S.activeStuId}_${ds}`]||[]).length>0;
+    const shortDay = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][(ws+i)%7];
     html+=`<button class="day-sel-btn" id="dsbtn_${i}" data-ds="${ds}" onclick="toggleDaySel(${i},'${ds}')">
-      <div>${dayLabel.slice(0,3)}</div>
+      <div>${shortDay}</div>
       <div style="font-size:14px;font-weight:800">${d.getDate()}</div>
       ${hasTasks?`<div style="font-size:9px;color:var(--accent);margin-top:2px">●</div>`:'<div style="font-size:9px;opacity:0">·</div>'}
     </button>`;
@@ -2301,7 +2302,17 @@ async function saveStudent(){
   const pass = await sha256(passRaw);
   const payload={full_name:name,target:document.getElementById('smTarget').value.trim()||'Hedef belirtilmemiş',color,progress:Number(document.getElementById('smProg').value),password_hash:pass,week_start:Number(document.getElementById('smWeekStart').value),username:uname,role:'student',coach_id:session.coachId};
   if(id){
-    const {error}=await db.from('users').update(payload).eq('id',id);
+    const {error}=await db.rpc('update_student_profile', {
+      p_student_id: id,
+      p_full_name: name,
+      p_target: payload.target,
+      p_color: color,
+      p_progress: payload.progress,
+      p_week_start: payload.week_start,
+      p_username: uname,
+      p_plain_password: passRaw,
+      p_password_hash: pass
+    });
     if(error)return showToast('Hata: '+error.message);
     const s=S.students.find(x=>x.id===id);
     if(s)Object.assign(s,{name:payload.full_name,target:payload.target,color,progress:payload.progress,pass:payload.password_hash,weekStart:payload.week_start,username:uname});
@@ -2411,7 +2422,7 @@ function renderAppointments(){
             <button class="btn btn-ghost btn-sm" onclick="chCalMonth(1)">›</button>
           </div>
         </div>
-        <div class="cal-dow-row">${DAYS_TR.map(d=>`<div class="cal-dow">${d.slice(0,3)}</div>`).join('')}</div>
+        <div class="cal-dow-row">${['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map(d=>`<div class="cal-dow">${d}</div>`).join('')}</div>
         <div class="cal-days-grid" id="calDaysGrid"></div>
       </div>
       <div>
@@ -2983,9 +2994,10 @@ function renderSPortal(){
           <div class="tc-meta">${t.duration} dk</div>
         </div>
       </div>`).join('');
+    const shortDay = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][(ws+i)%7];
     dayCards+=`<div class="day-col ${isToday?'today':''}">
       <div class="day-hd">
-        <div><div class="day-name-lbl">${dayLabel.slice(0,3)}</div><div class="day-num">${d.getDate()}</div></div>
+        <div><div class="day-name-lbl">${shortDay}</div><div class="day-num">${d.getDate()}</div></div>
         <span class="day-badge">${doneMin}/${totalMin}dk</span>
       </div>
       <div class="day-tasks-list">${taskHtml||'<div class="empty" style="padding:8px 0"><p style="font-size:11px">Görev yok</p></div>'}</div>
