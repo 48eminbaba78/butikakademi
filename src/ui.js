@@ -303,6 +303,15 @@ function switchTab(tab, updateHash = true){
   }
   if(tab==='messages'||tab==='smessages') initRealtime();
   else destroyRealtime();
+
+  const bubble = document.getElementById('aiChatBubble');
+  if (bubble) {
+    if (tab === 'dev-tickets' || tab.startsWith('dev-')) {
+      bubble.style.display = 'none';
+    } else if (session.role === 'student' || session.role === 'coach' || session.role === 'parent') {
+      bubble.style.display = 'flex';
+    }
+  }
 }
 
 // ── KOÇ ANA SAYFA ──────────────────────────────
@@ -8540,6 +8549,8 @@ window.devDeleteAnnounce = devDeleteAnnounce;
 window.renderDevTickets = renderDevTickets;
 window.updateTicketStatus = updateTicketStatus;
 window.devDeleteTicket = devDeleteTicket;
+window.selectDevTicket = selectDevTicket;
+window.sendDevReply = sendDevReply;
 window.openSupportTicket = openSupportTicket;
 window.openSupportChat = openSupportChat;
 window.closeSupportChat = closeSupportChat;
