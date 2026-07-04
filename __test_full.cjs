@@ -399,11 +399,11 @@ async function logout() {
     const addBtn = await page.locator('.add-day-btn').count();
     log(addBtn === 0 ? '✅' : '❌', 'STU-4', `Görev Ekle butonu yok (readonly): ${addBtn === 0}`);
 
-    const taskCards = await page.locator('.task-card').count();
+    const taskCards = await page.locator('#view-sportal .task-card').count();
     log('ℹ️', 'STU-5', `Göreve sayısı: ${taskCards}`);
 
     if (taskCards > 0) {
-      await page.locator('.task-card').first().click();
+      await page.locator('#view-sportal .task-card').first().click();
       const detailVisible = await page.locator('#taskDetailModal').waitFor({ state: 'visible', timeout: 4000 }).then(() => true).catch(() => false);
       if (detailVisible) {
         await screenshot('13_student_task_detail');

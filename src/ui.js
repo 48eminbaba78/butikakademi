@@ -114,11 +114,11 @@ function showTrialExpiredScreen() {
         <h2 style="font-size:20px;font-weight:900;margin-bottom:12px;color:var(--accent)">Deneme Süreniz Doldu</h2>
         <p style="font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:24px">
           Rostrum Akademi'nin 14 günlük ücretsiz deneme süresi sona ermiştir. 
-          Çalışmalarınıza devam etmek ve size uygun paketi seçmek için lütfen Emin Ceylan ile iletişime geçin.
+          Çalışmalarınıza devam etmek ve size uygun paketi seçmek için lütfen kurucu/destek ekibimizle iletişime geçin.
         </p>
         <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch">
           <button class="btn btn-accent" onclick="openSupportChatDirect()" style="justify-content:center;padding:12px;font-size:14px;font-weight:700">
-            💬 Emin Ceylan'a Canlı Mesaj Gönder
+            💬 Kurucuya / Ekibe Yaz (Canlı Destek)
           </button>
           <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
             E-posta: <b>ceylanemin1928@gmail.com</b>
@@ -4449,7 +4449,7 @@ async function pollActiveDevChat() {
 
     msgsContainer.innerHTML = parsedMessages.map(m => {
       const isMe = m.sender === 'emin';
-      const senderName = isMe ? 'Emin Ceylan' : m.sender === 'ai' ? 'Yapay Zeka' : m.name || 'Kullanıcı';
+      const senderName = isMe ? 'Kurucu / Destek' : m.sender === 'ai' ? 'Yapay Zeka' : m.name || 'Kullanıcı';
       const bg = isMe ? 'var(--blue)' : m.sender === 'ai' ? 'var(--surface2)' : 'var(--accent)';
       const color = isMe ? '#fff' : m.sender === 'ai' ? 'var(--text)' : 'var(--on-accent)';
       const align = isMe ? 'flex-end' : 'flex-start';
@@ -4521,7 +4521,7 @@ function loadDevChatArea() {
     <div id="devChatMessages" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px; background:var(--surface)">
       ${parsedMessages.map(m => {
         const isMe = m.sender === 'emin';
-        const senderName = isMe ? 'Emin Ceylan' : m.sender === 'ai' ? 'Yapay Zeka' : m.name || 'Kullanıcı';
+        const senderName = isMe ? 'Kurucu / Destek' : m.sender === 'ai' ? 'Yapay Zeka' : m.name || 'Kullanıcı';
         const bg = isMe ? 'var(--blue)' : m.sender === 'ai' ? 'var(--surface2)' : 'var(--accent)';
         const color = isMe ? '#fff' : m.sender === 'ai' ? 'var(--text)' : 'var(--on-accent)';
         const align = isMe ? 'flex-end' : 'flex-start';
@@ -4571,7 +4571,7 @@ async function sendDevReply() {
     sender: 'emin',
     text,
     time: new Date().toISOString(),
-    name: 'Emin Ceylan'
+    name: 'Kurucu / Destek'
   };
 
   currentHistory.push(replyMsg);
@@ -4736,7 +4736,7 @@ async function refreshSupportMessages() {
               🤖 Yapay Zeka Asistanı ile Konuş
             </button>
             <button class="btn btn-ghost" onclick="startEminSupportChat()" style="justify-content:center;padding:10px;font-size:13px;border-color:var(--border)">
-              ✉️ Emin Ceylan'a Doğrudan Mesaj Gönder
+              ✉️ Kurucuya / Destek Ekibine Yaz
             </button>
           </div>
         </div>
@@ -4758,7 +4758,7 @@ function renderSupportMessagesList(list) {
 
   msgsContainer.innerHTML = list.map(m => {
     const isMe = m.sender === 'user';
-    const senderName = isMe ? 'Siz' : m.sender === 'ai' ? 'Yapay Zeka Asistanı' : 'Emin Ceylan (Kurucu)';
+    const senderName = isMe ? 'Siz' : m.sender === 'ai' ? 'Yapay Zeka Asistanı' : 'Kurucu / Destek Ekibi';
     const bg = isMe ? 'var(--accent)' : 'var(--surface2)';
     const border = isMe ? 'none' : '1px solid var(--border)';
     const textColor = isMe ? 'var(--on-accent)' : 'var(--text)';
@@ -4797,9 +4797,9 @@ function startEminSupportChat() {
     msgsContainer.innerHTML = `
       <div style="text-align:center;padding:40px 20px">
         <div style="font-size:48px;margin-bottom:12px">✉️</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">Emin Ceylan'a Doğrudan Mesaj Gönder</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">Kurucuya / Destek Ekibine Yaz</div>
         <div style="font-size:12px;color:var(--text-mid);line-height:1.6;margin-bottom:24px">
-          Soru, görüş veya abonelik taleplerinizi iletin. Emin Bey mesajlarınızı inceleyip en kısa sürede bu ekrandan yanıtlayacaktır.
+          Soru, görüş veya abonelik taleplerinizi iletin. Kurucu ekibimiz mesajlarınızı inceleyip en kısa sürede bu ekrandan yanıtlayacaktır.
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;max-width:320px;margin:0 auto">
           <input type="text" id="eminSubject" placeholder="Konu (Örn: Paket Satın Alma)" style="padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px">
@@ -4848,7 +4848,7 @@ async function submitEminInitialMessage() {
 
   _activeTicketId = data.id;
   _chatState = 'emin';
-  showToast('Talebiniz Emin Ceylan\'a iletildi ✓');
+  showToast('Talebiniz destek ekibine iletildi ✓');
   await refreshSupportMessages();
 }
 
@@ -6716,8 +6716,8 @@ async function callGeminiFallback(userText, context, userRole) {
 Rostrum Akademi İşleyişi, Üyelik ve Fiyatlandırma Bilgileri:
 1. Kayıt olan tüm koçlara 14 gün ücretsiz deneme süresi tanımlanır. Bu süre bitiminde panel kilitlenir.
 2. Otomatik ödeme/kredi kartı altyapısı yoktur; paket satın alma, ödeme ve lisans uzatma işlemleri tamamen manuel olarak yürütülür.
-3. Kullanıcılar paket satın almak, deneme sürelerini uzatmak veya üyeliklerini aktif etmek için Emin Ceylan (ceylanemin1928@gmail.com) ile iletişime geçmelidir.
-4. Destek panelinde bulunan "Emin Ceylan'a Bağlan" seçeneği ile doğrudan Emin Bey'e mesaj gönderebilir ve bu ekran üzerinden onunla canlı yazışabilirler.
+3. Kullanıcılar paket satın almak, deneme sürelerini uzatmak veya üyeliklerini aktif etmek için Kurucu Emin Ceylan (ceylanemin1928@gmail.com) ile iletişime geçmelidir.
+4. Destek panelinde bulunan "Kurucuya / Destek Ekibine Yaz" seçeneği ile doğrudan kurucu ekibe mesaj gönderebilir ve bu ekran üzerinden onunla canlı yazışabilirler.
 5. Güncel Paket Fiyatları:
    - Başlangıç Paketi (Starter): Aylık 299 TL
    - Koç Pro Paketi (Pro): Aylık 599 TL

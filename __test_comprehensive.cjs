@@ -385,12 +385,12 @@ async function testStudent(browser) {
       const addBtnsInProgram = await page.locator('.add-day-btn').count();
       log(addBtnsInProgram === 0 ? '✅' : '❌', 'ÖĞR', 'READONLY', `Program içinde Görev Ekle yok: ${addBtnsInProgram === 0}`);
 
-      const taskCards = await page.locator('.task-card').count();
+      const taskCards = await page.locator('#view-sportal .task-card').count();
       log('ℹ️', 'ÖĞR', 'PROGRAM', `Görev sayısı: ${taskCards}`);
 
       if (taskCards > 0) {
         // Görev tıkla → detay modal
-        await page.locator('.task-card').first().click();
+        await page.locator('#view-sportal .task-card').first().click();
         const detailOk = await page.locator('#taskDetailModal').waitFor({ state: 'visible', timeout: 4000 }).then(() => true).catch(() => false);
         log(detailOk ? '✅' : '⚠️', 'ÖĞR', 'DETAY-MODAL', `Görev detay açıldı: ${detailOk}`);
 
@@ -574,7 +574,7 @@ async function testMobile(browser) {
 
     // Öğrenciler sekmesi
     try {
-      const stuTab = page.locator('.sb-item').filter({ hasText: /öğrenci/i }).first();
+      const stuTab = page.locator('.tn-nav-item').filter({ hasText: /öğrenci/i }).first();
       if (await stuTab.count() > 0) {
         await stuTab.click();
         await page.waitForTimeout(1500);
@@ -636,7 +636,7 @@ async function testMobile(browser) {
 
     // Kaynaklarım filtre bar — mobilde
     try {
-      await page.locator('.sb-item').filter({ hasText: /kaynak/i }).first().click();
+      await page.locator('.tn-nav-item').filter({ hasText: /kaynak/i }).first().click();
       await page.waitForTimeout(1800);
       await ss(page, 'm06_resources');
       await ssFull(page, 'm06_resources_full');
@@ -676,10 +676,10 @@ async function testMobile(browser) {
     log(hasHorizScroll2 ? '⚠️' : '✅', 'MOBİL', 'ÖĞR-LAYOUT', `Yatay overflow yok: ${!hasHorizScroll2}`);
 
     // Program sekmesi
-    const progTab = page2.locator('.sb-item').filter({ hasText: /program/i }).first();
-    if (await progTab.count() > 0) {
-      await progTab.click();
-      await page2.waitForTimeout(2000);
+    const progTab = page2.locator('.tn-nav-item').filter({ hasText: /program/i }).first();
+      if (await progTab.count() > 0) {
+        await progTab.click();
+        await page2.waitForTimeout(2000);
       await ss(page2, 'm08_student_program');
       await ssFull(page2, 'm08_student_program_full');
 
