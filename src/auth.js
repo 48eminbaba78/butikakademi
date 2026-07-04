@@ -129,9 +129,18 @@ export async function checkOAuthSession() {
   try {
     const { data: { session: oauthSess } } = await db.auth.getSession();
     if (!oauthSess?.user) return;
+
+    if (document.getElementById('appShell')?.classList.contains('visible')) return;
+
     showLoading(true);
     const { data: profile } = await db.from('users').select('*').eq('id', oauthSess.user.id).maybeSingle();
-    if (profile) {
+
+    const isNewGoogleUser = profile && 
+      profile.password_hash === 'supabase_managed' && 
+      profile.username === profile.email.split('@')[0] &&
+      (profile.target === 'Hedef belirtilmemiş' || !profile.target);
+
+    if (profile && !isNewGoogleUser) {
       await finishLogin(profile);
     } else {
       showLoading(false);
@@ -406,3 +415,12 @@ window.finishLogin = finishLogin;
 window.doLogout = doLogout;
 window.showForgotPassword = showForgotPassword;
 window.sendResetEmail = sendResetEmail;
+
+// Real-time auth state change listener to resolve OAuth redirect race conditions
+db.auth.onAuthStateChange(async (event, sessionData) => {
+  console.log('[Supabase Auth State Change]', event, sessionData);
+  if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && sessionData?.user) {
+    if (document.getElementById('appShell')?.classList.contains('visible')) return;
+    await checkOAuthSession();
+  }
+});
