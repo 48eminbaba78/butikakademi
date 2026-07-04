@@ -130,23 +130,35 @@ export async function simOAuthLogin(type) {
 
 export async function checkOAuthSession() {
   if (_sessionHandled) return;
+  let _timeoutId = null;
   try {
+    console.log('[Auth] 1/4 getSession...');
     const { data: { session: oauthSess } } = await db.auth.getSession();
+    console.log('[Auth] 2/4 session:', oauthSess?.user?.email || 'yok');
     if (!oauthSess?.user) return;
     if (document.getElementById('appShell')?.classList.contains('visible')) return;
-    if (_sessionHandled) return;  // re-check after the async getSession call
+    if (_sessionHandled) return;
     _sessionHandled = true;
 
     showLoading(true);
-    const { data: profile } = await db.from('users').select('*').eq('id', oauthSess.user.id).maybeSingle();
+
+    // 10 saniye içinde tamamlanmazsa spinner'ı kapat, kullanıcı manuel giriş yapabilsin
+    _timeoutId = setTimeout(() => {
+      console.warn('[Auth] timeout — Supabase yanıt vermedi, spinner kapatılıyor');
+      _sessionHandled = false;
+      showLoading(false);
+    }, 10000);
+
+    console.log('[Auth] 3/4 profil yükleniyor...');
+    const { data: profile, error: pErr } = await db.from('users').select('*').eq('id', oauthSess.user.id).maybeSingle();
+    console.log('[Auth] 4/4 profil:', profile?.role, pErr?.message || '');
+    clearTimeout(_timeoutId);
 
     let needsOnboarding = false;
     if (profile) {
       if (profile.role === 'coach') {
         const { data: ws } = await db.from('workspaces').select('*').eq('coach_id', profile.id).maybeSingle();
-        if (!ws || !ws.onboarding_done) {
-          needsOnboarding = true;
-        }
+        if (!ws || !ws.onboarding_done) needsOnboarding = true;
       }
     } else {
       needsOnboarding = true;
@@ -162,6 +174,8 @@ export async function checkOAuthSession() {
       window._oauthUser = oauthSess.user;
     }
   } catch (e) {
+    clearTimeout(_timeoutId);
+    _sessionHandled = false;
     showLoading(false);
     console.warn('[checkOAuthSession]', e);
   }
