@@ -7,6 +7,9 @@ import { S, session } from './state.js';
 import { loadAllData, invalidateCache } from './api.js';
 import { showLoading, sha256, normalizeUsername, showToast } from './helpers.js';
 
+// Prevents concurrent or duplicate session initialization calls
+let _sessionHandled = false;
+
 export function loginErr(msg) {
   const el = document.getElementById('loginErr');
   el.textContent = msg;
@@ -126,11 +129,13 @@ export async function simOAuthLogin(type) {
 }
 
 export async function checkOAuthSession() {
+  if (_sessionHandled) return;
   try {
     const { data: { session: oauthSess } } = await db.auth.getSession();
     if (!oauthSess?.user) return;
-
     if (document.getElementById('appShell')?.classList.contains('visible')) return;
+    if (_sessionHandled) return;  // re-check after the async getSession call
+    _sessionHandled = true;
 
     showLoading(true);
     const { data: profile } = await db.from('users').select('*').eq('id', oauthSess.user.id).maybeSingle();
@@ -424,10 +429,10 @@ window.doLogout = doLogout;
 window.showForgotPassword = showForgotPassword;
 window.sendResetEmail = sendResetEmail;
 
-// Real-time auth state change listener to resolve OAuth redirect race conditions
+// Handles Google OAuth redirect: SIGNED_IN fires when Supabase processes the OAuth callback.
+// INITIAL_SESSION is intentionally excluded — the explicit checkOAuthSession() call in main.js covers it.
 db.auth.onAuthStateChange(async (event, sessionData) => {
-  console.log('[Supabase Auth State Change]', event, sessionData);
-  if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && sessionData?.user) {
+  if (event === 'SIGNED_IN' && sessionData?.user) {
     if (document.getElementById('appShell')?.classList.contains('visible')) return;
     await checkOAuthSession();
   }

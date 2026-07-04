@@ -8211,8 +8211,6 @@ async function pasteTaskToWholeWeek() {
 // ═══════════════════════════════════════════════
 loadTheme();
 renderNetInputs();
-// Google OAuth redirect sonrası oturum kontrolü
-checkOAuthSession();
 
 window.addEventListener('hashchange', () => {
   let tab = window.location.hash.substring(1);
