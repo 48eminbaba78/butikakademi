@@ -78,6 +78,63 @@ function customConfirm(message) {
 }
 window.customConfirm = customConfirm;
 
+function checkCoachSubscription() {
+  const dbUser = session.dbUser;
+  if (!dbUser || (session.role !== 'coach' && session.role !== 'developer')) return;
+
+  // Bypass for Emin Ceylan, test accounts, localhost, and explicit test mode
+  if (
+    dbUser.email === 'ceylanemin1928@gmail.com' ||
+    dbUser.email === 'simkoc1@rostrumakademi.com' ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.__testMode
+  ) return;
+
+  const plan = dbUser.plan || 'trial';
+  if (plan === 'trial') {
+    const trialEnds = dbUser.trial_ends_at ? new Date(dbUser.trial_ends_at) : new Date(new Date(dbUser.created_at).getTime() + 14 * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    if (now > trialEnds) {
+      showTrialExpiredScreen();
+    }
+  }
+}
+
+function showTrialExpiredScreen() {
+  let modal = document.getElementById('trialExpiredModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'trialExpiredModal';
+    modal.className = 'modal-bg open';
+    modal.style.zIndex = '9999999'; // ensure it is on top of everything
+    modal.innerHTML = `
+      <div class="modal" style="max-width:460px;text-align:center;padding:32px 24px;border-radius:18px;background:var(--surface);border:2.5px solid var(--accent);box-shadow:var(--shadow-lg)">
+        <div style="font-size:54px;margin-bottom:18px">⏳</div>
+        <h2 style="font-size:20px;font-weight:900;margin-bottom:12px;color:var(--accent)">Deneme Süreniz Doldu</h2>
+        <p style="font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:24px">
+          Rostrum Akademi'nin 14 günlük ücretsiz deneme süresi sona ermiştir. 
+          Çalışmalarınıza devam etmek ve size uygun paketi seçmek için lütfen Emin Ceylan ile iletişime geçin.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch">
+          <button class="btn btn-accent" onclick="openSupportChatDirect()" style="justify-content:center;padding:12px;font-size:14px;font-weight:700">
+            💬 Emin Ceylan'a Canlı Mesaj Gönder
+          </button>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+            E-posta: <b>ceylanemin1928@gmail.com</b>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  } else {
+    modal.classList.add('open');
+  }
+}
+window.openSupportChatDirect = openSupportChat;
+window.checkCoachSubscription = checkCoachSubscription;
+window.showTrialExpiredScreen = showTrialExpiredScreen;
+
 
 // ═══════════════════════════════════════════════
 // SHELL
@@ -128,6 +185,7 @@ document.addEventListener('click', e => {
 });
 
 function setupShell(){
+  checkCoachSubscription();
   const tabs = session.role==='coach' ? coachTabs : session.role==='developer' ? [...coachTabs, ...devTabs] : session.role==='parent' ? parentTabs : stuTabs;
   const allTabs = [...tabs, {id:'profile',lbl:'👤',name:'Profil'}, {id:'settings',lbl:'⚙️',name:'Ayarlar'}];
 
@@ -4273,89 +4331,584 @@ async function devDeleteAnnounce(id) {
 }
 
 // ── DESTEK / TİCKET ───────────────────────────
+let _chatPollInterval = null;
+let _activeTicketId = null;
+let _selectedDevTicketId = null;
+let _devChatPollInterval = null;
+let _devTicketsList = [];
+let _supportMessagesList = [];
+let _chatState = 'welcome'; // 'welcome', 'ai', 'emin', 'emin_start'
+
 async function renderDevTickets() {
   const el = document.getElementById('view-dev-tickets');
-  const {data} = await db.from('tickets').select('*,users(full_name,role)').order('created_at',{ascending:false});
-  const statusColors = {open:'var(--red)',in_progress:'var(--accent)',resolved:'var(--green)',closed:'var(--text-dim)'};
-  const prioColors = {urgent:'var(--red)',high:'var(--accent)',normal:'var(--blue)',low:'var(--text-dim)'};
+  if (!el) return;
+
+  const { data, error } = await db.from('tickets')
+    .select('*,users(full_name,role)')
+    .order('updated_at', { ascending: false });
+
+  _devTicketsList = data || [];
+
+  if (!_selectedDevTicketId && _devTicketsList.length > 0) {
+    _selectedDevTicketId = _devTicketsList[0].id;
+  }
 
   el.innerHTML = `
-    <div class="sh"><h2>🎫 Destek & Geri Bildirim</h2></div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-      ${['open','in_progress','resolved','closed'].map(s=>{
-        const count=(data||[]).filter(t=>t.status===s).length;
-        return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12px;font-weight:700;color:${statusColors[s]}">${s.replace('_',' ')} <span style="font-size:18px;font-family:'Inter',sans-serif;display:block">${count}</span></div>`;
+    <div class="sh" style="margin-bottom:12px">
+      <h2>🎫 Destek & Geri Bildirim Masası</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 16px; height: 600px; max-height: calc(100vh - 180px); margin-top: 10px">
+      <!-- Left Pane: Chats List -->
+      <div style="overflow-y: auto; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; gap: 8px; padding: 12px">
+        <div style="font-size: 11px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; margin-bottom:4px">Konuşmalar</div>
+        ${_devTicketsList.length === 0 ? `
+          <div style="text-align:center; padding:40px 10px; color:var(--text-dim); font-size:12px">Kayıtlı destek talebi yok.</div>
+        ` : _devTicketsList.map(t => {
+          const isSelected = t.id === _selectedDevTicketId;
+          const userLabel = t.users?.full_name || 'Kullanıcı';
+          const userRole = t.users?.role === 'coach' ? 'KOÇ' : t.users?.role === 'parent' ? 'VELİ' : 'ÖĞRENCİ';
+          
+          let lastMsg = 'Mesaj yok';
+          try {
+            const parsed = JSON.parse(t.body);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              lastMsg = parsed[parsed.length - 1].text;
+            } else {
+              lastMsg = t.body;
+            }
+          } catch(e) {
+            lastMsg = t.body;
+          }
+
+          const lastMsgSnippet = lastMsg.length > 28 ? lastMsg.slice(0, 26) + '...' : lastMsg;
+          const statusBadge = t.status === 'open' 
+            ? '<span style="font-size:9px; background:#ef444422; color:#ef4444; padding:2px 6px; border-radius:99px; font-weight:700">Yeni</span>' 
+            : t.status === 'resolved'
+            ? '<span style="font-size:9px; background:#10b98122; color:#10b981; padding:2px 6px; border-radius:99px; font-weight:700">Cevaplandı</span>'
+            : '<span style="font-size:9px; background:var(--border2); color:var(--text-dim); padding:2px 6px; border-radius:99px; font-weight:700">Kapatıldı</span>';
+
+          const bg = isSelected ? 'var(--accent-dim)' : 'var(--surface)';
+          const border = isSelected ? '1.5px solid var(--accent)' : '1px solid var(--border)';
+          const padding = isSelected ? '10px 11px' : '10px 12px';
+
+          return `
+            <div onclick="selectDevTicket('${t.id}')" style="background:${bg}; border:${border}; border-radius:10px; padding:${padding}; cursor:pointer; display:flex; flex-direction:column; gap:4px; transition:all .15s">
+              <div style="display:flex; justify-content:space-between; align-items:center">
+                <span style="font-weight:700; font-size:12px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px">${esc(userLabel)}</span>
+                <span style="font-size:9px; font-weight:800; color:var(--text-dim)">${userRole}</span>
+              </div>
+              <div style="font-size:11px; color:var(--text-mid); overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${esc(lastMsgSnippet)}</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px">
+                <span style="font-size:9px; color:var(--text-dim)">${new Date(t.updated_at).toLocaleDateString('tr-TR')}</span>
+                ${statusBadge}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Right Pane: Active Chat Area -->
+      <div id="devChatArea" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; overflow: hidden">
+        <!-- Rendered dynamically by loadDevChatArea() -->
+      </div>
+    </div>
+  `;
+
+  loadDevChatArea();
+
+  if (_devChatPollInterval) clearInterval(_devChatPollInterval);
+  _devChatPollInterval = setInterval(pollActiveDevChat, 4000);
+}
+
+function selectDevTicket(id) {
+  _selectedDevTicketId = id;
+  renderDevTickets();
+}
+
+async function pollActiveDevChat() {
+  if (!_selectedDevTicketId) return;
+  const area = document.getElementById('devChatArea');
+  if (!area) return;
+
+  const { data: ticket, error } = await db.from('tickets')
+    .select('*,users(full_name,role)')
+    .eq('id', _selectedDevTicketId)
+    .single();
+
+  if (error || !ticket) return;
+
+  let parsedMessages = [];
+  try {
+    parsedMessages = JSON.parse(ticket.body);
+    if (!Array.isArray(parsedMessages)) {
+      parsedMessages = [{ sender: 'user', text: ticket.body, time: ticket.created_at }];
+    }
+  } catch(e) {
+    parsedMessages = [{ sender: 'user', text: ticket.body, time: ticket.created_at }];
+  }
+
+  const msgsContainer = document.getElementById('devChatMessages');
+  if (msgsContainer) {
+    const currentScroll = msgsContainer.scrollTop;
+    const isNearBottom = msgsContainer.scrollHeight - msgsContainer.clientHeight - currentScroll < 40;
+
+    msgsContainer.innerHTML = parsedMessages.map(m => {
+      const isMe = m.sender === 'emin';
+      const senderName = isMe ? 'Emin Ceylan' : m.sender === 'ai' ? 'Yapay Zeka' : m.name || 'Kullanıcı';
+      const bg = isMe ? 'var(--blue)' : m.sender === 'ai' ? 'var(--surface2)' : 'var(--accent)';
+      const color = isMe ? '#fff' : m.sender === 'ai' ? 'var(--text)' : 'var(--on-accent)';
+      const align = isMe ? 'flex-end' : 'flex-start';
+      const borderRadius = isMe ? '14px 14px 4px 14px' : '14px 14px 14px 4px';
+      const timeFormatted = new Date(m.time).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+      return `
+        <div style="align-self:${align}; max-width:80%; display:flex; flex-direction:column; align-items:${isMe ? 'flex-end' : 'flex-start'}">
+          <div style="font-size:10px; color:var(--text-dim); margin-bottom:3px; font-weight:600">${senderName}</div>
+          <div style="padding:10px 14px; border-radius:${borderRadius}; background:${bg}; color:${color}; font-size:13px; line-height:1.5; word-wrap:break-word; white-space:pre-wrap">${esc(m.text)}</div>
+          <div style="font-size:9px; color:var(--text-dim); margin-top:4px">${timeFormatted}</div>
+        </div>
+      `;
+    }).join('');
+
+    if (isNearBottom) {
+      msgsContainer.scrollTop = msgsContainer.scrollHeight;
+    }
+  }
+}
+
+function loadDevChatArea() {
+  const area = document.getElementById('devChatArea');
+  if (!area) return;
+
+  const t = _devTicketsList.find(x => x.id === _selectedDevTicketId);
+  if (!t) {
+    area.innerHTML = `
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-dim); padding:20px; text-align:center">
+        <div style="font-size:48px; margin-bottom:12px">🎫</div>
+        <div style="font-weight:700">Aktif Sohbet Seçilmedi</div>
+        <div style="font-size:12px; margin-top:4px">Soldaki listeden bir destek sohbeti seçerek yanıtlayabilirsiniz.</div>
+      </div>
+    `;
+    return;
+  }
+
+  const userLabel = t.users?.full_name || 'Kullanıcı';
+  const userRole = t.users?.role === 'coach' ? 'KOÇ' : t.users?.role === 'parent' ? 'VELİ' : 'ÖĞRENCİ';
+
+  let parsedMessages = [];
+  try {
+    parsedMessages = JSON.parse(t.body);
+    if (!Array.isArray(parsedMessages)) {
+      parsedMessages = [{ sender: 'user', text: t.body, time: t.created_at }];
+    }
+  } catch(e) {
+    parsedMessages = [{ sender: 'user', text: t.body, time: t.created_at }];
+  }
+
+  area.innerHTML = `
+    <!-- Active Chat Header -->
+    <div style="padding:14px 20px; border-bottom: 1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:var(--surface2)">
+      <div>
+        <div style="font-weight:800; font-size:14px; color:var(--text)">${esc(userLabel)} <span style="font-size:10px; font-weight:700; color:var(--text-dim); margin-left:6px">${userRole}</span></div>
+        <div style="font-size:11px; color:var(--text-mid); margin-top:2px">Konu: ${esc(t.subject)}</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center">
+        <select onchange="updateTicketStatus('${t.id}',this.value)" style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:6px 12px; font-size:12px; color:var(--text); cursor:pointer; outline:none">
+          <option value="open" ${t.status==='open'?'selected':''}>Açık (İşlem Bekliyor)</option>
+          <option value="resolved" ${t.status==='resolved'?'selected':''}>Cevaplandı / Çözüldü</option>
+          <option value="closed" ${t.status==='closed'?'selected':''}>Kapatıldı</option>
+        </select>
+        <button class="btn btn-danger btn-xs" onclick="devDeleteTicket('${t.id}')" style="padding:6px; border-radius:8px">🗑</button>
+      </div>
+    </div>
+
+    <!-- Message Logs -->
+    <div id="devChatMessages" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:12px; background:var(--surface)">
+      ${parsedMessages.map(m => {
+        const isMe = m.sender === 'emin';
+        const senderName = isMe ? 'Emin Ceylan' : m.sender === 'ai' ? 'Yapay Zeka' : m.name || 'Kullanıcı';
+        const bg = isMe ? 'var(--blue)' : m.sender === 'ai' ? 'var(--surface2)' : 'var(--accent)';
+        const color = isMe ? '#fff' : m.sender === 'ai' ? 'var(--text)' : 'var(--on-accent)';
+        const align = isMe ? 'flex-end' : 'flex-start';
+        const borderRadius = isMe ? '14px 14px 4px 14px' : '14px 14px 14px 4px';
+        const timeFormatted = new Date(m.time).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <div style="align-self:${align}; max-width:80%; display:flex; flex-direction:column; align-items:${isMe ? 'flex-end' : 'flex-start'}">
+            <div style="font-size:10px; color:var(--text-dim); margin-bottom:3px; font-weight:600">${senderName}</div>
+            <div style="padding:10px 14px; border-radius:${borderRadius}; background:${bg}; color:${color}; font-size:13px; line-height:1.5; word-wrap:break-word; white-space:pre-wrap">${esc(m.text)}</div>
+            <div style="font-size:9px; color:var(--text-dim); margin-top:4px">${timeFormatted}</div>
+          </div>
+        `;
       }).join('')}
     </div>
-    ${(data||[]).length===0?'<div class="empty"><p>Henüz ticket yok</p></div>':''}
-    ${(data||[]).map(t=>`
-      <div class="card" style="padding:16px 20px;margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px">
-          <div>
-            <div style="font-weight:700;margin-bottom:2px">${esc(t.subject)}</div>
-            <div style="font-size:12px;color:var(--text-mid)">${esc(t.users?.full_name||'?')} · ${t.users?.role} · ${new Date(t.created_at).toLocaleDateString('tr-TR')}</div>
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <span style="font-size:10px;padding:2px 8px;border-radius:99px;background:${statusColors[t.status]+'22'};color:${statusColors[t.status]}">${t.status}</span>
-            <span style="font-size:10px;padding:2px 8px;border-radius:99px;background:${prioColors[t.priority]+'22'};color:${prioColors[t.priority]}">${t.priority}</span>
-          </div>
-        </div>
-        <div style="font-size:13px;color:var(--text-mid);margin-bottom:10px;padding:10px;background:var(--surface2);border-radius:8px">${esc(t.body)}</div>
-        ${t.reply?`<div style="font-size:13px;color:var(--green);padding:10px;background:var(--green-dim);border-radius:8px;margin-bottom:10px"><strong>Yanıt:</strong> ${esc(t.reply)}</div>`:''}
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <select onchange="updateTicketStatus('${t.id}',this.value)" style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 10px;font-family:inherit;font-size:12px;color:var(--text);cursor:pointer">
-            ${['open','in_progress','resolved','closed'].map(s=>`<option value="${s}" ${t.status===s?'selected':''}>${s.replace('_',' ')}</option>`).join('')}
-          </select>
-          <button class="btn btn-ghost btn-sm" onclick="openTicketReply('${t.id}')">💬 Yanıtla</button>
-          <button class="btn btn-danger btn-xs" onclick="devDeleteTicket('${t.id}')">🗑</button>
-        </div>
-      </div>`).join('')}`;
+
+    <!-- Footer Reply Input -->
+    <div style="padding:12px 16px; border-top:1px solid var(--border); display:flex; gap:8px; background:var(--surface2); align-items:flex-end">
+      <textarea id="devReplyInput" placeholder="Sohbete yanıt yazın..." rows="1" style="flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 14px; font-size:13px; font-family:inherit; color:var(--text); resize:none; max-height:80px; outline:none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendDevReply()}"></textarea>
+      <button class="btn btn-accent" onclick="sendDevReply()" style="padding:8px 16px; font-size:13px; border-radius:10px; align-self:stretch; justify-content:center">Gönder</button>
+    </div>
+  `;
+
+  const msgsContainer = document.getElementById('devChatMessages');
+  if (msgsContainer) msgsContainer.scrollTop = msgsContainer.scrollHeight;
+}
+
+async function sendDevReply() {
+  const input = document.getElementById('devReplyInput');
+  const text = input.value.trim();
+  if (!text || !_selectedDevTicketId) return;
+
+  input.value = '';
+
+  showLoading(true);
+  const { data: ticket } = await db.from('tickets').select('body').eq('id', _selectedDevTicketId).single();
+  let currentHistory = [];
+  if (ticket && ticket.body) {
+    try {
+      currentHistory = JSON.parse(ticket.body);
+    } catch(e) {
+      currentHistory = [{ sender: 'user', text: ticket.body, time: new Date().toISOString() }];
+    }
+  }
+
+  const replyMsg = {
+    sender: 'emin',
+    text,
+    time: new Date().toISOString(),
+    name: 'Emin Ceylan'
+  };
+
+  currentHistory.push(replyMsg);
+
+  const { error } = await db.from('tickets')
+    .update({ 
+      body: JSON.stringify(currentHistory), 
+      reply: text, 
+      status: 'resolved', 
+      updated_at: new Date().toISOString() 
+    })
+    .eq('id', _selectedDevTicketId);
+
+  showLoading(false);
+
+  if (error) {
+    showToast('Hata: ' + error.message);
+    return;
+  }
+
+  showToast('Yanıt gönderildi ✓');
+  renderDevTickets();
 }
 
 async function updateTicketStatus(id, status) {
   await db.from('tickets').update({status, updated_at: new Date().toISOString()}).eq('id',id);
   showToast('Durum güncellendi ✓');
-}
-
-function openTicketReply(id) {
-  const reply = prompt('Yanıtınızı girin:');
-  if(!reply) return;
-  db.from('tickets').update({reply, status:'resolved', updated_at: new Date().toISOString()}).eq('id',id)
-    .then(()=>{ showToast('Yanıt gönderildi ✓'); renderDevTickets(); });
+  renderDevTickets();
 }
 
 async function devDeleteTicket(id) {
   if(!await customConfirm('Bu talebi silmek istediğinizden emin misiniz?')) return;
   await db.from('tickets').delete().eq('id',id);
-  showToast('Silindi'); renderDevTickets();
+  showToast('Silindi');
+  _selectedDevTicketId = null;
+  renderDevTickets();
 }
 
-// ── ÖĞRENCİ DESTEK TICKET GÖNDER ──────────────
 function openSupportTicket() {
-  let modal = document.getElementById('ticketSendModal');
-  if(!modal) {
-    modal = document.createElement('div'); modal.id='ticketSendModal'; modal.className='modal-bg';
-    modal.innerHTML=`<div class="modal"><button class="modal-close" onclick="cm('ticketSendModal')">×</button>
-      <h2>🎫 Destek Talebi Gönder</h2>
-      <div class="field"><label>Konu</label><input id="tkSubject" placeholder="Konu başlığı..."></div>
-      <div class="field"><label>Kategori</label><select id="tkCat"><option value="general">Genel</option><option value="bug">Hata Bildirimi</option><option value="feature">Özellik İsteği</option><option value="billing">Ödeme</option></select></div>
-      <div class="field"><label>Öncelik</label><select id="tkPrio"><option value="normal">Normal</option><option value="low">Düşük</option><option value="high">Yüksek</option><option value="urgent">Acil</option></select></div>
-      <div class="field"><label>Açıklama</label><textarea id="tkBody" placeholder="Sorununuzu detaylıca açıklayın..." style="min-height:100px"></textarea></div>
-      <button class="btn btn-accent" style="width:100%;justify-content:center;padding:12px;margin-top:4px" onclick="submitTicket()">Gönder</button>
-    </div>`;
-    document.body.appendChild(modal);
-    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open');});
-  }
-  om('ticketSendModal');
+  openSupportChat();
 }
 
-async function submitTicket() {
-  const subject = document.getElementById('tkSubject').value.trim();
-  const body = document.getElementById('tkBody').value.trim();
-  if(!subject||!body) return showToast('Konu ve açıklama zorunlu!');
-  const userId = session.studentId || session.dbUser?.id;
-  await db.from('tickets').insert({user_id:userId, subject, body, category:document.getElementById('tkCat').value, priority:document.getElementById('tkPrio').value, status:'open'});
-  showToast('Ticket gönderildi ✓'); cm('ticketSendModal');
+async function openSupportChat() {
+  let modal = document.getElementById('supportChatModal');
+  if(!modal) {
+    modal = document.createElement('div');
+    modal.id = 'supportChatModal';
+    modal.className = 'modal-bg';
+    modal.style.zIndex = '99999999';
+    modal.innerHTML = `
+      <div class="modal" style="max-width:500px;width:100%;height:600px;display:flex;flex-direction:column;padding:0;overflow:hidden;border-radius:18px;border:1px solid var(--border)">
+        <!-- Header -->
+        <div style="padding:16px 20px;background:linear-gradient(135deg,rgba(240,165,0,.1),rgba(232,98,42,.05));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">💬</span>
+            <div>
+              <div style="font-weight:800;font-size:15px;color:var(--text)">Rostrum Destek Merkezi</div>
+              <div style="font-size:11px;color:var(--green);font-weight:700" id="supportStatusLabel">● Çevrimiçi Asistan</div>
+            </div>
+          </div>
+          <button class="modal-close" onclick="closeSupportChat()" style="position:static;font-size:22px;background:none;border:none;color:var(--text-mid);cursor:pointer;padding:4px">✕</button>
+        </div>
+
+        <!-- Chat messages view -->
+        <div id="supportMessages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:var(--surface)">
+          <!-- Dynamic Messages -->
+        </div>
+
+        <!-- Typing Indicator -->
+        <div id="supportTyping" class="ai-typing" style="margin: 0 20px 10px; padding:8px 12px; border-radius:10px; display:none; gap:4px; align-items:center; background:var(--surface2)">
+          <span></span><span></span><span></span>
+        </div>
+
+        <!-- Footer input bar -->
+        <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:var(--surface2)">
+          <textarea id="supportInput" placeholder="Mesajınızı yazın..." rows="1" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:13px;font-family:inherit;color:var(--text);resize:none;max-height:80px;outline:none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSupportMessage()}"></textarea>
+          <button class="btn btn-accent" onclick="sendSupportMessage()" style="padding:8px 16px;font-size:13px;border-radius:10px;align-self:stretch;justify-content:center">Gönder</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => {
+      const isBlocked = document.getElementById('trialExpiredModal')?.classList.contains('open');
+      if (e.target === modal && !isBlocked) {
+        closeSupportChat();
+      }
+    });
+  }
+
+  om('supportChatModal');
+  await refreshSupportMessages();
+
+  if (_chatPollInterval) clearInterval(_chatPollInterval);
+  _chatPollInterval = setInterval(refreshSupportMessages, 4000);
+}
+
+function closeSupportChat() {
+  cm('supportChatModal');
+  if (_chatPollInterval) {
+    clearInterval(_chatPollInterval);
+    _chatPollInterval = null;
+  }
+}
+
+async function refreshSupportMessages() {
+  const userId = session.dbUser?.id;
+  if (!userId) return;
+
+  const msgsContainer = document.getElementById('supportMessages');
+  if (!msgsContainer) return;
+
+  const { data: tickets, error } = await db.from('tickets')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'open')
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error('Error fetching ticket:', error);
+    return;
+  }
+
+  const activeTicket = tickets && tickets[0];
+
+  if (activeTicket) {
+    _activeTicketId = activeTicket.id;
+    _chatState = 'emin';
+    
+    const statusLabelEl = document.getElementById('supportStatusLabel');
+    if (statusLabelEl) statusLabelEl.textContent = '● Emin Ceylan (Kurucu)';
+
+    let parsedMessages = [];
+    try {
+      parsedMessages = JSON.parse(activeTicket.body);
+      if (!Array.isArray(parsedMessages)) {
+        parsedMessages = [{ sender: 'user', text: activeTicket.body, time: activeTicket.created_at }];
+      }
+    } catch(e) {
+      parsedMessages = [{ sender: 'user', text: activeTicket.body, time: activeTicket.created_at }];
+    }
+
+    if (activeTicket.reply && parsedMessages[parsedMessages.length - 1]?.text !== activeTicket.reply) {
+      parsedMessages.push({ sender: 'emin', text: activeTicket.reply, time: activeTicket.updated_at });
+    }
+
+    renderSupportMessagesList(parsedMessages);
+  } else {
+    if (_chatState === 'welcome') {
+      const statusLabelEl = document.getElementById('supportStatusLabel');
+      if (statusLabelEl) statusLabelEl.textContent = '● Çevrimiçi Asistan';
+
+      msgsContainer.innerHTML = `
+        <div style="text-align:center;padding:40px 20px">
+          <div style="font-size:48px;margin-bottom:12px">🎓</div>
+          <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">Rostrum Destek Asistanına Hoş Geldiniz!</div>
+          <div style="font-size:12px;color:var(--text-mid);line-height:1.6;margin-bottom:24px">
+            Uygulama ile ilgili teknik, pedagojik veya fiyatlandırma sorularınızı sorabilirsiniz.
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;max-width:280px;margin:0 auto">
+            <button class="btn btn-accent" onclick="startAISupportChat()" style="justify-content:center;padding:10px;font-size:13px">
+              🤖 Yapay Zeka Asistanı ile Konuş
+            </button>
+            <button class="btn btn-ghost" onclick="startEminSupportChat()" style="justify-content:center;padding:10px;font-size:13px;border-color:var(--border)">
+              ✉️ Emin Ceylan'a Doğrudan Mesaj Gönder
+            </button>
+          </div>
+        </div>
+      `;
+    } else if (_chatState === 'ai') {
+      const statusLabelEl = document.getElementById('supportStatusLabel');
+      if (statusLabelEl) statusLabelEl.textContent = '● Yapay Zeka';
+      renderSupportMessagesList(_supportMessagesList);
+    }
+  }
+}
+
+function renderSupportMessagesList(list) {
+  const msgsContainer = document.getElementById('supportMessages');
+  if (!msgsContainer) return;
+
+  const currentScroll = msgsContainer.scrollTop;
+  const isNearBottom = msgsContainer.scrollHeight - msgsContainer.clientHeight - currentScroll < 40;
+
+  msgsContainer.innerHTML = list.map(m => {
+    const isMe = m.sender === 'user';
+    const senderName = isMe ? 'Siz' : m.sender === 'ai' ? 'Yapay Zeka Asistanı' : 'Emin Ceylan (Kurucu)';
+    const bg = isMe ? 'var(--accent)' : 'var(--surface2)';
+    const border = isMe ? 'none' : '1px solid var(--border)';
+    const textColor = isMe ? 'var(--on-accent)' : 'var(--text)';
+    const align = isMe ? 'flex-end' : 'flex-start';
+    const borderRadius = isMe ? '14px 14px 4px 14px' : '14px 14px 14px 4px';
+    const timeFormatted = new Date(m.time).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+    return `
+      <div style="align-self:${align};max-width:80%;display:flex;flex-direction:column;align-items:${isMe ? 'flex-end' : 'flex-start'}">
+        <div style="font-size:10px;color:var(--text-dim);margin-bottom:3px;font-weight:600">${senderName}</div>
+        <div style="padding:10px 14px;border-radius:${borderRadius};background:${bg};border:${border};color:${textColor};font-size:13px;line-height:1.5;word-wrap:break-word;white-space:pre-wrap">${esc(m.text)}</div>
+        <div style="font-size:9px;color:var(--text-dim);margin-top:4px">${timeFormatted}</div>
+      </div>
+    `;
+  }).join('');
+
+  if (isNearBottom) {
+    msgsContainer.scrollTop = msgsContainer.scrollHeight;
+  }
+}
+
+function startAISupportChat() {
+  _chatState = 'ai';
+  _supportMessagesList = [{
+    sender: 'ai',
+    text: 'Merhaba! Ben Rostrum Akademi Yapay Zeka Asistanıyım. 🤖 Size nasıl yardımcı olabilirim?',
+    time: new Date().toISOString()
+  }];
+  renderSupportMessagesList(_supportMessagesList);
+}
+
+function startEminSupportChat() {
+  _chatState = 'emin_start';
+  const msgsContainer = document.getElementById('supportMessages');
+  if (msgsContainer) {
+    msgsContainer.innerHTML = `
+      <div style="text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:12px">✉️</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">Emin Ceylan'a Doğrudan Mesaj Gönder</div>
+        <div style="font-size:12px;color:var(--text-mid);line-height:1.6;margin-bottom:24px">
+          Soru, görüş veya abonelik taleplerinizi iletin. Emin Bey mesajlarınızı inceleyip en kısa sürede bu ekrandan yanıtlayacaktır.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;max-width:320px;margin:0 auto">
+          <input type="text" id="eminSubject" placeholder="Konu (Örn: Paket Satın Alma)" style="padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px">
+          <textarea id="eminInitialMessage" placeholder="Mesajınız..." style="padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);min-height:80px;font-size:13px"></textarea>
+          <button class="btn btn-accent" onclick="submitEminInitialMessage()" style="justify-content:center;padding:10px;font-size:13px">
+            Gönder ve Bağlan
+          </button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+async function submitEminInitialMessage() {
+  const subjectInput = document.getElementById('eminSubject');
+  const msgInput = document.getElementById('eminInitialMessage');
+  const subject = subjectInput ? subjectInput.value.trim() : 'Müşteri Destek Sohbeti';
+  const text = msgInput ? msgInput.value.trim() : '';
+
+  if (!text) return showToast('Mesaj boş olamaz!');
+
+  const userId = session.dbUser?.id;
+  const name = session.dbUser?.full_name || 'Kullanıcı';
+
+  const initialMessage = {
+    sender: 'user',
+    text,
+    time: new Date().toISOString(),
+    name
+  };
+
+  showLoading(true);
+  const { data, error } = await db.from('tickets').insert({
+    user_id: userId,
+    subject,
+    body: JSON.stringify([initialMessage]),
+    category: 'emin',
+    status: 'open'
+  }).select().single();
+  showLoading(false);
+
+  if (error) {
+    showToast('Hata: ' + error.message);
+    return;
+  }
+
+  _activeTicketId = data.id;
+  _chatState = 'emin';
+  showToast('Talebiniz Emin Ceylan\'a iletildi ✓');
+  await refreshSupportMessages();
+}
+
+async function sendSupportMessage() {
+  const input = document.getElementById('supportInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+
+  if (_chatState === 'ai') {
+    const userMsg = { sender: 'user', text, time: new Date().toISOString() };
+    _supportMessagesList.push(userMsg);
+    renderSupportMessagesList(_supportMessagesList);
+
+    const typing = document.getElementById('supportTyping');
+    if (typing) typing.style.display = 'flex';
+
+    try {
+      const reply = await callGeminiFallback(text, {}, session.role || 'coach');
+      _supportMessagesList.push({ sender: 'ai', text: reply, time: new Date().toISOString() });
+    } catch(e) {
+      _supportMessagesList.push({ sender: 'ai', text: 'Üzgünüm, şu anda yanıt veremiyorum. Lütfen daha sonra deneyin.', time: new Date().toISOString() });
+    } finally {
+      if (typing) typing.style.display = 'none';
+      renderSupportMessagesList(_supportMessagesList);
+    }
+  } else if (_chatState === 'emin') {
+    const name = session.dbUser?.full_name || 'Kullanıcı';
+    const userMsg = { sender: 'user', text, time: new Date().toISOString(), name };
+
+    showLoading(true);
+    const { data: ticket } = await db.from('tickets').select('body').eq('id', _activeTicketId).single();
+    let currentHistory = [];
+    if (ticket && ticket.body) {
+      try {
+        currentHistory = JSON.parse(ticket.body);
+      } catch(e) {
+        currentHistory = [{ sender: 'user', text: ticket.body, time: new Date().toISOString(), name }];
+      }
+    }
+    currentHistory.push(userMsg);
+
+    const { error } = await db.from('tickets')
+      .update({ body: JSON.stringify(currentHistory), status: 'open', updated_at: new Date().toISOString() })
+      .eq('id', _activeTicketId);
+
+    showLoading(false);
+    if (error) {
+      showToast('Gönderim hatası: ' + error.message);
+      return;
+    }
+    await refreshSupportMessages();
+  }
 }
 
 // Duyuruları portal'da göster
@@ -7982,10 +8535,17 @@ window.toggleAnnounce = toggleAnnounce;
 window.devDeleteAnnounce = devDeleteAnnounce;
 window.renderDevTickets = renderDevTickets;
 window.updateTicketStatus = updateTicketStatus;
-window.openTicketReply = openTicketReply;
 window.devDeleteTicket = devDeleteTicket;
 window.openSupportTicket = openSupportTicket;
-window.submitTicket = submitTicket;
+window.openSupportChat = openSupportChat;
+window.closeSupportChat = closeSupportChat;
+window.startAISupportChat = startAISupportChat;
+window.startEminSupportChat = startEminSupportChat;
+window.submitEminInitialMessage = submitEminInitialMessage;
+window.sendSupportMessage = sendSupportMessage;
+window.openSupportChatDirect = openSupportChat;
+window.checkCoachSubscription = checkCoachSubscription;
+window.showTrialExpiredScreen = showTrialExpiredScreen;
 window.loadAnnouncements = loadAnnouncements;
 window.saveStudentDev = saveStudentDev;
 window.showOnboarding = showOnboarding;

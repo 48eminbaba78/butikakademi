@@ -1164,43 +1164,77 @@ async function loadRevenue(){
   document.getElementById('subscriptionsTable').innerHTML='<tr><td colspan="7" class="loading">Yükleniyor...</td></tr>';
   const {data:coaches}=await db.from('users').select('*').eq('role','coach').order('created_at',{ascending:false});
   const allCoaches=coaches||[];
-  // Plan dağılımı (şu an plan alanı yoksa subscriptions tablosuna bakılır)
-  const {data:subs}=await db.from('subscriptions').select('*').order('created_at',{ascending:false}).catch(()=>({data:[]}));
-  const allSubs=subs||[];
-  const activeSubs=allSubs.filter(s=>s.status==='active');
-  const trialSubs=allSubs.filter(s=>s.status==='trialing');
-  // Her koç için plan bilgisi (subscriptions tablosundan veya users.plan alanından)
-  const freePlan=allCoaches.filter(c=>!allSubs.find(s=>s.user_id===c.id&&s.status==='active'&&s.status!=='trialing'));
-  document.getElementById('revActive').textContent=activeSubs.length;
-  document.getElementById('revTrial').textContent=trialSubs.length;
-  document.getElementById('revFree').textContent=freePlan.length;
-  document.getElementById('revMonthly').textContent='₺'+(activeSubs.length*299).toLocaleString('tr-TR');
-  document.getElementById('pdFree').textContent=freePlan.length+' koç';
-  document.getElementById('pdPro').textContent=activeSubs.filter(s=>s.plan==='pro'||!s.plan).length+' koç';
-  document.getElementById('pdEnt').textContent=activeSubs.filter(s=>s.plan==='enterprise').length+' koç';
-  // Table: koçları sub ile eşleştir
+
+  const activeCoaches = allCoaches.filter(c => c.plan && c.plan !== 'trial');
+  const trialCoaches = allCoaches.filter(c => c.plan === 'trial' || !c.plan);
+  const now = new Date();
+  const expiredCoaches = trialCoaches.filter(c => {
+    const trialEnds = c.trial_ends_at ? new Date(c.trial_ends_at) : new Date(new Date(c.created_at).getTime() + 14 * 24 * 60 * 60 * 1000);
+    return now > trialEnds;
+  });
+  const activeTrialCoaches = trialCoaches.filter(c => {
+    const trialEnds = c.trial_ends_at ? new Date(c.trial_ends_at) : new Date(new Date(c.created_at).getTime() + 14 * 24 * 60 * 60 * 1000);
+    return now <= trialEnds;
+  });
+
+  let monthlyEst = 0;
+  activeCoaches.forEach(c => {
+    if (c.plan === 'starter') monthlyEst += 299;
+    else if (c.plan === 'pro') monthlyEst += 599;
+    else if (c.plan === 'enterprise') monthlyEst += 1499;
+  });
+
+  document.getElementById('revActive').textContent=activeCoaches.length;
+  document.getElementById('revTrial').textContent=activeTrialCoaches.length;
+  document.getElementById('revFree').textContent=expiredCoaches.length;
+  document.getElementById('revMonthly').textContent='₺'+monthlyEst.toLocaleString('tr-TR');
+  document.getElementById('pdFree').textContent=allCoaches.filter(c=>c.plan==='starter').length+' koç';
+  document.getElementById('pdPro').textContent=allCoaches.filter(c=>c.plan==='pro').length+' koç';
+  document.getElementById('pdEnt').textContent=allCoaches.filter(c=>c.plan==='enterprise').length+' koç';
+
   if(!allCoaches.length){document.getElementById('subscriptionsTable').innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--dim)">Koç bulunamadı</td></tr>';return;}
   document.getElementById('subscriptionsTable').innerHTML=allCoaches.map(c=>{
-    const sub=allSubs.find(s=>s.user_id===c.id);
-    const plan=sub?.plan||c.plan||'starter';
-    const status=sub?.status||'free';
-    const planLabel={starter:'<span style="font-size:11px;font-weight:700;color:var(--mid)">Başlangıç</span>',pro:'<span style="font-size:11px;font-weight:700;color:var(--acc)">Koç Pro</span>',enterprise:'<span style="font-size:11px;font-weight:700;color:var(--acc2)">Kurum</span>'}[plan]||plan;
-    const statusLabel={active:'<span style="color:var(--acc3);font-weight:700;font-size:12px">● Aktif</span>',trialing:'<span style="color:var(--acc4);font-weight:700;font-size:12px">⏳ Deneme</span>',canceled:'<span style="color:var(--red);font-weight:700;font-size:12px">✕ İptal</span>',free:'<span style="color:var(--dim);font-size:12px">Ücretsiz</span>'}[status]||status;
-    const start=sub?.created_at?new Date(sub.created_at).toLocaleDateString('tr-TR'):'—';
-    const end=sub?.current_period_end?new Date(sub.current_period_end).toLocaleDateString('tr-TR'):'—';
+    const plan=c.plan||'trial';
+    const start=c.created_at?new Date(c.created_at).toLocaleDateString('tr-TR'):'—';
+    const trialEnds = c.trial_ends_at ? new Date(c.trial_ends_at) : new Date(new Date(c.created_at).getTime() + 14 * 24 * 60 * 60 * 1000);
+    const endInputVal = trialEnds.toISOString().split('T')[0];
+    const endFormatted = trialEnds.toLocaleDateString('tr-TR');
+
+    let statusLabel = '';
+    if (plan === 'trial') {
+      if (now > trialEnds) {
+        statusLabel = '<span style="color:var(--red);font-weight:700;font-size:12px">⏳ Süresi Doldu</span>';
+      } else {
+        statusLabel = '<span style="color:var(--acc4);font-weight:700;font-size:12px">⏳ Deneme</span>';
+      }
+    } else {
+      statusLabel = '<span style="color:var(--acc3);font-weight:700;font-size:12px">● Aktif</span>';
+    }
+
+    const planLabel={
+      trial:'<span style="font-size:11px;font-weight:700;color:var(--acc4)">Deneme</span>',
+      starter:'<span style="font-size:11px;font-weight:700;color:var(--mid)">Başlangıç</span>',
+      pro:'<span style="font-size:11px;font-weight:700;color:var(--acc)">Koç Pro</span>',
+      enterprise:'<span style="font-size:11px;font-weight:700;color:var(--acc2)">Kurum</span>'
+    }[plan]||plan;
+
     return `<tr>
       <td><div style="font-weight:600;font-size:13px">${esc(c.full_name||c.username||'—')}</div></td>
       <td style="color:var(--mid);font-size:12px">${esc(c.email||'—')}</td>
       <td>${planLabel}</td>
       <td style="font-size:12px;color:var(--dim)">${start}</td>
-      <td style="font-size:12px;color:var(--dim)">${end}</td>
+      <td style="font-size:12px;color:var(--dim)">${endFormatted}</td>
       <td>${statusLabel}</td>
       <td>
-        <select onchange="setUserPlan('${c.id}',this.value)" style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:var(--text);outline:none;cursor:pointer">
-          <option value="starter" ${plan==='starter'?'selected':''}>Başlangıç</option>
-          <option value="pro" ${plan==='pro'?'selected':''}>Koç Pro</option>
-          <option value="enterprise" ${plan==='enterprise'?'selected':''}>Kurum</option>
-        </select>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select onchange="setUserPlan('${c.id}',this.value)" style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:var(--text);outline:none;cursor:pointer">
+            <option value="trial" ${plan==='trial'?'selected':''}>Deneme (14 Gün)</option>
+            <option value="starter" ${plan==='starter'?'selected':''}>Başlangıç</option>
+            <option value="pro" ${plan==='pro'?'selected':''}>Koç Pro</option>
+            <option value="enterprise" ${plan==='enterprise'?'selected':''}>Kurum</option>
+          </select>
+          <input type="date" value="${endInputVal}" onchange="setUserTrialDate('${c.id}',this.value)" style="background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:var(--text);outline:none;width:110px">
+        </div>
       </td>
     </tr>`;
   }).join('');
@@ -1209,7 +1243,20 @@ async function setUserPlan(userId,plan){
   const {error}=await db.from('users').update({plan}).eq('id',userId);
   if(error){showToast('Hata: '+error.message);return;}
   showToast('Plan güncellendi ✓ — '+plan);
+  loadRevenue();
 }
+async function setUserTrialDate(userId, dateStr) {
+  if (!dateStr) return;
+  const trial_ends_at = new Date(dateStr).toISOString();
+  const {error} = await db.from('users').update({trial_ends_at}).eq('id', userId);
+  if (error) {
+    showToast('Hata: ' + error.message);
+    return;
+  }
+  showToast('Deneme bitiş tarihi güncellendi ✓');
+  loadRevenue();
+}
+window.setUserTrialDate = setUserTrialDate;
 
 // ── LEADS ─────────────────────────────────────
 async function loadLeads(){
