@@ -443,11 +443,15 @@ window.doLogout = doLogout;
 window.showForgotPassword = showForgotPassword;
 window.sendResetEmail = sendResetEmail;
 
-// Handles Google OAuth redirect: SIGNED_IN fires when Supabase processes the OAuth callback.
-// INITIAL_SESSION is intentionally excluded — the explicit checkOAuthSession() call in main.js covers it.
 db.auth.onAuthStateChange(async (event, sessionData) => {
+  // SIGNED_IN: handles Google OAuth redirect (fires when Supabase processes OAuth tokens from URL)
   if (event === 'SIGNED_IN' && sessionData?.user) {
     if (document.getElementById('appShell')?.classList.contains('visible')) return;
     await checkOAuthSession();
+  }
+  // SIGNED_OUT: session expired or refresh token invalid — clear any stuck spinner
+  if (event === 'SIGNED_OUT') {
+    _sessionHandled = false;
+    showLoading(false);
   }
 });
