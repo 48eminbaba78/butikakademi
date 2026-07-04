@@ -135,12 +135,19 @@ export async function checkOAuthSession() {
     showLoading(true);
     const { data: profile } = await db.from('users').select('*').eq('id', oauthSess.user.id).maybeSingle();
 
-    const isNewGoogleUser = profile && 
-      profile.password_hash === 'supabase_managed' && 
-      profile.username === profile.email.split('@')[0] &&
-      (profile.target === 'Hedef belirtilmemiş' || !profile.target);
+    let needsOnboarding = false;
+    if (profile) {
+      if (profile.role === 'coach') {
+        const { data: ws } = await db.from('workspaces').select('*').eq('coach_id', profile.id).maybeSingle();
+        if (!ws || !ws.onboarding_done) {
+          needsOnboarding = true;
+        }
+      }
+    } else {
+      needsOnboarding = true;
+    }
 
-    if (profile && !isNewGoogleUser) {
+    if (profile && !needsOnboarding) {
       await finishLogin(profile);
     } else {
       showLoading(false);
