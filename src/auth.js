@@ -256,39 +256,21 @@ export async function doLogin() {
       return loginErr('Hesabınız veritabanında aktif değil.');
     }
 
-    // Fallback logic for legacy accounts
-    let rows = null;
-    const lookupField = usernameOrEmail.includes('@') ? 'email' : 'username';
-    const lookupVal = usernameOrEmail.includes('@') ? usernameOrEmail.toLowerCase() : normalizeUsername(usernameOrEmail);
-
+    // Fallback: kimlik bilgisiyle güvenli lookup (security definer RPC)
     try {
-      rows = (await db.from('users').select('*').eq(lookupField, lookupVal).maybeSingle()).data;
-    } catch (e) {
-      console.warn('Fallback DB lookup error:', e);
-    }
-
-    if (!rows && lookupField === 'email') {
-      try {
-        const usernameFromEmail = normalizeUsername(usernameOrEmail.split('@')[0]);
-        rows = (await db.from('users').select('*').eq('username', usernameFromEmail).maybeSingle()).data;
-      } catch (e) {
-        console.warn('Fallback username lookup error:', e);
-      }
-    }
-
-    if (rows) {
+      const lookupUser = normalizeUsername(usernameOrEmail.includes('@') ? usernameOrEmail.split('@')[0] : usernameOrEmail);
       const passHash = await sha256(pass);
-      const isHashMatch = rows.password_hash === passHash;
-      const isPlainMatch = rows.password_hash === pass;
-      if (isHashMatch || isPlainMatch) {
-        if (isPlainMatch && !isHashMatch) {
-          try {
-            await db.from('users').update({ password_hash: passHash }).eq('id', rows.id);
-          } catch (e) {}
-        }
+      const { data: rpcRows } = await db.rpc('get_user_by_credentials', {
+        p_username: lookupUser,
+        p_password_hash: passHash
+      });
+      const rows = Array.isArray(rpcRows) ? rpcRows[0] : rpcRows;
+      if (rows) {
         await finishLogin(rows);
         return;
       }
+    } catch (e) {
+      console.warn('Fallback RPC error:', e);
     }
 
     showLoading(false);

@@ -11,6 +11,20 @@ import {
   om, cm, getWeekStart, getStudentWeekStart, saveUI, saveS
 } from './helpers.js';
 
+function formatMinToHours(mins) {
+  if (!mins || mins <= 0) return '0 sa';
+  const hrs = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (hrs > 0 && m > 0) {
+    return `${hrs} sa ${m} dk`;
+  } else if (hrs > 0) {
+    return `${hrs} sa`;
+  } else {
+    return `${m} dk`;
+  }
+}
+window.formatMinToHours = formatMinToHours;
+
 
 // ═══════════════════════════════════════════════
 // SHELL
@@ -1157,7 +1171,7 @@ function renderProgram(){
           <div class="day-num">${d.getDate()}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-          <span class="day-badge">${doneMin}/${totalMin} dk</span>
+          <span class="day-badge" style="font-size:8.5px">${formatMinToHours(doneMin)} / ${formatMinToHours(totalMin)}</span>
           ${_clipboardTask?`<button class="btn btn-ghost btn-xs" onclick="pasteTaskFromClipboard('${ds}')" style="font-size:9px;color:var(--accent);border-color:rgba(240,165,0,.3);background:var(--accent-dim);padding:2px 6px">Yapıştır</button>`:''}
         </div>
       </div>
@@ -1180,11 +1194,14 @@ function renderProgram(){
         <button class="btn btn-danger btn-sm" onclick="openClearWeekModal()">Temizle</button>
       </div>
     </div>
-    <div class="week-nav">
-      <button class="btn btn-ghost btn-sm" onclick="chWeek(-1)">←</button>
-      <span class="week-lbl">${wStart.getDate()} ${MONTHS_TR[wStart.getMonth()]} — ${wEnd.getDate()} ${MONTHS_TR[wEnd.getMonth()]} ${wEnd.getFullYear()}</span>
-      <button class="btn btn-ghost btn-sm" onclick="chWeek(1)">→</button>
-      <button class="btn btn-ghost btn-sm" onclick="goToday()">Bugün</button>
+    <div class="week-nav" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="chWeek(-1)">←</button>
+        <span class="week-lbl">${wStart.getDate()} ${MONTHS_TR[wStart.getMonth()]} — ${wEnd.getDate()} ${MONTHS_TR[wEnd.getMonth()]} ${wEnd.getFullYear()}</span>
+        <button class="btn btn-ghost btn-sm" onclick="chWeek(1)">→</button>
+        <button class="btn btn-ghost btn-sm" onclick="goToday()">Bugün</button>
+      </div>
+      ${_clipboardTask?`<button class="btn btn-accent btn-sm" onclick="pasteTaskToWholeWeek()" style="font-size:12px;padding:6px 12px;gap:6px">📋 Kopyalananı Tüm Haftaya Yapıştır</button>`:''}
     </div>
     <div class="week-grid">${dayCards}</div>`;
 }
@@ -1731,140 +1748,158 @@ async function saveStudentSpeed(stuId, examType, subject, secsPerQ){
 // Ders değişince kitap listesi sıfırla — BUG FIX
 document.getElementById('tmType').addEventListener('change', updateSubjectList);
 
+let _savingTask = false;
 async function saveTask(){
-  const type=document.getElementById('tmType').value;
-  const sel=document.getElementById('tmSubjectSel');
-  const free=document.getElementById('tmSubjectFree');
-  const examType=document.getElementById('tmExam').value;
-  const duration=parseInt(document.getElementById('tmDuration').value)||60;
-  const baseNote=document.getElementById('tmNote').value.trim();
+  if (_savingTask) return;
+  _savingTask = true;
+  const saveBtn = document.querySelector('#taskModal button[onclick*="saveTask"]');
+  const oldText = saveBtn ? saveBtn.textContent : 'Programa Ekle';
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Kaydediliyor...';
+  }
 
-  // ── Manuel kaynak modu ──
-  const isManualMode = document.getElementById('tmNewResourceToggle')?.checked;
-  if (isManualMode) {
-    const kaynak = document.getElementById('tmManualKaynak').value.trim();
-    if (!kaynak) return showToast('Kaynak adı girin!');
-    const subjectBase = sel.style.display !== 'none' ? sel.value : free.value.trim();
-    const subject = subjectBase ? `${subjectBase} - ${kaynak}` : kaynak;
-    const fullList = _manualTests.map(label => ({ label, url: '', soru: 0 }));
-    let note = baseNote;
-    if (_manualTests.length > 0) {
-      note = `${_manualTests.length} test: ${_manualTests.slice(0,3).join(', ')}${_manualTests.length>3?` +${_manualTests.length-3} daha`:''}`;
+  try {
+    const type=document.getElementById('tmType').value;
+    const sel=document.getElementById('tmSubjectSel');
+    const free=document.getElementById('tmSubjectFree');
+    const examType=document.getElementById('tmExam').value;
+    const duration=parseInt(document.getElementById('tmDuration').value)||60;
+    const baseNote=document.getElementById('tmNote').value.trim();
+
+    // ── Manuel kaynak modu ──
+    const isManualMode = document.getElementById('tmNewResourceToggle')?.checked;
+    if (isManualMode) {
+      const kaynak = document.getElementById('tmManualKaynak').value.trim();
+      if (!kaynak) return showToast('Kaynak adı girin!');
+      const subjectBase = sel.style.display !== 'none' ? sel.value : free.value.trim();
+      const subject = subjectBase ? `${subjectBase} - ${kaynak}` : kaynak;
+      const fullList = _manualTests.map(label => ({ label, url: '', soru: 0 }));
+      let note = baseNote;
+      if (_manualTests.length > 0) {
+        note = `${_manualTests.length} test: ${_manualTests.slice(0,3).join(', ')}${_manualTests.length>3?` +${_manualTests.length-3} daha`:''}`;
+      }
+      const payload = {
+        student_id:S.activeStuId, coach_id:session.coachId, date:_taskDate,
+        type, exam_type:examType, subject, duration, note, done:false,
+        task_items: fullList.length > 0 ? fullList : null
+      };
+      showLoading(true);
+      const { error } = await db.from('tasks').insert(payload);
+      showLoading(false);
+      if (error) return showToast('Hata: '+error.message);
+      const key=`${S.activeStuId}_${_taskDate}`;
+      if(!S.tasks[key]) S.tasks[key]=[];
+      S.tasks[key].push({type,exam:examType,subject,duration,note,done:false,task_items:payload.task_items});
+      cm('taskModal'); renderProgram(); showToast('Görev eklendi ✓');
+      return;
     }
-    const payload = {
+
+    // ── Normal mod (veritabanı arama) ──
+    const bookVal=document.getElementById('tmBookVal').value;
+    const isPlaylist=_selectedBook?.resource_type==='playlist';
+
+    let subject='';
+    if((type==='soru'||type==='konu') && bookVal){
+      const dersSel=sel.style.display!=='none'?sel.value:'';
+      subject=dersSel?`${dersSel} - ${bookVal}`:`${bookVal}`;
+    } else {
+      subject=(sel.style.display!=='none'?sel.value:free.value).trim();
+    }
+    if(!subject)return showToast('Ders adı girin!');
+
+    const checkedBoxes=[...document.querySelectorAll('#tmTestList input[type=checkbox]:checked')];
+
+    // Not: seçili testlerin/videoların tam listesi
+    let note = baseNote;
+    let fullList = []; // detay modal için tam liste
+    if(checkedBoxes.length>0 && _selectedBook){
+      const labels = checkedBoxes.map(cb=>{
+        const t=_selectedBook.testler[parseInt(cb.value)];
+        return t?.label||t||'';
+      });
+      fullList = checkedBoxes.map(cb=>{
+        const t=_selectedBook.testler[parseInt(cb.value)];
+        return {label:t?.label||t||'', url:t?.url||'', soru:t?.soru||0};
+      });
+      if(isPlaylist){
+        const _vShort = l => l.length > 14 ? l.slice(0,13)+'…' : l;
+        note=`${labels.length} video: ${labels.slice(0,5).map(_vShort).join(', ')}${labels.length>5?` +${labels.length-5}`:''}`;
+      } else {
+        const _tShort = l => l.length > 14 ? l.slice(0,13)+'…' : l;
+        note=`${labels.length} test: ${labels.slice(0,5).map(_tShort).join(', ')}${labels.length>5?` +${labels.length-5}`:''}`;
+      }
+    }
+
+    const payload={
       student_id:S.activeStuId, coach_id:session.coachId, date:_taskDate,
       type, exam_type:examType, subject, duration, note, done:false,
       task_items: fullList.length > 0 ? fullList : null
     };
-    showLoading(true);
-    const { error } = await db.from('tasks').insert(payload);
-    showLoading(false);
-    if (error) return showToast('Hata: '+error.message);
-    const key=`${S.activeStuId}_${_taskDate}`;
-    if(!S.tasks[key]) S.tasks[key]=[];
-    S.tasks[key].push({type,exam:examType,subject,duration,note,done:false,task_items:payload.task_items});
-    cm('taskModal'); renderProgram(); showToast('Görev eklendi ✓');
-    return;
-  }
 
-  // ── Normal mod (veritabanı arama) ──
-  const bookVal=document.getElementById('tmBookVal').value;
-  const isPlaylist=_selectedBook?.resource_type==='playlist';
+    if (_editingTaskId) {
+      showLoading(true);
+      const { error } = await db.from('tasks').update({
+        type: payload.type,
+        exam_type: payload.exam_type,
+        subject: payload.subject,
+        duration: payload.duration,
+        note: payload.note,
+        task_items: payload.task_items
+      }).eq('id', _editingTaskId);
+      showLoading(false);
+      
+      if(error) return showToast('Hata: '+error.message);
 
-  let subject='';
-  if((type==='soru'||type==='konu') && bookVal){
-    const dersSel=sel.style.display!=='none'?sel.value:'';
-    subject=dersSel?`${dersSel} - ${bookVal}`:`${bookVal}`;
-  } else {
-    subject=(sel.style.display!=='none'?sel.value:free.value).trim();
-  }
-  if(!subject)return showToast('Ders adı girin!');
-
-  const checkedBoxes=[...document.querySelectorAll('#tmTestList input[type=checkbox]:checked')];
-
-  // Not: seçili testlerin/videoların tam listesi
-  let note = baseNote;
-  let fullList = []; // detay modal için tam liste
-  if(checkedBoxes.length>0 && _selectedBook){
-    const labels = checkedBoxes.map(cb=>{
-      const t=_selectedBook.testler[parseInt(cb.value)];
-      return t?.label||t||'';
-    });
-    fullList = checkedBoxes.map(cb=>{
-      const t=_selectedBook.testler[parseInt(cb.value)];
-      return {label:t?.label||t||'', url:t?.url||'', soru:t?.soru||0};
-    });
-    if(isPlaylist){
-      const _vShort = l => l.length > 14 ? l.slice(0,13)+'…' : l;
-      note=`${labels.length} video: ${labels.slice(0,5).map(_vShort).join(', ')}${labels.length>5?` +${labels.length-5}`:''}`;
-    } else {
-      const _tShort = l => l.length > 14 ? l.slice(0,13)+'…' : l;
-      note=`${labels.length} test: ${labels.slice(0,5).map(_tShort).join(', ')}${labels.length>5?` +${labels.length-5}`:''}`;
-    }
-  }
-
-  const payload={
-    student_id:S.activeStuId, coach_id:session.coachId, date:_taskDate,
-    type, exam_type:examType, subject, duration, note, done:false,
-    task_items: fullList.length > 0 ? fullList : null
-  };
-
-  if (_editingTaskId) {
-    showLoading(true);
-    const { error } = await db.from('tasks').update({
-      type: payload.type,
-      exam_type: payload.exam_type,
-      subject: payload.subject,
-      duration: payload.duration,
-      note: payload.note,
-      task_items: payload.task_items
-    }).eq('id', _editingTaskId);
-    showLoading(false);
-    
-    if(error) return showToast('Hata: '+error.message);
-
-    const key=`${S.activeStuId}_${_taskDate}`;
-    if(S.tasks[key]) {
-      const idx = S.tasks[key].findIndex(t => t._id === _editingTaskId);
-      if (idx !== -1) {
-        S.tasks[key][idx] = {
-          _id: _editingTaskId,
-          type: payload.type,
-          exam: payload.exam_type,
-          subject: payload.subject,
-          duration: payload.duration,
-          note: payload.note,
-          done: S.tasks[key][idx].done,
-          student_note: S.tasks[key][idx].student_note || '',
-          task_items: payload.task_items
-        };
+      const key=`${S.activeStuId}_${_taskDate}`;
+      if(S.tasks[key]) {
+        const idx = S.tasks[key].findIndex(t => t._id === _editingTaskId);
+        if (idx !== -1) {
+          S.tasks[key][idx] = {
+            _id: _editingTaskId,
+            type: payload.type,
+            exam: payload.exam_type,
+            subject: payload.subject,
+            duration: payload.duration,
+            note: payload.note,
+            done: S.tasks[key][idx].done,
+            student_note: S.tasks[key][idx].student_note || '',
+            task_items: payload.task_items
+          };
+        }
       }
+      cm('taskModal');
+      renderProgram();
+      showToast('Görev güncellendi ✓');
+      _editingTaskId = null;
+    } else {
+      const {data,error}=await db.from('tasks').insert(payload).select().single();
+      if(error)return showToast('Hata: '+error.message);
+
+      const key=`${S.activeStuId}_${_taskDate}`;
+      if(!S.tasks[key])S.tasks[key]=[];
+      S.tasks[key].push({
+        _id:data.id,
+        type:data.type,
+        exam:data.exam_type,
+        subject:data.subject,
+        duration:data.duration,
+        note:data.note,
+        done:false,
+        student_note: '',
+        task_items: data.task_items || null
+      });
+
+      cm('taskModal');
+      renderProgram();
+      showToast('Görev eklendi ✓');
     }
-    cm('taskModal');
-    renderProgram();
-    showToast('Görev güncellendi ✓');
-    _editingTaskId = null;
-  } else {
-    const {data,error}=await db.from('tasks').insert(payload).select().single();
-    if(error)return showToast('Hata: '+error.message);
-
-    const key=`${S.activeStuId}_${_taskDate}`;
-    if(!S.tasks[key])S.tasks[key]=[];
-    S.tasks[key].push({
-      _id:data.id,
-      type:data.type,
-      exam:data.exam_type,
-      subject:data.subject,
-      duration:data.duration,
-      note:data.note,
-      done:false,
-      student_note: '',
-      task_items: data.task_items || null
-    });
-
-    cm('taskModal');
-    renderProgram();
-    showToast('Görev eklendi ✓');
+  } finally {
+    _savingTask = false;
+    if (saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = oldText;
+    }
   }
 }
 async function toggleTask(ds,idx){
@@ -1887,6 +1922,7 @@ function showTaskMenu(ds, idx, btn){
   drop.innerHTML = `
     <button onclick="closeTaskMenu();openCoachTaskEdit('${ds}',${idx})">✏️ Düzenle</button>
     <button onclick="closeTaskMenu();copyTaskToClipboard('${ds}',${idx})">📋 Kopyala</button>
+    <button onclick="closeTaskMenu();copyTaskToWholeWeek('${ds}',${idx})">📅 Tüm Haftaya Kopyala</button>
     <button class="danger" onclick="closeTaskMenu();deleteTask('${ds}',${idx})">🗑 Kaldır</button>`;
   // Ekran sınırını kontrol et
   const top = rect.bottom + 4;
@@ -2320,22 +2356,16 @@ async function saveStudent(){
     saveUI();cm('studentModal');renderStudentsSearch();
   } else {
     const email = uname + '@rostrumakademi.com';
-    const { data: newUserId, error } = await db.rpc('create_new_user', {
-      p_email: email,
-      p_password: passRaw,
-      p_full_name: payload.full_name,
-      p_username: uname,
-      p_role: 'student',
-      p_target: payload.target,
-      p_color: payload.color,
-      p_progress: payload.progress,
-      p_week_start: payload.week_start,
-      p_coach_id: payload.coach_id,
-      p_institution_id: null,
-      p_exam_profile: 'YKS'
+    const { data: { session: authSess } } = await db.auth.getSession();
+    const resp = await fetch('/api/create-student', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authSess?.access_token||''}` },
+      body: JSON.stringify({ email, password: passRaw, full_name: payload.full_name, username: uname, color: payload.color, target: payload.target, progress: payload.progress, week_start: payload.week_start, coach_id: payload.coach_id, exam_profile: 'YKS' })
     });
-    if(error)return showToast('Hata: '+error.message);
-    S.students.push({id:newUserId,name:payload.full_name,target:payload.target,color:payload.color,progress:payload.progress||0,pass:payload.password_hash,weekStart:payload.week_start||0,username:uname});
+    const result = await resp.json();
+    if (!resp.ok) return showToast('Hata: ' + result.error);
+    const newUserId = result.userId;
+    S.students.push({id:newUserId,name:payload.full_name,target:payload.target,color:payload.color,progress:payload.progress||0,pass:pass,weekStart:payload.week_start||0,username:uname});
     if(!S.activeStuId)S.activeStuId=newUserId;
     saveUI();cm('studentModal');
     // Davet bilgisi göster
@@ -2998,7 +3028,7 @@ function renderSPortal(){
     dayCards+=`<div class="day-col ${isToday?'today':''}">
       <div class="day-hd">
         <div><div class="day-name-lbl">${shortDay}</div><div class="day-num">${d.getDate()}</div></div>
-        <span class="day-badge">${doneMin}/${totalMin}dk</span>
+        <span class="day-badge" style="font-size:8.5px">${formatMinToHours(doneMin)} / ${formatMinToHours(totalMin)}</span>
       </div>
       <div class="day-tasks-list">${taskHtml||'<div class="empty" style="padding:8px 0"><p style="font-size:11px">Görev yok</p></div>'}</div>
     </div>`;
@@ -4434,24 +4464,17 @@ async function advanceOnboarding(step, skip) {
       const pass = await sha256(_obPassRaw);
       if(name) {
         const email = uname + '@rostrumakademi.com';
-        const { data: newUserId, error } = await db.rpc('create_new_user', {
-          p_email: email,
-          p_password: _obPassRaw,
-          p_full_name: name,
-          p_username: uname,
-          p_role: 'student',
-          p_target: '',
-          p_color: '#4da6ff',
-          p_progress: 0,
-          p_week_start: 0,
-          p_coach_id: session.coachId,
-          p_institution_id: null,
-          p_exam_profile: 'YKS'
+        const { data: { session: authSess } } = await db.auth.getSession();
+        const resp = await fetch('/api/create-student', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authSess?.access_token||''}` },
+          body: JSON.stringify({ email, password: _obPassRaw, full_name: name, username: uname, color: '#4da6ff', target: '', progress: 0, week_start: 0, coach_id: session.coachId, exam_profile: 'YKS' })
         });
-        if(!error && newUserId) {
-          S.students.push({id:newUserId, name:name, target:'', color:'#4da6ff', progress:0, pass, weekStart:0, username:uname, coachId:session.coachId});
-        } else if(error) {
-          showToast('Hata: ' + error.message);
+        const result = await resp.json();
+        if(resp.ok && result.userId) {
+          S.students.push({id:result.userId, name, target:'', color:'#4da6ff', progress:0, pass, weekStart:0, username:uname, coachId:session.coachId});
+        } else {
+          showToast('Öğrenci eklenemedi: ' + (result.error||'Bilinmeyen hata'));
         }
       }
     }
@@ -5631,11 +5654,42 @@ function printWeeklyProgramWithNote(stuId, coachNote){
   const pctColor=pct>=80?'#22c55e':pct>=50?bc:'#f59e0b';
   const initials=stu.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
+  let detailedDaysList = '';
+  for(let i=0;i<7;i++){
+    const d=addDays(wStart,i);
+    const ds=fmtDate(d);
+    const tasks=S.tasks[`${stuId}_${ds}`]||[];
+    if (tasks.length === 0) continue;
+
+    const dayName=DAYS[(wsOff+i)%7];
+    const taskRows = tasks.map((t, index) => {
+      const color=TC[t.type]||'#94a3b8';
+      const lbl=TL[t.type]||'Diğer';
+      return `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #eee">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font-size:12px;font-weight:800;color:${color}">${index + 1}. ${lbl}${t.exam?` (${t.exam})`:''}</span>
+          <span style="font-size:12px;font-weight:700;color:#111">${esc(t.subject)}</span>
+          <span style="font-size:11px;color:#666;margin-left:auto">${t.duration} dk</span>
+        </div>
+        ${t.note ? `<div style="font-size:10px;color:#555;margin-top:4px;padding-left:14px;border-left:2px solid ${color}40;line-height:1.5">${esc(t.note).replace(/\n/g, '<br>')}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    detailedDaysList += `<div style="margin-bottom:24px">
+      <h3 style="font-size:14px;font-weight:800;color:${bc};border-bottom:2px solid ${bc}40;padding-bottom:4px;margin-bottom:10px">${d.getDate()} ${MONTHS[d.getMonth()]} - ${dayName}</h3>
+      <div>${taskRows}</div>
+    </div>`;
+  }
+
   const html=`<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Segoe UI',-apple-system,Arial,sans-serif;background:#fff;color:#111;}
-    @media print{.no-print{display:none!important;}@page{size:A4 landscape;margin:5mm;}}
+    @media print{
+      .no-print{display:none!important;}
+      @page{size:A4 landscape;margin:5mm;}
+      .page-break{page-break-before:always;}
+    }
   </style>
   </head><body>
 
@@ -5706,6 +5760,13 @@ function printWeeklyProgramWithNote(stuId, coachNote){
     <button onclick="window.print()" style="background:${bc};color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.2px">🖨️ PDF İndir / Yazdır</button>
     <span style="font-size:11px;color:#bbb">Tarayıcı ayarlarından "Arka plan grafikleri"ni aktif edin</span>
   </div>
+
+  <!-- PAGE 2: DETAILED LIST VIEW -->
+  ${detailedDaysList ? `
+  <div class="page-break" style="padding:40px 30px;max-width:1000px;margin:0 auto">
+    <div style="font-size:18px;font-weight:900;color:${bc};margin-bottom:20px;border-bottom:2px solid ${bc};padding-bottom:10px">📋 Günlük Detaylı Görev Açıklamaları</div>
+    ${detailedDaysList}
+  </div>` : ''}
 
   </body></html>`;
 
@@ -7412,9 +7473,118 @@ async function pasteTaskFromClipboard(ds) {
     task_items: data.task_items
   });
   
-  _clipboardTask = null;
   renderProgram();
   showToast('Görev yapıştırıldı ✓');
+}
+
+async function copyTaskToWholeWeek(ds, idx) {
+  const key = `${S.activeStuId}_${ds}`;
+  const t = S.tasks[key]?.[idx];
+  if(!t) return;
+
+  const stu = S.students.find(s => s.id === S.activeStuId);
+  const ws = stu?.weekStart ?? 0;
+  const wStart = getWeekStart(S.weekOffset, ws);
+
+  const payloads = [];
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(wStart, i);
+    const dateStr = fmtDate(d);
+    if (dateStr === ds) continue;
+    
+    payloads.push({
+      student_id: S.activeStuId,
+      coach_id: session.coachId,
+      date: dateStr,
+      type: t.type,
+      exam_type: t.exam || null,
+      subject: t.subject,
+      duration: t.duration,
+      note: t.note,
+      done: false,
+      task_items: t.task_items
+    });
+  }
+
+  if (payloads.length === 0) return;
+
+  showLoading(true);
+  const { data, error } = await db.from('tasks').insert(payloads).select();
+  showLoading(false);
+  
+  if (error) return showToast('Hata: ' + error.message);
+
+  (data || []).forEach(inserted => {
+    const k = `${S.activeStuId}_${inserted.date}`;
+    if (!S.tasks[k]) S.tasks[k] = [];
+    S.tasks[k].push({
+      _id: inserted.id,
+      type: inserted.type,
+      exam: inserted.exam_type,
+      subject: inserted.subject,
+      duration: inserted.duration,
+      note: inserted.note,
+      done: false,
+      student_note: '',
+      task_items: inserted.task_items
+    });
+  });
+
+  renderProgram();
+  showToast('Görev tüm haftaya kopyalandı ✓');
+}
+
+async function pasteTaskToWholeWeek() {
+  if (!_clipboardTask) return;
+
+  const stu = S.students.find(s => s.id === S.activeStuId);
+  const ws = stu?.weekStart ?? 0;
+  const wStart = getWeekStart(S.weekOffset, ws);
+
+  const payloads = [];
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(wStart, i);
+    const dateStr = fmtDate(d);
+    
+    payloads.push({
+      student_id: S.activeStuId,
+      coach_id: session.coachId,
+      date: dateStr,
+      type: _clipboardTask.type,
+      exam_type: _clipboardTask.exam || null,
+      subject: _clipboardTask.subject,
+      duration: _clipboardTask.duration,
+      note: _clipboardTask.note,
+      done: false,
+      task_items: _clipboardTask.task_items
+    });
+  }
+
+  showLoading(true);
+  const { data, error } = await db.from('tasks').insert(payloads).select();
+  showLoading(false);
+  
+  if (error) return showToast('Hata: ' + error.message);
+
+  (data || []).forEach(inserted => {
+    const k = `${S.activeStuId}_${inserted.date}`;
+    if (!S.tasks[k]) S.tasks[k] = [];
+    S.tasks[k].push({
+      _id: inserted.id,
+      type: inserted.type,
+      exam: inserted.exam_type,
+      subject: inserted.subject,
+      duration: inserted.duration,
+      note: inserted.note,
+      done: false,
+      student_note: '',
+      task_items: inserted.task_items
+    });
+  });
+
+  _clipboardTask = null;
+  renderProgram();
+  showToast('Görev tüm haftaya yapıştırıldı ✓');
 }
 
 // ═══════════════════════════════════════════════
@@ -7830,6 +8000,8 @@ window.applyTemplateToWeek = applyTemplateToWeek;
 window.confirmApplyTemplate = confirmApplyTemplate;
 window.copyTaskToClipboard = copyTaskToClipboard;
 window.pasteTaskFromClipboard = pasteTaskFromClipboard;
+window.copyTaskToWholeWeek = copyTaskToWholeWeek;
+window.pasteTaskToWholeWeek = pasteTaskToWholeWeek;
 window.sendWhatsAppReport = sendWhatsAppReport;
 window.toggleUserMenu = toggleUserMenu;
 window.closeUserMenu = closeUserMenu;
