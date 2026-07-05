@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Rostrum Akademi">
 <title>Rostrum Akademi</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/app-2IokHbsi.js"></script>
+  <script type="module" crossorigin src="/assets/app-C53rFbgg.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/app-z8_gsrof.css">
 </head>
 <body>
@@ -438,11 +438,15 @@
       </div>
     </div>
 
-    <!-- Süre + Not yan yana -->
-    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;margin-top:12px">
+    <!-- Süre + Saat + Not yan yana -->
+    <div style="display:grid;grid-template-columns:100px 110px 1fr;gap:10px;margin-top:12px">
       <div class="field">
         <label>Süre (dk)</label>
         <input type="number" id="tmDuration" value="60" min="5">
+      </div>
+      <div class="field">
+        <label>Saat (İsteğe bağlı)</label>
+        <input type="time" id="tmStartTime" style="color-scheme:dark">
       </div>
       <div class="field">
         <label>Not</label>

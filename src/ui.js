@@ -779,6 +779,7 @@ function openStudentDetail(stuId){
         {label:'Konu Haritası', icon:'🗺️', fn:`openKonuHaritasi('${s.id}')`},
         {label:'Hız', icon:'⚡', fn:`openSpeedModal('${s.id}')`},
         {label:'Rapor', icon:'📄', fn:`openReportModal('${s.id}')`},
+        {label:'Geçmiş Raporlar', icon:'🗂️', fn:`openPastReports('${s.id}')`},
       ].map(t=>`<button onclick="${t.fn}" style="display:flex;align-items:center;gap:6px;padding:14px 18px;background:none;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s" onmouseover="this.style.color='var(--text)';this.style.borderBottomColor='var(--border2)'" onmouseout="this.style.color='var(--text-mid)';this.style.borderBottomColor='transparent'">${t.icon} ${t.label}</button>`).join('')}
     </div>
 
@@ -1584,7 +1585,8 @@ function renderProgram(){
   const wStart=getWeekStart(S.weekOffset,ws);
   const wEnd=addDays(wStart,6);
   const today=todayStr();
-  const selOpts=S.students.map(s=>`<option value="${s.id}" ${s.id===S.activeStuId?'selected':''}>${esc(s.name)}</option>`).join('');
+  const progMode = localStorage.getItem('ra_program_mode') || 'weekly';
+
   let dayCards='';
   for(let i=0;i<7;i++){
     const d=addDays(wStart,i);
@@ -1595,16 +1597,34 @@ function renderProgram(){
     const totalMin=tasks.reduce((s,t)=>s+Number(t.duration),0);
     const doneMin=tasks.reduce((s,t)=>s+(t.done?Number(t.duration):0),0);
     const dayLabel=DAYS_TR[(ws+i)%7];
-    const taskHtml=tasks.map((t,ti)=>`
-      <div class="task-card task-${t.type} ${t.done?'done':''}" onclick="openTaskDetail('${ds}',${ti},'coach')" style="cursor:pointer">
-        <div class="tc-check ${t.done?'on':''}" onclick="event.stopPropagation();toggleTask('${ds}',${ti})"></div>
-        <div class="tc-body">
-          <div class="tc-type">${typeLabel(t.type)}${t.exam?' · '+t.exam:''}</div>
-          <div class="tc-subject">${esc(t.subject)}</div>
-          <div class="tc-meta">${t.duration} dk</div>
-        </div>
-        <button class="tc-menu-btn" onclick="event.stopPropagation();showTaskMenu('${ds}',${ti},this)">⋯</button>
-      </div>`).join('');
+
+    // Saatlik moda göre sırala
+    const sortedTasks = [...tasks];
+    if (progMode === 'hourly') {
+      sortedTasks.sort((a, b) => {
+        if (a.start_time && !b.start_time) return -1;
+        if (!a.start_time && b.start_time) return 1;
+        if (a.start_time && b.start_time) return a.start_time.localeCompare(b.start_time);
+        return 0;
+      });
+    }
+
+    const taskHtml=sortedTasks.map((t)=> {
+      const ti = tasks.indexOf(t);
+      const timeBadge = t.start_time ? `<div class="tc-time-badge">🕒 ${t.start_time}</div>` : '';
+      return `
+        <div data-task-id="${t._id}" class="task-card task-${t.type} ${t.done?'done':''} ${t.start_time?'hourly-card':''}" onclick="openTaskDetail('${ds}',${ti},'coach')" style="cursor:pointer">
+          <div class="tc-check ${t.done?'on':''}" onclick="event.stopPropagation();toggleTask('${ds}',${ti})"></div>
+          <div class="tc-body">
+            ${timeBadge}
+            <div class="tc-type">${typeLabel(t.type)}${t.exam?' · '+t.exam:''}</div>
+            <div class="tc-subject">${esc(t.subject)}</div>
+            <div class="tc-meta">${t.duration} dk</div>
+          </div>
+          <button class="tc-menu-btn" onclick="event.stopPropagation();showTaskMenu('${ds}',${ti},this)">⋯</button>
+        </div>`;
+    }).join('');
+
     const shortDay = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][(ws+i)%7];
     dayCards+=`<div class="day-col ${isToday?'today':''}">
       <div class="day-hd">
@@ -1621,6 +1641,7 @@ function renderProgram(){
       <button class="add-day-btn" onclick="openTaskModal('${ds}','${dayLabel}')" ${!S.activeStuId?'disabled':''}>+ Görev Ekle</button>
     </div>`;
   }
+
   el.innerHTML=`
     <button class="back-link" onclick="switchTab('student-detail')">← ${stu?esc(stu.name):'Öğrenci'}</button>
     <div class="card prog-banner">
@@ -1643,6 +1664,13 @@ function renderProgram(){
         <button class="btn btn-ghost btn-sm" onclick="chWeek(1)">→</button>
         <button class="btn btn-ghost btn-sm" onclick="goToday()">Bugün</button>
       </div>
+      
+      <!-- Program Görünüm Seçici Toggle -->
+      <div style="display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:4px">
+        <button class="btn btn-xs ${progMode==='weekly'?'btn-accent':'btn-ghost'}" onclick="setProgramMode('weekly')" style="padding:4px 10px;font-size:11px;font-weight:700;border-radius:8px">📋 Günlük Serbest</button>
+        <button class="btn btn-xs ${progMode==='hourly'?'btn-accent':'btn-ghost'}" onclick="setProgramMode('hourly')" style="padding:4px 10px;font-size:11px;font-weight:700;border-radius:8px">🕒 Saatlik Düzen</button>
+      </div>
+
       ${_clipboardTask?`<button class="btn btn-accent btn-sm" onclick="pasteTaskToWholeWeek()" style="font-size:12px;padding:6px 12px;gap:6px">📋 Kopyalananı Tüm Haftaya Yapıştır</button>`:''}
     </div>
     <div class="week-grid">${dayCards}</div>`;
@@ -1651,6 +1679,40 @@ function renderProgram(){
 function selectStu(id){S.activeStuId=id||null;saveS();renderProgram();}
 function chWeek(d){S.weekOffset+=d;saveS();renderProgram();}
 function goToday(){S.weekOffset=0;saveS();renderProgram();}
+
+function setProgramMode(mode) {
+  localStorage.setItem('ra_program_mode', mode);
+  if (session.role === 'student') {
+    renderSPortal();
+  } else {
+    renderProgram();
+  }
+}
+window.setProgramMode = setProgramMode;
+
+(()=>{
+  const s=document.createElement('style');
+  s.textContent=`
+    .tc-time-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-dim);
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 6px;
+      width: fit-content;
+      border: 1px solid rgba(240,165,0,.2);
+    }
+    .task-card.hourly-card {
+      border-left: 4px solid var(--accent) !important;
+    }
+  `;
+  document.head.appendChild(s);
+})();
 
 // CLEAR WEEK with day picker
 let _clearDaysSel=[];
@@ -1865,6 +1927,7 @@ function openTaskModal(ds, dayName){
   document.querySelector('#taskModal .btn-accent').textContent = 'Programa Ekle';
   document.getElementById('tmSubjectFree').value='';
   document.getElementById('tmDuration').value='60';
+  document.getElementById('tmStartTime').value='';
   document.getElementById('tmNote').value='';
   document.getElementById('tmExam').value='';
   document.getElementById('tmType').value='deneme';
@@ -2222,6 +2285,7 @@ async function saveTask(){
     const free=document.getElementById('tmSubjectFree');
     const examType=document.getElementById('tmExam').value;
     const duration=parseInt(document.getElementById('tmDuration').value)||60;
+    const startTime=document.getElementById('tmStartTime').value || null;
     const baseNote=document.getElementById('tmNote').value.trim();
 
     // ── Manuel kaynak modu ──
@@ -2239,7 +2303,8 @@ async function saveTask(){
       const payload = {
         student_id:S.activeStuId, coach_id:session.coachId, date:_taskDate,
         type, exam_type:examType, subject, duration, note, done:false,
-        task_items: fullList.length > 0 ? fullList : null
+        task_items: fullList.length > 0 ? fullList : null,
+        start_time: startTime
       };
       showLoading(true);
       const { error } = await db.from('tasks').insert(payload);
@@ -2247,7 +2312,7 @@ async function saveTask(){
       if (error) return showToast('Hata: '+error.message);
       const key=`${S.activeStuId}_${_taskDate}`;
       if(!S.tasks[key]) S.tasks[key]=[];
-      S.tasks[key].push({type,exam:examType,subject,duration,note,done:false,task_items:payload.task_items});
+      S.tasks[key].push({type,exam:examType,subject,duration,note,done:false,task_items:payload.task_items,start_time:startTime});
       cm('taskModal'); renderProgram(); showToast('Görev eklendi ✓');
       return;
     }
@@ -2291,7 +2356,8 @@ async function saveTask(){
     const payload={
       student_id:S.activeStuId, coach_id:session.coachId, date:_taskDate,
       type, exam_type:examType, subject, duration, note, done:false,
-      task_items: fullList.length > 0 ? fullList : null
+      task_items: fullList.length > 0 ? fullList : null,
+      start_time: startTime
     };
 
     if (_editingTaskId) {
@@ -2302,7 +2368,8 @@ async function saveTask(){
         subject: payload.subject,
         duration: payload.duration,
         note: payload.note,
-        task_items: payload.task_items
+        task_items: payload.task_items,
+        start_time: payload.start_time
       }).eq('id', _editingTaskId);
       showLoading(false);
       
@@ -2321,7 +2388,8 @@ async function saveTask(){
             note: payload.note,
             done: S.tasks[key][idx].done,
             student_note: S.tasks[key][idx].student_note || '',
-            task_items: payload.task_items
+            task_items: payload.task_items,
+            start_time: payload.start_time
           };
         }
       }
@@ -2344,7 +2412,8 @@ async function saveTask(){
         note:data.note,
         done:false,
         student_note: '',
-        task_items: data.task_items || null
+        task_items: data.task_items || null,
+        start_time: data.start_time
       });
 
       cm('taskModal');
@@ -2418,9 +2487,20 @@ async function deleteTask(ds,idx){
   const key=`${S.activeStuId}_${ds}`;
   const t=S.tasks[key]?.[idx]; if(!t)return;
   const label = [t.exam, t.subject].filter(Boolean).join(' · ') || t.type || 'Görev';
+  
   // Row fade animation
   const rowEl = document.querySelector(`[data-task-id="${t._id}"]`);
-  if (rowEl) { rowEl.style.transition='opacity .25s,transform .25s'; rowEl.style.opacity='0'; rowEl.style.transform='translateX(20px)'; }
+  if (rowEl) {
+    rowEl.style.transition = 'all 0.3s ease';
+    rowEl.style.opacity = '0';
+    rowEl.style.transform = 'translateX(30px)';
+    const bodyEl = rowEl.querySelector('.tc-body');
+    if (bodyEl) {
+      bodyEl.innerHTML = '<div style="color:var(--red); font-weight:700; font-size:12px; display:flex; align-items:center; gap:6px">🗑️ Siliniyor...</div>';
+    }
+  }
+  
+  await new Promise(resolve => setTimeout(resolve, 300));
   await db.from('tasks').delete().eq('id',t._id);
   S.tasks[key].splice(idx,1);
   renderProgram();
@@ -3006,6 +3086,16 @@ function copyInvite(username, pass, url){
 }
 async function deleteStu(id){
   if(!await customConfirm('Bu öğrenciyi silmek istediğinizden emin misiniz?'))return;
+  
+  const rowEl = document.getElementById(`sturow_${id}`);
+  if (rowEl) {
+    rowEl.style.transition = 'all 0.3s ease';
+    rowEl.style.opacity = '0';
+    rowEl.style.transform = 'translateX(30px)';
+    rowEl.innerHTML = '<div style="color:var(--red); font-weight:700; font-size:13px; display:flex; align-items:center; gap:6px">🗑️ Siliniyor...</div>';
+  }
+  
+  await new Promise(resolve => setTimeout(resolve, 300));
   const {error}=await db.from('users').delete().eq('id',id);
   if(error)return showToast('Hata: '+error.message);
   S.students=S.students.filter(s=>s.id!==id);
@@ -3071,7 +3161,7 @@ function renderApptList(){
     const stu=S.students.find(s=>s.id===a.studentId);
     const isToday=a.date===ts;
     const dl=isToday?'BUGÜN':new Date(a.date+'T12:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
-    return `<div class="appt-item" style="border-left-color:${stu?.color||'#555'}">
+    return `<div data-appt-id="${a.id}" class="appt-item" style="border-left-color:${stu?.color||'#555'}">
       <div class="appt-when">${dl} • ${a.time} (${a.duration} dk)</div>
       <div class="appt-name">${esc(stu?.name||'?')}</div>
       <div class="appt-type">${esc(a.type)}</div>
@@ -3124,7 +3214,24 @@ async function saveAppt(){
   cm('apptModal');
   if(currentTab === 'todolist') renderAgenda(); else if(document.getElementById('view-appointments')?.classList.contains('active')) renderAppointments();
 }
-async function deleteAppt(id){if(!await customConfirm('Bu randevuyu silmek istediğinizden emin misiniz?'))return;await db.from('appointments').delete().eq('id',id);S.appointments=S.appointments.filter(a=>a.id!==id);renderAppointments();showToast('Silindi');}
+async function deleteAppt(id){
+  if(!await customConfirm('Bu randevuyu silmek istediğinizden emin misiniz?'))return;
+  
+  const rowEl = document.querySelector(`[data-appt-id="${id}"]`);
+  if (rowEl) {
+    rowEl.style.transition = 'all 0.3s ease';
+    rowEl.style.opacity = '0';
+    rowEl.style.transform = 'translateX(30px)';
+    const nameEl = rowEl.querySelector('.appt-name');
+    if (nameEl) nameEl.innerHTML = '<span style="color:var(--red); font-weight:700">🗑️ Siliniyor...</span>';
+  }
+  
+  await new Promise(resolve => setTimeout(resolve, 300));
+  await db.from('appointments').delete().eq('id',id);
+  S.appointments=S.appointments.filter(a=>a.id!==id);
+  renderAppointments();
+  showToast('Silindi');
+}
 
 // ═══════════════════════════════════════════════
 // YKS PUAN HESAP YARDIMCILARI (2024 formülü)
@@ -3573,7 +3680,7 @@ function renderPortal(){
         <div class="portal-sec-title">📋 Bugünün Görevleri</div>
         ${todayTasks.length?`
           ${todayTasks.map((t,i)=>`
-            <div class="task-card task-${t.type} ${t.done?'done':''}" style="margin-bottom:6px">
+            <div data-task-id="${t._id}" class="task-card task-${t.type} ${t.done?'done':''}" style="margin-bottom:6px">
               <div class="tc-check ${t.done?'on':''}" onclick="stuToggleTask('${today}',${i})"></div>
               <div class="tc-body">
                 <div class="tc-type">${typeLabel(t.type)}${t.exam?' · '+t.exam:''}</div>
@@ -3627,6 +3734,8 @@ function renderSPortal(){
   const wStart=getWeekStart(S.weekOffset,ws);
   const wEnd=addDays(wStart,6);
   const today=todayStr();
+  const progMode = localStorage.getItem('ra_program_mode') || 'weekly';
+
   let dayCards='';
   for(let i=0;i<7;i++){
     const d=addDays(wStart,i);const ds=fmtDate(d);const isToday=ds===today;
@@ -3634,15 +3743,33 @@ function renderSPortal(){
     const totalMin=tasks.reduce((s,t)=>s+Number(t.duration),0);
     const doneMin=tasks.reduce((s,t)=>s+(t.done?Number(t.duration):0),0);
     const dayLabel=DAYS_TR[(ws+i)%7];
-    const taskHtml=tasks.map((t,ti)=>`
-      <div class="task-card task-${t.type} ${t.done?'done':''}" onclick="openTaskDetail('${ds}',${ti},'student')" style="cursor:pointer">
-        <div class="tc-check ${t.done?'on':''}" onclick="event.stopPropagation();stuToggleTask2('${ds}',${ti})"></div>
-        <div class="tc-body">
-          <div class="tc-type">${typeLabel(t.type)}${t.exam?' · '+t.exam:''}</div>
-          <div class="tc-subject">${esc(t.subject)}</div>
-          <div class="tc-meta">${t.duration} dk</div>
-        </div>
-      </div>`).join('');
+
+    // Saatlik moda göre sırala
+    const sortedTasks = [...tasks];
+    if (progMode === 'hourly') {
+      sortedTasks.sort((a, b) => {
+        if (a.start_time && !b.start_time) return -1;
+        if (!a.start_time && b.start_time) return 1;
+        if (a.start_time && b.start_time) return a.start_time.localeCompare(b.start_time);
+        return 0;
+      });
+    }
+
+    const taskHtml=sortedTasks.map((t)=> {
+      const ti = tasks.indexOf(t);
+      const timeBadge = t.start_time ? `<div class="tc-time-badge">🕒 ${t.start_time}</div>` : '';
+      return `
+        <div data-task-id="${t._id}" class="task-card task-${t.type} ${t.done?'done':''} ${t.start_time?'hourly-card':''}" onclick="openTaskDetail('${ds}',${ti},'student')" style="cursor:pointer">
+          <div class="tc-check ${t.done?'on':''}" onclick="event.stopPropagation();stuToggleTask2('${ds}',${ti})"></div>
+          <div class="tc-body">
+            ${timeBadge}
+            <div class="tc-type">${typeLabel(t.type)}${t.exam?' · '+t.exam:''}</div>
+            <div class="tc-subject">${esc(t.subject)}</div>
+            <div class="tc-meta">${t.duration} dk</div>
+          </div>
+        </div>`;
+    }).join('');
+
     const shortDay = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'][(ws+i)%7];
     dayCards+=`<div class="day-col ${isToday?'today':''}">
       <div class="day-hd">
@@ -3653,11 +3780,19 @@ function renderSPortal(){
     </div>`;
   }
   el.innerHTML=`
-    <div class="week-nav" style="margin-bottom:14px">
-      <button class="btn btn-ghost btn-sm" onclick="chWeekS(-1)">← Önceki</button>
-      <span class="week-lbl">${wStart.getDate()} ${MONTHS_TR[wStart.getMonth()]} — ${wEnd.getDate()} ${MONTHS_TR[wEnd.getMonth()]} ${wEnd.getFullYear()}</span>
-      <button class="btn btn-ghost btn-sm" onclick="chWeekS(1)">Sonraki →</button>
-      <button class="btn btn-ghost btn-sm" onclick="S.weekOffset=0;saveUI();renderSPortal()">Bugün</button>
+    <div class="week-nav" style="margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="btn btn-ghost btn-sm" onclick="chWeekS(-1)">← Önceki</button>
+        <span class="week-lbl">${wStart.getDate()} ${MONTHS_TR[wStart.getMonth()]} — ${wEnd.getDate()} ${MONTHS_TR[wEnd.getMonth()]} ${wEnd.getFullYear()}</span>
+        <button class="btn btn-ghost btn-sm" onclick="chWeekS(1)">Sonraki →</button>
+        <button class="btn btn-ghost btn-sm" onclick="S.weekOffset=0;saveUI();renderSPortal()">Bugün</button>
+      </div>
+
+      <!-- Program Görünüm Seçici Toggle -->
+      <div style="display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:4px">
+        <button class="btn btn-xs ${progMode==='weekly'?'btn-accent':'btn-ghost'}" onclick="setProgramMode('weekly')" style="padding:4px 10px;font-size:11px;font-weight:700;border-radius:8px">📋 Günlük Serbest</button>
+        <button class="btn btn-xs ${progMode==='hourly'?'btn-accent':'btn-ghost'}" onclick="setProgramMode('hourly')" style="padding:4px 10px;font-size:11px;font-weight:700;border-radius:8px">🕒 Saatlik Düzen</button>
+      </div>
     </div>
     <div class="week-grid">${dayCards}</div>`;
 }
@@ -6551,6 +6686,7 @@ function openReportModal(stuId) {
           <button class="btn btn-accent" style="flex:1;justify-content:center" onclick="generatePDF()">⬇️ PDF İndir</button>
         </div>
         <button class="btn btn-ghost" style="width:100%;justify-content:center;background:#25d366;color:#fff;border:none;gap:6px" onclick="sendWhatsAppReport()">💬 Veliye WhatsApp Gönder</button>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center;background:var(--surface3);color:var(--text);border:1px solid var(--border);gap:6px" onclick="archivePerformanceReport()">💾 Raporu Sisteme Kaydet (Arşivle)</button>
       </div>
     </div>`;
     document.body.appendChild(modal);
@@ -7601,6 +7737,17 @@ async function sendCopilotDraft(stuId) {
     }).select().single();
     
     if (error) throw error;
+
+    // Ayrıca reports tablosuna arşivle
+    await db.from('reports').insert({
+      student_id: stuId,
+      coach_id: coachId,
+      type: 'ai_copilot',
+      title: 'Yapay Zeka Copilot Değerlendirmesi',
+      content: text,
+      start_date: todayStr(),
+      end_date: todayStr()
+    });
     
     if (!S.messages[stuId]) S.messages[stuId] = [];
     S.messages[stuId].push({
@@ -7611,7 +7758,7 @@ async function sendCopilotDraft(stuId) {
       read: false
     });
     
-    showToast('Taslak mesaj başarıyla düzenlendi ve öğrenciye gönderildi!');
+    showToast('Taslak mesaj başarıyla düzenlendi, öğrenciye gönderildi ve arşive kaydedildi! ✓');
     
     // Clear Copilot Area
     document.getElementById('aiCopilotResultArea').style.display = 'none';
@@ -8477,6 +8624,7 @@ async function openCoachTaskEdit(ds, idx) {
   document.getElementById('tmType').value = t.type;
   document.getElementById('tmExam').value = t.exam || '';
   document.getElementById('tmDuration').value = t.duration || 60;
+  document.getElementById('tmStartTime').value = t.start_time || '';
   document.getElementById('tmNote').value = t.note || '';
 
   const exam = t.exam || '';
@@ -9327,3 +9475,197 @@ window.editStudentBook = editStudentBook;
 window.sbUpdatePct = sbUpdatePct;
 window.saveStudentBook = saveStudentBook;
 window.deleteStudentBook = deleteStudentBook;
+
+async function archivePerformanceReport() {
+  const stuId = document.getElementById('rpStuId').value;
+  const s = S.students.find(x => x.id === stuId);
+  if (!s) return;
+  const period = document.getElementById('rpPeriod').value;
+  const { start, end } = getReportDates();
+  const note = document.getElementById('rpNote').value.trim();
+  
+  let periodTitle = "Performans Raporu";
+  if (period === 'weekly') periodTitle = "Haftalık Performans Raporu";
+  else if (period === 'monthly') periodTitle = "Aylık Performans Raporu";
+  else periodTitle = "Özel Dönem Performans Raporu";
+  
+  const title = `${periodTitle} (${start} - ${end})`;
+  const content = note || "Değerlendirme notu eklenmedi.";
+  
+  showLoading(true);
+  const coachId = session.coachId || s.coachId;
+  const { error } = await db.from('reports').insert({
+    student_id: stuId,
+    coach_id: coachId,
+    type: 'performance',
+    title: title,
+    content: content,
+    start_date: start,
+    end_date: end
+  });
+  showLoading(false);
+  
+  if (error) {
+    showToast('Rapor kaydedilirken hata oluştu: ' + error.message);
+  } else {
+    showToast('Rapor başarıyla geçmişe kaydedildi! ✓');
+    cm('reportModal');
+  }
+}
+
+async function openPastReports(stuId) {
+  const s = S.students.find(x => x.id === stuId);
+  if (!s) return;
+  S.activeStuId = stuId;
+  if (currentTab !== 'student-detail') switchTab('student-detail');
+  const el = document.getElementById('view-student-detail');
+  el.innerHTML = `<button class="back-link" onclick="openStudentDetail('${stuId}')">← ${esc(s.name)}</button>
+    <div style="padding:20px;color:var(--text-mid);font-size:13px">Raporlar yükleniyor…</div>`;
+
+  const { data, error } = await db.from('reports').select('*').eq('student_id', stuId).order('created_at', { ascending: false });
+  if (error) {
+    el.innerHTML = `<button class="back-link" onclick="openStudentDetail('${stuId}')">← ${esc(s.name)}</button>
+      <div style="padding:20px;color:var(--red);font-size:13px">Hata: ${error.message}</div>`;
+    return;
+  }
+
+  let html = `
+    <button class="back-link" onclick="openStudentDetail('${stuId}')">← ${esc(s.name)}</button>
+    <div style="padding:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)">🗂️ Geçmiş Raporlar</h2>
+      </div>
+  `;
+
+  if (!data || data.length === 0) {
+    html += `
+      <div style="text-align:center;padding:40px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text-dim)">
+        <div style="font-size:36px;margin-bottom:12px">📭</div>
+        <div style="font-size:13px">Bu öğrenci için henüz kaydedilmiş bir gelişim raporu bulunmuyor.</div>
+      </div>
+    </div>`;
+    el.innerHTML = html;
+    return;
+  }
+
+  html += `<div style="display:flex;flex-direction:column;gap:12px">`;
+  data.forEach(r => {
+    const icon = r.type === 'ai_copilot' ? '🧠' : '📄';
+    const typeText = r.type === 'ai_copilot' ? 'AI Copilot Değerlendirmesi' : 'Performans Raporu';
+    const dateStr = new Date(r.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    
+    html += `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:var(--shadow)">
+        <div style="min-width:0;flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-size:16px">${icon}</span>
+            <span style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text-dim);letter-spacing:.5px">${typeText}</span>
+          </div>
+          <h4 style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.title)}</h4>
+          <div style="font-size:11px;color:var(--text-dim)">Oluşturulma: ${dateStr}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="viewArchivedReport('${r.id}')">Görüntüle</button>
+          ${(session.role === 'coach' || session.role === 'developer') ? `<button class="btn btn-danger btn-sm" style="background:#ef4444;border-color:#ef4444;color:#fff" onclick="deleteArchivedReport('${r.id}', '${stuId}')">Sil</button>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  html += `</div></div>`;
+  el.innerHTML = html;
+}
+
+async function viewArchivedReport(reportId) {
+  showLoading(true);
+  const { data, error } = await db.from('reports').select('*').eq('id', reportId).single();
+  showLoading(false);
+  if (error || !data) return showToast('Rapor yüklenemedi: ' + (error?.message || 'Bulunamadı'));
+
+  let modal = document.getElementById('viewReportDetailModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'viewReportDetailModal';
+    modal.className = 'modal-bg';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+  }
+
+  const icon = data.type === 'ai_copilot' ? '🧠' : '📄';
+  const formattedDate = new Date(data.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  modal.innerHTML = `
+    <div class="modal" style="max-width:600px; max-height:85vh; overflow-y:auto">
+      <button class="modal-close" onclick="cm('viewReportDetailModal')">×</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:12px">
+        <span style="font-size:24px">${icon}</span>
+        <div>
+          <h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)">${esc(data.title)}</h3>
+          <div style="font-size:11px;color:var(--text-dim)">Oluşturulma Tarihi: ${formattedDate}</div>
+        </div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:20px;font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;overflow-y:auto;max-height:450px">${esc(data.content)}</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px;gap:8px">
+        <button class="btn btn-ghost" onclick="cm('viewReportDetailModal')">Kapat</button>
+        <button class="btn btn-accent" onclick="printActiveReport()">Yazdır / Paylaş</button>
+      </div>
+    </div>
+  `;
+  om('viewReportDetailModal');
+}
+
+function printActiveReport() {
+  const modal = document.getElementById('viewReportDetailModal');
+  if (!modal) return;
+  const title = modal.querySelector('h3').textContent;
+  const dateStr = modal.querySelector('div div').textContent;
+  const content = modal.querySelector('div[style*="pre-wrap"]').textContent;
+
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          body { font-family: 'Inter', sans-serif; padding: 40px; color: #1f2937; line-height: 1.6; }
+          .header { border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; }
+          .title { font-size: 24px; font-weight: 800; margin: 0; color: #111827; }
+          .date { font-size: 13px; color: #6b7280; margin-top: 5px; }
+          .content { font-size: 15px; white-space: pre-wrap; color: #374151; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1 class="title">${title}</h1>
+          <div class="date">${dateStr}</div>
+        </div>
+        <div class="content">${content}</div>
+        <script>
+          window.onload = function() { window.print(); }
+        </script>
+      </body>
+    </html>
+  `);
+  win.document.close();
+}
+
+async function deleteArchivedReport(reportId, stuId) {
+  const confirmed = await customConfirm('Bu raporu kalıcı olarak silmek istediğinize emin misiniz?');
+  if (!confirmed) return;
+
+  showLoading(true);
+  const { error } = await db.from('reports').delete().eq('id', reportId);
+  showLoading(false);
+
+  if (error) {
+    showToast('Rapor silinirken hata oluştu: ' + error.message);
+  } else {
+    showToast('Rapor başarıyla silindi ✓');
+    openPastReports(stuId);
+  }
+}
+
+window.archivePerformanceReport = archivePerformanceReport;
+window.openPastReports = openPastReports;
+window.viewArchivedReport = viewArchivedReport;
+window.printActiveReport = printActiveReport;
+window.deleteArchivedReport = deleteArchivedReport;

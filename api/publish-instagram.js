@@ -6,9 +6,26 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SB_URL = 'https://imyhenrwmsmyikpollur.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34';
+const SB_URL = process.env.SUPABASE_URL || 'https://imyhenrwmsmyikpollur.supabase.co';
+const SB_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlteWhlbnJ3bXNteWlrcG9sbHVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxNDE3ODYsImV4cCI6MjA5NTcxNzc4Nn0._ySJ5ArD1GYthyitHjdyEjLaUhextIwEqpRoF5ScI34';
 const db = createClient(SB_URL, SB_KEY);
+
+
+// ── Token geçerlilik kontrolü: yayın öncesi hızlı test ──
+async function validateToken(accountId, accessToken) {
+  const res = await fetch(
+    `https://graph.facebook.com/v20.0/${accountId}?fields=id,username&access_token=${accessToken}`
+  );
+  const data = await res.json();
+  if (data.error) {
+    const code = data.error.code;
+    if (code === 190) {
+      throw new Error('TOKEN_EXPIRED: Instagram access token süresi dolmuş. Admin paneli → Yapay Zeka & Pazarlama → Bağlantı Ayarları bölümünden yeni uzun ömürlü token girin.');
+    }
+    throw new Error(`TOKEN_INVALID [${code}]: ${data.error.message}`);
+  }
+  return data.username;
+}
 
 async function uploadImage(base64, fileName) {
   const buffer = Buffer.from(base64, 'base64');
@@ -101,6 +118,15 @@ export default async function handler(req, res) {
     const accessToken = creds.instagram_access_token;
     const ts = Date.now();
 
+    // Yayın öncesi token'ı doğrula — süresi dolmuşsa net hata dön
+    try {
+      const igUsername = await validateToken(accountId, accessToken);
+      console.log('[API] Token geçerli, hesap: @' + igUsername);
+    } catch (tokenErr) {
+      console.error('[API] Token doğrulama hatası:', tokenErr.message);
+      return res.status(401).json({ message: tokenErr.message, tokenError: true });
+    }
+
     // ── HIKAYE (tek görsel) ──
     if (isStory) {
       const imageUrl = await uploadImage(imageBase64, `story-${ts}.jpg`);
@@ -160,6 +186,12 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('[API] Publish Instagram error:', err);
-    return res.status(500).json({ message: 'Sunucu hatası: ' + err.message });
+    const isAuthError = /190|TOKEN_|OAuth|access token/i.test(err.message);
+    return res.status(isAuthError ? 401 : 500).json({
+      message: isAuthError
+        ? 'Instagram yetkilendirme hatası: ' + err.message
+        : 'Sunucu hatası: ' + err.message,
+      tokenError: isAuthError
+    });
   }
 }

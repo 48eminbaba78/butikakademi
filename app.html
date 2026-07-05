@@ -68,35 +68,119 @@
           <a class="login-forgot" onclick="showForgotPassword()">Şifremi Unuttum</a>
         </div>
 
-        <!-- ── KAYIT PANELİ ── -->
+        <!-- ── KAYIT PANELİ (SİHİRBAZ) ── -->
         <div id="registerPanel" style="display:none">
-          <button class="btn-google" onclick="loginWithGoogle()">
-            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58Z"/></svg>
-            Google ile Kayıt Ol
-          </button>
-          <div class="login-divider"><span>veya e-posta ile</span></div>
-          <div class="lfield"><label>Ad Soyad</label><input type="text" id="regName" placeholder="Adınız Soyadınız" autocomplete="name"></div>
-          <div class="lfield"><label>E-posta</label><input type="email" id="regEmail" placeholder="ornek@gmail.com" autocomplete="email"></div>
-          <div class="lfield"><label>Şifre</label><input type="password" id="regPass" placeholder="En az 8 karakter" autocomplete="new-password"></div>
-          <div class="lfield">
-            <label>Hesap Türü</label>
-            <div class="reg-role-btns">
-              <button class="reg-role-btn" id="rrbCoach" onclick="setRegRole('coach')">
-                <span style="font-size:20px">🎓</span>
-                <span class="rrb-name">Koç</span>
-                <span class="rrb-sub">Öğrenci yönet</span>
+          
+          <!-- Adım 0: Rol Seçimi -->
+          <div id="regWizardStep0">
+            <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:12px;text-align:center">Hoş Geldiniz! 👋</div>
+            <div style="font-size:13px;color:var(--text-mid);margin-bottom:24px;text-align:center">Kayıt olmak için hesap türünüzü seçin:</div>
+            
+            <div class="reg-role-btns" style="display:flex;gap:12px;margin-bottom:20px">
+              <button class="reg-role-btn" id="rrbCoach" onclick="setRegRole('coach')" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;border-radius:12px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--text);font-family:inherit;transition:all .15s">
+                <span style="font-size:24px;margin-bottom:6px">🎓</span>
+                <span style="font-weight:700;font-size:14px">Koç</span>
+                <span style="font-size:11px;color:var(--text-dim);margin-top:2px">Öğrencileri yönet</span>
               </button>
-              <button class="reg-role-btn" id="rrbStudent" onclick="setRegRole('student')">
-                <span style="font-size:20px">📚</span>
-                <span class="rrb-name">Öğrenci</span>
-                <span class="rrb-sub">Koç davet eder</span>
+              <button class="reg-role-btn" id="rrbStudent" onclick="setRegRole('student')" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;border-radius:12px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--text);font-family:inherit;transition:all .15s">
+                <span style="font-size:24px;margin-bottom:6px">📚</span>
+                <span style="font-weight:700;font-size:14px">Öğrenci</span>
+                <span style="font-size:11px;color:var(--text-dim);margin-top:2px">Koç davet eder</span>
               </button>
             </div>
+            
+            <div id="regErr0" style="display:none;color:var(--red);font-size:13px;margin-top:12px;padding:10px;background:var(--red-dim);border-radius:8px;text-align:center"></div>
+            <button class="btn-login" style="margin-top:10px" onclick="nextRegWizardStep()">Devam Et →</button>
           </div>
-          <div id="regErr" style="display:none;color:var(--red);font-size:13px;margin-bottom:8px;padding:10px 14px;background:var(--red-dim);border-radius:8px"></div>
-          <button class="btn-login" onclick="doRegister()">Kayıt Ol →</button>
-          <div id="regSuccess" style="display:none;text-align:center;padding:16px;background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.3);border-radius:10px;margin-top:8px;font-size:13px;color:#3ecf8e;line-height:1.6"></div>
-          <div class="login-hint">Kayıt olarak <a href="/terms.html" target="_blank" style="color:var(--accent)">Kullanım Koşulları</a>'nı kabul etmiş olursunuz.</div>
+
+          <!-- Adım 1: Koç - Marka Bilgileri -->
+          <div id="regWizardStepCoach1" style="display:none">
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;text-align:center">Markanızı Tanıyalım 🏷️</div>
+            <div style="font-size:12px;color:var(--text-mid);margin-bottom:20px;text-align:center">Öğrencileriniz uygulamaya girdiğinde ne görsün?</div>
+            
+            <div class="lfield">
+              <label>Akademi / Koçluk Adı</label>
+              <input type="text" id="regBrandName" placeholder="Örn: Emin Hoca Akademi">
+            </div>
+            <div class="lfield">
+              <label>Marka Rengi</label>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px" id="regBrandColorContainer">
+                <div onclick="setRegBrandColor('#f0a500', this)" style="width:32px;height:32px;background:#f0a500;border-radius:8px;cursor:pointer;transition:transform .1s;outline:3px solid white" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''"></div>
+                <div onclick="setRegBrandColor('#e8622a', this)" style="width:32px;height:32px;background:#e8622a;border-radius:8px;cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''"></div>
+                <div onclick="setRegBrandColor('#4da6ff', this)" style="width:32px;height:32px;background:#4da6ff;border-radius:8px;cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''"></div>
+                <div onclick="setRegBrandColor('#3ecf8e', this)" style="width:32px;height:32px;background:#3ecf8e;border-radius:8px;cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''"></div>
+                <div onclick="setRegBrandColor('#c084fc', this)" style="width:32px;height:32px;background:#c084fc;border-radius:8px;cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''"></div>
+                <div onclick="setRegBrandColor('#f472b6', this)" style="width:32px;height:32px;background:#f472b6;border-radius:8px;cursor:pointer;transition:transform .1s" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform=''"></div>
+              </div>
+              <input type="hidden" id="regBrandColor" value="#f0a500">
+            </div>
+            
+            <div style="display:flex;gap:8px;margin-top:20px">
+              <button class="btn-login" style="background:var(--surface3);color:var(--text);flex:1" onclick="prevRegWizardStep()">Geri</button>
+              <button class="btn-login" style="flex:2" onclick="nextRegWizardStep()">Devam Et →</button>
+            </div>
+          </div>
+
+          <!-- Adım 2: Koç - Profil & Uzmanlık -->
+          <div id="regWizardStepCoach2" style="display:none">
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;text-align:center">Profiliniz ve Uzmanlıklarınız 👤</div>
+            <div style="font-size:12px;color:var(--text-mid);margin-bottom:20px;text-align:center">Öğrenci eşleştirme ve profil detaylarınız için:</div>
+            
+            <div class="lfield">
+              <label>Telefon Numarası (isteğe bağlı)</label>
+              <input type="tel" id="regPhone" placeholder="05XX XXX XX XX">
+            </div>
+            <div class="lfield">
+              <label>Uzmanlık Alanlarınız</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" id="regExamTypesWrap">
+                <label class="ob-exam-sel" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1.5px solid var(--accent);background:var(--accent-dim);cursor:pointer;font-size:13px;font-weight:600;transition:all .15s" onclick="this.classList.toggle('ob-exam-sel');this.style.borderColor=this.classList.contains('ob-exam-sel')?'var(--accent)':'var(--border)';this.style.background=this.classList.contains('ob-exam-sel')?'var(--accent-dim)':'var(--surface2)';">
+                  <input type="checkbox" value="YKS" style="display:none" checked> 📐 YKS
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:13px;font-weight:600;transition:all .15s" onclick="this.classList.toggle('ob-exam-sel');this.style.borderColor=this.classList.contains('ob-exam-sel')?'var(--accent)':'var(--border)';this.style.background=this.classList.contains('ob-exam-sel')?'var(--accent-dim)':'var(--surface2)';">
+                  <input type="checkbox" value="LGS" style="display:none"> 📗 LGS
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:13px;font-weight:600;transition:all .15s" onclick="this.classList.toggle('ob-exam-sel');this.style.borderColor=this.classList.contains('ob-exam-sel')?'var(--accent)':'var(--border)';this.style.background=this.classList.contains('ob-exam-sel')?'var(--accent-dim)':'var(--surface2)';">
+                  <input type="checkbox" value="KPSS" style="display:none"> 🏛️ KPSS
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;font-size:13px;font-weight:600;transition:all .15s" onclick="this.classList.toggle('ob-exam-sel');this.style.borderColor=this.classList.contains('ob-exam-sel')?'var(--accent)':'var(--border)';this.style.background=this.classList.contains('ob-exam-sel')?'var(--accent-dim)':'var(--surface2)';">
+                  <input type="checkbox" value="ALES" style="display:none"> 🎓 ALES
+                </label>
+              </div>
+            </div>
+            <div class="lfield">
+              <label>Kaç öğrenciyle çalışıyorsunuz?</label>
+              <select id="regStudentCountRange" style="width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:12px 14px;font-size:14px;font-family:inherit;color:var(--text);outline:none">
+                <option value="1-5">1–5 öğrenci</option>
+                <option value="6-15">6–15 öğrenci</option>
+                <option value="16-30">16–30 öğrenci</option>
+                <option value="30+">30+ öğrenci</option>
+              </select>
+            </div>
+            
+            <div style="display:flex;gap:8px;margin-top:20px">
+              <button class="btn-login" style="background:var(--surface3);color:var(--text);flex:1" onclick="prevRegWizardStep()">Geri</button>
+              <button class="btn-login" style="flex:2" onclick="nextRegWizardStep()">Devam Et →</button>
+            </div>
+          </div>
+
+          <!-- Adım 3: Hesap Bilgileri -->
+          <div id="regWizardStepFinal" style="display:none">
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px;text-align:center">Hesap Bilgileri 🔑</div>
+            <div style="font-size:12px;color:var(--text-mid);margin-bottom:20px;text-align:center">Platforma giriş yapacağınız bilgileri belirleyin:</div>
+            
+            <div class="lfield"><label>Ad Soyad</label><input type="text" id="regName" placeholder="Adınız Soyadınız" autocomplete="name"></div>
+            <div class="lfield"><label>E-posta</label><input type="email" id="regEmail" placeholder="ornek@gmail.com" autocomplete="email"></div>
+            <div class="lfield"><label>Şifre</label><input type="password" id="regPass" placeholder="En az 8 karakter" autocomplete="new-password"></div>
+            
+            <div id="regErr" style="display:none;color:var(--red);font-size:13px;margin-top:12px;padding:10px 14px;background:var(--red-dim);border-radius:8px"></div>
+            <button class="btn-login" onclick="doRegister()">Kayıt Ol →</button>
+            <div id="regSuccess" style="display:none;text-align:center;padding:16px;background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.3);border-radius:10px;margin-top:8px;font-size:13px;color:#3ecf8e;line-height:1.6"></div>
+            
+            <div style="display:flex;gap:8px;margin-top:20px">
+              <button class="btn-login" style="background:var(--surface3);color:var(--text);flex:1" onclick="prevRegWizardStep()">Geri</button>
+            </div>
+            <div class="login-hint" style="margin-top:20px">Kayıt olarak <a href="/terms.html" target="_blank" style="color:var(--accent)">Kullanım Koşulları</a>'nı kabul etmiş olursunuz.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -353,11 +437,15 @@
       </div>
     </div>
 
-    <!-- Süre + Not yan yana -->
-    <div style="display:grid;grid-template-columns:100px 1fr;gap:10px;margin-top:12px">
+    <!-- Süre + Saat + Not yan yana -->
+    <div style="display:grid;grid-template-columns:100px 110px 1fr;gap:10px;margin-top:12px">
       <div class="field">
         <label>Süre (dk)</label>
         <input type="number" id="tmDuration" value="60" min="5">
+      </div>
+      <div class="field">
+        <label>Saat (İsteğe bağlı)</label>
+        <input type="time" id="tmStartTime" style="color-scheme:dark">
       </div>
       <div class="field">
         <label>Not</label>

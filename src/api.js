@@ -160,7 +160,8 @@ async function _fetchAll() {
       done:          t.done,
       student_note:  t.student_note || '',
       student_result:t.student_result || null,
-      task_items:    t.task_items
+      task_items:    t.task_items,
+      start_time:    t.start_time
     });
   });
 

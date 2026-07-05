@@ -2868,7 +2868,10 @@ async function publishIgPost(isStory = false) {
     } else {
       const err = await response.json();
       const msg = err.message || 'Yayınlanamadı';
-      if (msg.includes('API access blocked') || msg.includes('access')) {
+      if (err.tokenError || response.status === 401) {
+        showToast('🔑 Instagram token süresi dolmuş veya geçersiz. Bağlantı Ayarları sekmesinden yeni uzun ömürlü token girin.', false);
+        try { await db.from('instagram_posts').update({ status: 'failed', error_message: msg }).eq('id', p.id); } catch(_){}
+      } else if (msg.includes('API access blocked') || msg.includes('access')) {
         showToast('Instagram API erişimi engellendi. Bağlantı Ayarları → Token yenileyin veya Meta uygulamasının instagram_content_publish iznini kontrol edin.', false);
       } else if (msg.includes('kimlik') || msg.includes('eksik')) {
         showToast('Instagram kimlik bilgileri eksik. Bağlantı Ayarları sekmesinden girin.', false);

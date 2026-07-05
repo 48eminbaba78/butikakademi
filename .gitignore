@@ -12,3 +12,18 @@ publisher_*.json
 main.dart.js
 main.dart.mod.js
 generate-doc.cjs
+
+.env*
+
+# Ortam değişkenleri — ASLA commit etme
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env*.local
+
+# Geçici / debug dosyaları
+scratch/
+__*.js
+__*.cjs
+_*.mjs
