@@ -4218,6 +4218,16 @@ function stopChatPoll(){}
 // ═══════════════════════════════════════════════
 
 // ── DASHBOARD ──────────────────────────────────
+async function devResetOnboarding() {
+  await db.from('workspaces').upsert(
+    { coach_id: session.coachId, brand_name: S.workspace?.brand_name || 'Akademi', brand_color: S.workspace?.brand_color || '#f0a500', onboarding_done: false },
+    { onConflict: 'coach_id' }
+  );
+  if (S.workspace) S.workspace.onboarding_done = false;
+  showOnboarding();
+}
+window.devResetOnboarding = devResetOnboarding;
+
 async function renderDevDashboard() {
   const el = document.getElementById('view-dev-dashboard');
   el.innerHTML = `<div class="sh"><h2>🖥️ Sistem Dashboard</h2></div><div class="empty"><p>Yükleniyor...</p></div>`;
@@ -4252,7 +4262,12 @@ async function renderDevDashboard() {
   const maxD = Math.max(...tasksByDay,1);
 
   el.innerHTML = `
-    <div class="sh"><h2>🖥️ Sistem Dashboard</h2><span style="font-size:12px;color:var(--text-dim)">${new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</span></div>
+    <div class="sh"><h2>🖥️ Sistem Dashboard</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:12px;color:var(--text-dim)">${new Date().toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</span>
+        <button class="btn btn-ghost btn-sm" onclick="devResetOnboarding()" title="Onboarding sihirbazını yeniden başlat">🧙 Sihirbazı Test Et</button>
+      </div>
+    </div>
 
     <div class="stats-row" style="margin-bottom:20px">
       <div class="stat-card"><div class="stat-label">Toplam Öğrenci</div><div class="stat-val" style="color:var(--blue)">${students}</div></div>
