@@ -130,15 +130,20 @@ export async function simOAuthLogin(type) {
 
 export async function checkOAuthSession() {
   if (_sessionHandled) return;
+  _sessionHandled = true;
   let _timeoutId = null;
   try {
     console.log('[Auth] 1/4 getSession...');
     const { data: { session: oauthSess } } = await db.auth.getSession();
     console.log('[Auth] 2/4 session:', oauthSess?.user?.email || 'yok');
-    if (!oauthSess?.user) return;
-    if (document.getElementById('appShell')?.classList.contains('visible')) return;
-    if (_sessionHandled) return;
-    _sessionHandled = true;
+    if (!oauthSess?.user) {
+      _sessionHandled = false;
+      return;
+    }
+    if (document.getElementById('appShell')?.classList.contains('visible')) {
+      _sessionHandled = false;
+      return;
+    }
 
     showLoading(true);
 
@@ -273,7 +278,7 @@ export async function doLogin() {
   const _loginTimeout = setTimeout(() => {
     showLoading(false);
     loginErr('Bağlantı zaman aşımına uğradı. Supabase yanıt vermiyor — lütfen tekrar deneyin.');
-  }, 12000);
+  }, 15000);
   try {
     let email = usernameOrEmail;
     if (!email.includes('@')) {
@@ -288,6 +293,7 @@ export async function doLogin() {
       const { data: profile, error: pErr } = await db.from('users').select('*').eq('id', authData.user.id).maybeSingle();
       if (pErr) console.error('Profile fetch error:', pErr);
       if (profile) {
+        clearTimeout(_loginTimeout);
         await finishLogin(profile);
         return;
       }
@@ -305,6 +311,7 @@ export async function doLogin() {
       });
       const rows = Array.isArray(rpcRows) ? rpcRows[0] : rpcRows;
       if (rows) {
+        clearTimeout(_loginTimeout);
         await finishLogin(rows);
         return;
       }
@@ -383,6 +390,10 @@ export async function finishLogin(rows) {
 }
 
 export function doLogout() {
+  if (window._fcInstance) {
+    window._fcInstance.destroy();
+    window._fcInstance = null;
+  }
   if (window.destroyRealtime) window.destroyRealtime();
   db.auth.signOut().catch(() => {});
   invalidateCache();
@@ -428,6 +439,37 @@ export async function sendResetEmail() {
   }
 }
 
+export async function updateUserPassword() {
+  const newPass = document.getElementById('newPasswordInput').value;
+  if (!newPass || newPass.length < 8) {
+    alert('Şifre en az 8 karakter olmalıdır.');
+    return;
+  }
+  showLoading(true);
+  try {
+    // 1. Supabase Auth şifresini güncelle
+    const { error } = await db.auth.updateUser({ password: newPass });
+    if (error) throw error;
+    
+    // 2. public.users tablosundaki hash'i de güncelle
+    const hash = await sha256(newPass);
+    const { data: { user } } = await db.auth.getUser();
+    if (user) {
+      await db.from('users').update({ password_hash: hash }).eq('id', user.id);
+    }
+
+    alert('Şifreniz başarıyla güncellendi! Lütfen yeni şifrenizle giriş yapın.');
+    window.cm('resetPasswordModal');
+    await db.auth.signOut();
+    window.location.hash = '';
+    window.location.reload();
+  } catch (e) {
+    alert('Şifre güncellenirken hata oluştu: ' + e.message);
+  } finally {
+    showLoading(false);
+  }
+}
+
 // Expose to window for HTML inline event handlers
 window.loginErr = loginErr;
 window.regErr = regErr;
@@ -448,8 +490,14 @@ window.finishLogin = finishLogin;
 window.doLogout = doLogout;
 window.showForgotPassword = showForgotPassword;
 window.sendResetEmail = sendResetEmail;
+window.updateUserPassword = updateUserPassword;
 
 db.auth.onAuthStateChange(async (event, sessionData) => {
+  // PASSWORD_RECOVERY: Şifre sıfırlama linki tıklandığında tetiklenir
+  if (event === 'PASSWORD_RECOVERY') {
+    window.om('resetPasswordModal');
+    return;
+  }
   // SIGNED_IN: handles Google OAuth redirect (fires when Supabase processes OAuth tokens from URL)
   if (event === 'SIGNED_IN' && sessionData?.user) {
     if (document.getElementById('appShell')?.classList.contains('visible')) return;
@@ -461,3 +509,22 @@ db.auth.onAuthStateChange(async (event, sessionData) => {
     showLoading(false);
   }
 });
+
+// Kullanıcı adı ve E-posta inputlarını senkronize tutan (mirroring) yardımcı işlev
+function setupLoginMirroring() {
+  const emailEl = document.getElementById('loginEmail');
+  const userEl = document.getElementById('loginUser');
+  if (emailEl && userEl) {
+    emailEl.addEventListener('input', (e) => {
+      userEl.value = e.target.value;
+    });
+    userEl.addEventListener('input', (e) => {
+      emailEl.value = e.target.value;
+    });
+  }
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupLoginMirroring);
+} else {
+  setupLoginMirroring();
+}

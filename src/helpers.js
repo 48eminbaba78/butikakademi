@@ -21,6 +21,21 @@ export function saveS() {
 
 export function showLoading(on) {
   let el = document.getElementById('loadingOverlay');
+  
+  // Mükerrer tıklamaları önlemek için giriş/aksiyon butonlarını devre dışı bırak
+  const actionBtns = document.querySelectorAll('.btn-login, .btn-accent, .btn');
+  actionBtns.forEach(btn => {
+    if (on) {
+      btn.setAttribute('disabled', 'true');
+      btn.style.opacity = '0.6';
+      btn.style.pointerEvents = 'none';
+    } else {
+      btn.removeAttribute('disabled');
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+    }
+  });
+
   if (on && !el) {
     el = document.createElement('div');
     el.id = 'loadingOverlay';
@@ -81,13 +96,15 @@ export function showToast(msg) {
 
 // Click-outside ve Escape tuşu ile tüm modalları kapatma desteği
 document.addEventListener('click', e => {
-  if (e.target.classList.contains('modal-bg')) {
+  if (e.target.classList.contains('modal-bg') && e.target.id !== 'trialExpiredModal') {
     e.target.classList.remove('open');
   }
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-bg.open').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.modal-bg.open').forEach(el => {
+      if (el.id !== 'trialExpiredModal') el.classList.remove('open');
+    });
   }
 });
 

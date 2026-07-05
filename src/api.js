@@ -117,14 +117,20 @@ async function _fetchAll() {
     ? db.from('student_speeds').select('*').eq('coach_id', coachId)
     : db.from('student_speeds').select('*');
 
-  const konuP = (role === 'coach' || role === 'developer')
-    ? db.from('konu_hafta_soru').select('*').eq('coach_id', coachId)
+  const masteryP = (role === 'coach' || role === 'developer')
+    ? db.from('konu_mastery').select('*').eq('coach_id', coachId)
     : role === 'student'
-    ? db.from('konu_hafta_soru').select('*').eq('student_id', session.studentId)
+    ? db.from('konu_mastery').select('*').eq('student_id', session.studentId)
     : Promise.resolve({ data: [] });
 
-  const [wsRes, stuRes, taskRes, apptRes, examRes, msgRes, todoRes, speedRes, konuRes] =
-    await Promise.all([wsP, stuP, taskP, apptP, examP, msgP, todoP, speedP, konuP]);
+  const tekrarLogP = (role === 'coach' || role === 'developer')
+    ? db.from('konu_tekrar_log').select('*').eq('coach_id', coachId)
+    : role === 'student'
+    ? db.from('konu_tekrar_log').select('*').eq('student_id', session.studentId)
+    : Promise.resolve({ data: [] });
+
+  const [wsRes, stuRes, taskRes, apptRes, examRes, msgRes, todoRes, speedRes, masteryRes, tekrarLogRes] =
+    await Promise.all([wsP, stuP, taskP, apptP, examP, msgP, todoP, speedP, masteryP, tekrarLogP]);
 
   if (role === 'coach' || role === 'developer') S.workspace = wsRes.data || null;
 
@@ -136,7 +142,8 @@ async function _fetchAll() {
     progress: s.progress || 0,
     weekStart:s.week_start || 0,
     username: s.username,
-    coachId:  s.coach_id
+    coachId:  s.coach_id,
+    yksArea:  s.yks_area || 'SAY'
   }));
 
   S.tasks = {};
@@ -202,7 +209,23 @@ async function _fetchAll() {
   });
 
   S.studentSpeeds = speedRes.data || [];
-  S.konuHaftaSoru = konuRes.data || [];
+
+  // konu_mastery: { student_id: { subject: { konu: masteryRow } } }
+  S.konuMastery = {};
+  (masteryRes.data || []).forEach(r => {
+    if (!S.konuMastery[r.student_id]) S.konuMastery[r.student_id] = {};
+    if (!S.konuMastery[r.student_id][r.subject]) S.konuMastery[r.student_id][r.subject] = {};
+    S.konuMastery[r.student_id][r.subject][r.konu] = r;
+  });
+
+  // konu_tekrar_log: { student_id: { subject: { konu: { period_start: row } } } }
+  S.konuTekrarLog = {};
+  (tekrarLogRes.data || []).forEach(r => {
+    if (!S.konuTekrarLog[r.student_id]) S.konuTekrarLog[r.student_id] = {};
+    if (!S.konuTekrarLog[r.student_id][r.subject]) S.konuTekrarLog[r.student_id][r.subject] = {};
+    if (!S.konuTekrarLog[r.student_id][r.subject][r.konu]) S.konuTekrarLog[r.student_id][r.subject][r.konu] = {};
+    S.konuTekrarLog[r.student_id][r.subject][r.konu][r.period_start] = r;
+  });
 
   try {
     const ui = JSON.parse(localStorage.getItem('ba_ui_' + session.dbUser?.id) || '{}');

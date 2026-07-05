@@ -683,3 +683,39 @@ CREATE TABLE IF NOT EXISTS public.konu_hafta_soru (
 ALTER TABLE public.konu_hafta_soru ENABLE ROW LEVEL SECURITY;
 
 
+-- ----------------------------------------------------------------------------
+-- 15. KONU MASTERY TABLE (7-Star Hakimiyet Sistemi)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.konu_mastery (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  student_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  coach_id uuid NOT NULL,
+  subject text NOT NULL,
+  konu text NOT NULL,
+  stars integer NOT NULL DEFAULT 0 CHECK (stars BETWEEN 0 AND 7),
+  status text NOT NULL DEFAULT 'not_started' CHECK (status IN ('not_started','active','td')),
+  ka_date timestamptz,
+  td_date timestamptz,
+  last_review_date timestamptz,
+  review_count integer DEFAULT 0,
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE(student_id, subject, konu)
+);
+ALTER TABLE public.konu_mastery ENABLE ROW LEVEL SECURITY;
+
+-- ----------------------------------------------------------------------------
+-- 16. KONU TEKRAR LOG TABLE (10-Günlük Periyot Takibi)
+-- ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.konu_tekrar_log (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  student_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  coach_id uuid NOT NULL,
+  subject text NOT NULL,
+  konu text NOT NULL,
+  period_start date NOT NULL,
+  review_count integer DEFAULT 0 CHECK (review_count BETWEEN 0 AND 6),
+  notes text,
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE(student_id, subject, konu, period_start)
+);
+ALTER TABLE public.konu_tekrar_log ENABLE ROW LEVEL SECURITY;

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nasıl Yapılır — Rostrum Akademi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0e0c;--surface:#1a1916;--surface2:#242220;--surface3:#2e2b28;--border:#383430;--accent:#f0a500;--accent2:#e8622a;--text:#f0ece6;--text-mid:#9a9088;--text-dim:#5a5450;--green:#3ecf8e;--red:#ff5c5c;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:0 0 80px;}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:.3px;}
+.topbar-logo span{color:var(--accent);}
+.topbar-back{font-size:13px;color:var(--text-mid);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}
+.topbar-back:hover{color:var(--text);}
+
+/* HERO */
+.hero{max-width:780px;margin:56px auto 48px;padding:0 24px;text-align:center;}
+.hero-badge{display:inline-block;background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.25);border-radius:99px;padding:5px 16px;font-size:12px;font-weight:600;color:var(--accent);margin-bottom:20px;letter-spacing:.5px;}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:800;line-height:1.15;margin-bottom:14px;}
+.hero p{font-size:15px;color:var(--text-mid);line-height:1.7;max-width:560px;margin:0 auto;}
+
+/* TOC */
+.toc{max-width:780px;margin:0 auto 40px;padding:0 24px;}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 24px;}
+.toc-title{font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;}
+.toc-list{display:flex;flex-direction:column;gap:8px;}
+.toc-list a{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-mid);font-size:13px;font-weight:500;transition:color .2s;}
+.toc-list a:hover{color:var(--accent);}
+.toc-num{width:22px;height:22px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+
+/* SECTIONS */
+.sections{max-width:780px;margin:0 auto;padding:0 24px;display:flex;flex-direction:column;gap:32px;}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;overflow:hidden;}
+.section-head{padding:22px 28px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px;}
+.section-num{width:36px;height:36px;border-radius:10px;background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.25);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--accent);flex-shrink:0;}
+.section-head-text h2{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:4px;}
+.section-head-text p{font-size:13px;color:var(--text-mid);line-height:1.5;}
+.section-body{padding:24px 28px;display:flex;flex-direction:column;gap:20px;}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:14px;}
+.step{display:flex;gap:14px;align-items:flex-start;}
+.step-dot{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--accent);flex-shrink:0;margin-top:1px;}
+.step-body{flex:1;}
+.step-title{font-size:14px;font-weight:700;margin-bottom:3px;}
+.step-desc{font-size:13px;color:var(--text-mid);line-height:1.6;}
+.step-code{display:inline-block;background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-family:monospace;font-size:12px;color:var(--accent);margin-top:4px;}
+
+/* INFO BOX */
+.info-box{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--text-mid);line-height:1.7;}
+.info-box b{color:var(--accent);}
+.warn-box{background:rgba(255,92,92,.06);border:1px solid rgba(255,92,92,.2);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--text-mid);line-height:1.7;}
+.warn-box b{color:var(--red);}
+
+/* FORMAT TABLE */
+.fmt-table{width:100%;border-collapse:collapse;font-size:13px;}
+.fmt-table th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);padding:8px 12px;border-bottom:1px solid var(--border);}
+.fmt-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+.fmt-table tr:last-child td{border-bottom:none;}
+.fmt-table td:first-child{color:var(--text-mid);font-family:monospace;font-size:12px;}
+.fmt-table td:last-child{color:var(--text-mid);}
+.fmt-table td b{color:var(--text);}
+
+/* CODE BLOCK */
+.code-block{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:monospace;font-size:12px;color:var(--text-mid);line-height:2;white-space:pre-wrap;}
+.code-block .hl{color:var(--accent);}
+.code-block .hl2{color:var(--green);}
+
+/* VISUAL MOCK */
+.yt-mock{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.yt-mock-bar{display:flex;align-items:center;gap:8px;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:12px;}
+.yt-mock-url{flex:1;font-size:11px;font-family:monospace;color:var(--accent);}
+.yt-mock-badge{background:#ff0000;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:4px;}
+.yt-mock-item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:6px;background:var(--surface);margin-bottom:4px;}
+.yt-mock-thumb{width:40px;height:28px;background:linear-gradient(135deg,#333,#222);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.yt-mock-info{flex:1;}
+.yt-mock-title{font-size:11px;font-weight:600;margin-bottom:2px;}
+.yt-mock-dur{font-size:10px;color:var(--text-dim);}
+
+/* CTA */
+.cta-bar{max-width:780px;margin:48px auto 0;padding:0 24px;}
+.cta-inner{background:linear-gradient(135deg,var(--surface) 0%,var(--surface2) 100%);border:1px solid var(--border);border-radius:18px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.cta-text h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:4px;}
+.cta-text p{font-size:13px;color:var(--text-mid);}
+.cta-btn{background:var(--accent);color:#0f0e0c;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;text-decoration:none;white-space:nowrap;display:inline-block;}
+.cta-btn:hover{background:#fbb800;}
+
+@media(max-width:640px){
+  .topbar{padding:12px 16px;}
+  .hero{margin:32px auto 32px;padding:0 16px;}
+  .toc,.sections,.cta-bar{padding:0 16px;}
+  .section-head,.section-body{padding:18px 20px;}
+  .cta-inner{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">Rostrum<span>.</span></div>
+  <a href="javascript:window.close()" class="topbar-back">← Geri Dön</a>
+</div>
+
+<div class="hero">
+  <div class="hero-badge">YARDIM MERKEZİ</div>
+  <h1>Kaynak Nasıl Eklenir?</h1>
+  <p>YouTube playlist otomatik çekme ve manuel kaynak girişi için adım adım rehber.</p>
+</div>
+
+<div class="toc">
+  <div class="toc-inner">
+    <div class="toc-title">İçindekiler</div>
+    <div class="toc-list">
+      <a href="#yt-auto"><span class="toc-num">1</span> YouTube'dan Otomatik Ekle</a>
+      <a href="#yt-url"><span class="toc-num">2</span> Playlist URL Nasıl Alınır?</a>
+      <a href="#manuel"><span class="toc-num">3</span> Manuel Video Girişi</a>
+      <a href="#soru-bankasi"><span class="toc-num">4</span> Soru Bankası Ekleme</a>
+      <a href="#sikca"><span class="toc-num">5</span> Sık Sorulan Sorular</a>
+    </div>
+  </div>
+</div>
+
+<div class="sections">
+
+  <!-- 1. YouTube Otomatik -->
+  <div class="section-card" id="yt-auto">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div class="section-head-text">
+        <h2>YouTube'dan Otomatik Ekle</h2>
+        <p>Bir YouTube playlist'ini tek tıkla sisteme aktar. Tüm videolar, süreler ve başlıklar otomatik yüklenir.</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot">1</div>
+          <div class="step-body">
+            <div class="step-title">Kaynak Yöneticisi'ni aç</div>
+            <div class="step-desc">Sol menüden <b>Kaynaklarım</b>'a tıkla. Sağ üstteki <b>+ Playlist Ekle</b> butonuna bas.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">2</div>
+          <div class="step-body">
+            <div class="step-title">Playlist URL'ini kopyala</div>
+            <div class="step-desc">YouTube'da playlist sayfasını aç. Adres çubuğundan tüm URL'yi kopyala.</div>
+            <div class="step-code">youtube.com/playlist?list=PLxxxxxxxxxxxxxx</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">3</div>
+          <div class="step-body">
+            <div class="step-title">URL'yi yapıştır ve Çek'e bas</div>
+            <div class="step-desc">Açılan formda kırmızı çerçeveli alana yapıştır. <b>▶ Çek</b> butonuna bas.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">4</div>
+          <div class="step-body">
+            <div class="step-title">Liste otomatik doldu, Kaydet'e bas</div>
+            <div class="step-desc">Videolar aşağıdaki alana otomatik yazıldı. İstersen düzenle, sonra <b>Playlist Kaydet</b>'e bas.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual mock -->
+      <div class="yt-mock">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span class="yt-mock-badge">YT</span>
+            <span style="font-size:12px;font-weight:700">YouTube Playlist'ten Otomatik Ekle</span>
+          </div>
+        </div>
+        <div class="yt-mock-bar">
+          <span class="yt-mock-url">https://youtube.com/playlist?list=PLabcd...</span>
+          <button style="background:#f0a500;color:#0f0e0c;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer">▶ Çek</button>
+        </div>
+        <div class="yt-mock-item">
+          <div class="yt-mock-thumb">▶</div>
+          <div class="yt-mock-info"><div class="yt-mock-title">Ders 1 — Polinomlar ve Faktöriyel</div><div class="yt-mock-dur">45 dk</div></div>
+        </div>
+        <div class="yt-mock-item">
+          <div class="yt-mock-thumb">▶</div>
+          <div class="yt-mock-info"><div class="yt-mock-title">Ders 2 — Türev Giriş</div><div class="yt-mock-dur">38 dk</div></div>
+        </div>
+        <div style="text-align:center;font-size:11px;color:var(--text-dim);margin-top:8px">+ 24 video daha yüklendi</div>
+      </div>
+
+      <div class="warn-box">
+        <b>Dikkat:</b> Gizli (private) veya üyelere özel (members-only) playlist'ler çekilemez. Playlist'in herkese açık olduğundan emin ol.
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Playlist URL -->
+  <div class="section-card" id="yt-url">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div class="section-head-text">
+        <h2>Playlist URL Nereden Alınır?</h2>
+        <p>YouTube'da playlist URL'sini bulmak için üç farklı yol.</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-dot">A</div>
+          <div class="step-body">
+            <div class="step-title">Playlist sayfasından (En kolay)</div>
+            <div class="step-desc">YouTube'da bir playlist'e tıkla. Sağ tarafta açılan playlist panelinde <b>"Tümünü oynat"</b> yaz. Adres çubuğu <code style="color:var(--accent);font-family:monospace">?list=PL...</code> içerir. Tamamını kopyala.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">B</div>
+          <div class="step-body">
+            <div class="step-title">Kanal sayfasındaki playlist'ten</div>
+            <div class="step-desc">Kanalı aç → Playlist sekmesi → Bir playlist'e tıkla. URL şu formatta olacak:<br>
+            <span class="step-code">youtube.com/playlist?list=PLxxxxxx</span></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-dot">C</div>
+          <div class="step-body">
+            <div class="step-title">Video oynarken playlist'in URL'si</div>
+            <div class="step-desc">Bir video izlerken, eğer playlist'e ekliyse URL şöyle görünür:<br>
+            <span class="step-code">youtube.com/watch?v=xxxxx&list=PLyyyyyyy</span><br>
+            Bu URL de geçerlidir — yapıştırabilirsin.</div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">
+        <b>İpucu:</b> URL'de <b>list=</b> parametresi olduğu sürece sistem playlist'i tanır. Sadece <code style="font-family:monospace">list=</code>'ten sonraki kısmın bozuk olmamasına dikkat et.
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Manuel Video -->
+  <div class="section-card" id="manuel">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <div class="section-head-text">
+        <h2>Manuel Video Girişi</h2>
+        <p>YouTube dışı kaynaklarda veya tek tek video eklemek istediğinde kullan.</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px">Her satıra bir video. Format:</div>
+      <div class="code-block"><span class="hl">Video Adı</span> | <span class="hl2">YouTube Linki</span> | <span style="color:#4da6ff">Süre(dk)</span>
+
+<span class="hl">Ders 1 — Polinomlar</span> | <span class="hl2">https://youtube.com/watch?v=abc123</span> | <span style="color:#4da6ff">45</span>
+<span class="hl">Ders 2 — Türev Giriş</span> | <span class="hl2">https://youtube.com/watch?v=def456</span> | <span style="color:#4da6ff">38</span>
+<span class="hl">Ders 3 — İntegral</span> | <span class="hl2">https://youtube.com/watch?v=ghi789</span> | <span style="color:#4da6ff">52</span></div>
+
+      <table class="fmt-table">
+        <tr><th>Alan</th><th>Açıklama</th><th>Zorunlu?</th></tr>
+        <tr><td>Video Adı</td><td><b>İstediğin isim.</b> Konuyu ve sırayı belirt.</td><td style="color:var(--green)">✓ Evet</td></tr>
+        <tr><td>YouTube Linki</td><td><b>Tam URL.</b> youtube.com/watch?v=... veya youtu.be/...</td><td style="color:var(--green)">✓ Evet</td></tr>
+        <tr><td>Süre(dk)</td><td><b>Dakika cinsinden.</b> Öğrenciye süre bilgisi gösterir.</td><td style="color:var(--text-dim)">İsteğe bağlı</td></tr>
+      </table>
+
+      <div class="info-box">
+        <b>İpucu:</b> Ayırıcı olarak <b>|</b> (pipe) karakteri kullanılır. Her alan arasında bir tane olmalı. Satır sonuna ekstra | koyma.
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Soru Bankası -->
+  <div class="section-card" id="soru-bankasi">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <div class="section-head-text">
+        <h2>Soru Bankası Ekleme</h2>
+        <p>Basılı veya dijital soru bankası eklemek için test bazlı format kullanılır.</p>
+      </div>
+    </div>
+    <div class="section-body">
+      <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px">Her satıra bir test. Format:</div>
+      <div class="code-block"><span class="hl">Test Adı</span> | <span style="color:#4da6ff">Soru Sayısı</span>
+
+<span class="hl">Sayılar - Test 1</span> | <span style="color:#4da6ff">12</span>
+<span class="hl">Sayılar - Test 2</span> | <span style="color:#4da6ff">14</span>
+<span class="hl">Cebir - Karışık Test</span> | <span style="color:#4da6ff">20</span>
+<span class="hl">Fonksiyonlar - Kazanım Testi</span> | <span style="color:#4da6ff">16</span></div>
+
+      <table class="fmt-table">
+        <tr><th>Alan</th><th>Açıklama</th></tr>
+        <tr><td>Test Adı</td><td><b>Konu ve sıra numarası.</b> Öğrenci haftalık programda bu ismi görür.</td></tr>
+        <tr><td>Soru Sayısı</td><td><b>Sadece rakam.</b> Sistem bu sayıyı çözüm takibinde kullanır.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. SSS -->
+  <div class="section-card" id="sikca">
+    <div class="section-head">
+      <div class="section-num">5</div>
+      <div class="section-head-text">
+        <h2>Sık Sorulan Sorular</h2>
+      </div>
+    </div>
+    <div class="section-body">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px">Playlist'i çekince videolar çıkmıyor, ne yapmalıyım?</div>
+          <div style="font-size:13px;color:var(--text-mid);line-height:1.6">Playlist gizli olabilir. YouTube'da playlist ayarlarından "Herkese açık" yap. Ayrıca URL'de <code style="font-family:monospace;color:var(--accent)">list=</code> parametresinin tam olduğunu kontrol et.</div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px">Video süresini bilmiyorum, boş bırakabilir miyim?</div>
+          <div style="font-size:13px;color:var(--text-mid);line-height:1.6">Evet. Süre alanı isteğe bağlıdır. <code style="font-family:monospace;color:var(--accent)">Ders 1 | https://... | </code> şeklinde boş bırakabilir veya <b>0</b> yazabilirsin.</div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px">Bir playlist'i birden fazla öğrenciye atayabilir miyim?</div>
+          <div style="font-size:13px;color:var(--text-mid);line-height:1.6">Evet. Kaynak bir kez eklendikten sonra haftalık programda istediğin öğrenciye atayabilirsin. Kaynak veritabanında saklanır, tekrar girmen gerekmez.</div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:16px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:5px">Kaç video ekleyebilirim?</div>
+          <div style="font-size:13px;color:var(--text-mid);line-height:1.6">Sınır yoktur. Otomatik çekme ile 50 video/sayfa olarak yüklenir; çok büyük listeler birden fazla çekme ile tamamlanır.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="cta-bar">
+  <div class="cta-inner">
+    <div class="cta-text">
+      <h3>Hâlâ sorun mu yaşıyorsunuz?</h3>
+      <p>Koç panelinden yapay zeka asistanımıza sorabilirsiniz.</p>
+    </div>
+    <a href="/app.html" class="cta-btn">Panele Dön →</a>
+  </div>
+</div>
+
+</body>
+</html>

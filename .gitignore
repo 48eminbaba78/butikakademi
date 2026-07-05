@@ -6,3 +6,9 @@ __*.js
 _*.js
 _*.mjs
 test_ss
+.env*
+decrypted_*.json
+publisher_*.json
+main.dart.js
+main.dart.mod.js
+generate-doc.cjs
