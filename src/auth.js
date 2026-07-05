@@ -270,6 +270,10 @@ export async function doLogin() {
   if (!usernameOrEmail || !pass) return loginErr('Kullanıcı adı ve şifre zorunlu');
 
   showLoading(true);
+  const _loginTimeout = setTimeout(() => {
+    showLoading(false);
+    loginErr('Bağlantı zaman aşımına uğradı. Supabase yanıt vermiyor — lütfen tekrar deneyin.');
+  }, 12000);
   try {
     let email = usernameOrEmail;
     if (!email.includes('@')) {
@@ -314,6 +318,8 @@ export async function doLogin() {
     showLoading(false);
     console.error('[doLogin]', e);
     return loginErr('Giriş hatası: ' + e.message);
+  } finally {
+    clearTimeout(_loginTimeout);
   }
 }
 
