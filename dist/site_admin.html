@@ -1102,6 +1102,7 @@ function renderUserTable(){
           <button class="btn btn-ghost btn-sm" onclick="toggleUserActive('${u.id}',${!statusOk})" style="${statusOk?'color:var(--red)':'color:var(--acc3)'}">
             ${statusOk?'Pasifleştir':'Aktifleştir'}
           </button>
+          <button class="btn btn-ghost btn-sm" onclick="adminDeleteUser('${u.id}','${esc(u.full_name||u.username||'')}')" style="color:var(--red);border-color:rgba(239,68,68,.3)" title="Kalıcı sil">🗑</button>
         </div>
       </td>
     </tr>`;
@@ -1112,6 +1113,23 @@ async function toggleUserActive(id,makeActive){
   await db.from('users').update({active:makeActive}).eq('id',id);
   showToast(makeActive?'Aktifleştirildi ✓':'Pasifleştirildi');
   loadUsers();
+}
+async function adminDeleteUser(id, name) {
+  if (!confirm(`"${name}" kullanıcısını kalıcı olarak silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.`)) return;
+  const { data: { session: s } } = await db.auth.getSession();
+  try {
+    const resp = await fetch('/api/delete-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${s?.access_token || ''}` },
+      body: JSON.stringify({ targetUserId: id })
+    });
+    const d = await resp.json();
+    if (!resp.ok) throw new Error(d.error || 'Sunucu hatası');
+    showToast(`🗑 ${name} silindi`);
+    loadUsers();
+  } catch (e) {
+    alert('Hata: ' + e.message);
+  }
 }
 function viewUserDetail(id){
   const u=_allUsers.find(x=>x.id===id);
