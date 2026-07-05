@@ -177,6 +177,7 @@ const stuTabs=[
   {id:'sprofil',lbl:'👤',name:'Profilim'},
 ];
 const devTabs=[
+  {id:'dev-dashboard',lbl:'🖥️',name:'Dev Panel'},
   {id:'dev-tickets',lbl:'🎫',name:'Destek'},
 ];
 const parentTabs=[
