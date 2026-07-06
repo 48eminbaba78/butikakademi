@@ -1503,6 +1503,16 @@ function filterLeads(f,el){
   renderLeads();
 }
 
+function getWhatsAppUrl(l) {
+  if (!l.phone) return '';
+  const cleaned = l.phone.replace(/\D/g, '');
+  if (!cleaned) return '';
+  const phone = cleaned.startsWith('90') ? cleaned : '90' + cleaned;
+  const name = l.first_name || '';
+  const text = `Merhaba ${name} Hocam, Rostrum Akademi üzerinde markanıza özel oluşturduğumuz test paneli hazır! İncelemek isterseniz: https://rostrumakademi.com/app.html?sandbox=true`;
+  return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+}
+
 function renderLeads(){
   const q=document.getElementById('leadSearch')?.value?.toLowerCase()||'';
   let list=_leads;
@@ -1512,13 +1522,18 @@ function renderLeads(){
   if(!list.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--dim);padding:30px">Sonuç bulunamadı</td></tr>';return;}
   tbody.innerHTML=list.map(l=>`<tr>
     <td><div style="font-weight:700;color:var(--text)">${esc(l.first_name)} ${esc(l.last_name||'')}</div><div style="font-size:11px;color:var(--dim)">${esc(l.brand_name)}</div></td>
-    <td><a href="mailto:${esc(l.email)}" style="color:var(--acc4);text-decoration:none">${esc(l.email)}</a>${l.phone?`<div style="font-size:11px;color:var(--dim)">${esc(l.phone)}</div>`:''}</td>
+    <td>
+      <a href="mailto:${esc(l.email)}" style="color:var(--acc4);text-decoration:none">${esc(l.email)}</a>
+      ${l.phone?`<div style="font-size:11px;color:var(--dim)">${esc(l.phone)}</div>`:''}
+      ${l.email_clicked ? `<div style="font-size:10px;color:var(--acc3);font-weight:700;margin-top:2px">🔥 Linke Tıkladı ${l.clicked_at ? `(${new Date(l.clicked_at).toLocaleDateString('tr-TR')})` : ''}</div>` : ''}
+    </td>
     <td><span class="status-badge st-${l.plan==='pro'?'contacted':'pending'}" style="background:rgba(240,165,0,.1);color:var(--acc)">${esc(l.plan||'pro')}</span></td>
     <td>${esc(l.student_count||'—')}</td>
     <td><span class="status-badge st-${l.status}">${statusLabel(l.status)}</span></td>
     <td style="font-size:11px">${new Date(l.created_at).toLocaleDateString('tr-TR')}</td>
     <td><div style="display:flex;gap:4px">
       <button class="btn btn-ghost btn-sm" onclick="openLeadModal('${l.id}')">Detay</button>
+      ${l.phone ? `<a href="${getWhatsAppUrl(l)}" target="_blank" class="btn btn-ghost btn-sm" style="color:#25D366;border-color:rgba(37,211,102,.3);text-decoration:none" title="WhatsApp ile İletişim">💬 WA</a>` : ''}
       ${l.status==='pending'?`<button class="btn btn-green btn-sm" onclick="updateLeadStatus('${l.id}','approved')">✓</button>
       <button class="btn btn-danger btn-sm" onclick="updateLeadStatus('${l.id}','rejected')">✕</button>`:''}
     </div></td>
@@ -1552,6 +1567,7 @@ function openLeadModal(id){
     </div>
     <div style="display:flex;gap:8px">
       <button class="btn btn-acc" style="flex:1;justify-content:center" onclick="saveLeadModal('${l.id}')">Kaydet</button>
+      ${l.phone ? `<a href="${getWhatsAppUrl(l)}" target="_blank" class="btn btn-ghost" style="flex:1;justify-content:center;color:#25D366;border-color:rgba(37,211,102,.3);text-decoration:none">💬 WhatsApp</a>` : ''}
       <a href="mailto:${esc(l.email)}" class="btn btn-ghost" style="flex:1;justify-content:center">✉️ E-posta Gönder</a>
     </div>`;
   openModal('leadModal');

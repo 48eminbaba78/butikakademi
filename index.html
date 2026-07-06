@@ -1975,9 +1975,17 @@ async function trackEmailClick(){
     const urlParams = new URLSearchParams(window.location.search);
     const leadId = urlParams.get('lead_id');
     if(leadId){
-      const {error} = await _SB.from('leads').update({ email_clicked: true }).eq('id', leadId);
+      const {error} = await _SB.from('leads').update({
+        email_clicked: true,
+        clicked_at: new Date().toISOString()
+      }).eq('id', leadId);
       if(error) console.warn('trackEmailClick error:', error);
-      else console.log('Lead click tracked successfully:', leadId);
+      else {
+        console.log('Lead click tracked successfully:', leadId);
+        // Temiz URL için parametreyi gizle
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+      }
     }
   }catch(e){ console.warn('trackEmailClick error:', e); }
 }
