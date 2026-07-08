@@ -2938,6 +2938,96 @@ function selectStorySlide(n) {
   }
 }
 
+function selectIgPost(id) {
+  _selectedIgPostId = id;
+  _igApproved = false;
+  _selectedStorySlide = 0;
+  renderIgPosts();
+
+  const p = _igPosts.find(x => x.id === id);
+  if (!p) return;
+
+  // Önizleme — Reels veya Carousel olmasına göre göster
+  const previewContainer = document.getElementById('igPanelPreviewContainer');
+  const d = p.preview_data || {};
+  
+  if (p.content_type === 'reels' || p.theme_category === 'reels') {
+    previewContainer.innerHTML = renderReelsPreview(p);
+    const nav = document.getElementById('slide-btn-container');
+    if (nav) nav.style.setProperty('display', 'none', 'important');
+    const stVal = document.getElementById('igStorySlideText');
+    if (stVal) stVal.parentNode.style.display = 'none';
+  } else {
+    const nav = document.getElementById('slide-btn-container');
+    if (nav) nav.style.setProperty('display', 'flex', 'important');
+    const stVal = document.getElementById('igStorySlideText');
+    if (stVal) stVal.parentNode.style.display = 'block';
+    
+    const rawSlides = Array.isArray(p.story_slides) ? p.story_slides : [];
+    let carouselSlides = parseCarouselSlides(rawSlides);
+  
+    if (carouselSlides.length === 0) {
+      const hook = d.quote || p.caption?.split('\n')[0]?.substring(0, 80) || 'YKS koçluğunda yeni bir dönem';
+      const pts = (d.points || []).map(pt => [pt.title || String(pt), pt.desc || '']);
+      carouselSlides = [
+        { type: 'hook', headline: hook },
+        { type: 'content', headline: d.title || 'Neden Önemli?', points: pts.slice(0, 3) },
+        { type: 'content', headline: d.subtitle || 'Çözüm', points: pts.slice(3, 5) },
+        { type: 'insight', quote: d.quote || hook },
+        { type: 'cta', cta_text: 'Erken erişim açık — Yeniden Üret ile özelleştir' }
+      ];
+    }
+  
+    const svgStr = getCarouselSlideSvg(carouselSlides[0], 0, carouselSlides.length);
+    previewContainer.innerHTML = `<img src="data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgStr)}" style="width:100%;height:100%;object-fit:cover"/>`;
+    document.getElementById('igStorySlideText').value = rawSlides[0]?.text || rawSlides[0] || '';
+    selectStorySlide(0);
+  }
+
+  // Caption + hashtag
+  const fullCaption = p.caption || '';
+  const hashtagMatch = fullCaption.match(/(#\S+(\s+#\S+)*)\s*$/);
+  if (hashtagMatch) {
+    document.getElementById('igPanelCaptionPreview').value = fullCaption.replace(hashtagMatch[0], '').trim();
+    document.getElementById('igHashtagDisplay').textContent = hashtagMatch[0].trim();
+  } else {
+    document.getElementById('igPanelCaptionPreview').value = fullCaption;
+    document.getElementById('igHashtagDisplay').textContent = p.hashtags || '—';
+  }
+
+  // İçerik belleği
+  document.getElementById('igMemLastType').textContent = igTypeLabel(_igMemory?.last_published_type) || '—';
+  const isRepeat = _igMemory?.last_published_theme && _igMemory.last_published_theme === p.theme_category;
+  const riskEl = document.getElementById('igMemRepeatRisk');
+  if (riskEl) {
+    riskEl.textContent = isRepeat ? 'Var ⚠' : 'Yok';
+    riskEl.style.color = isRepeat ? '#F4A261' : '#3dba8f';
+  }
+  const sc = _igMemory?.monthly_social_proof_count ?? 0;
+  const scEl = document.getElementById('igMemSocialCount');
+  if (scEl) {
+    scEl.textContent = sc + ' / 1';
+    scEl.style.color = sc > 1 ? '#e05a5a' : '#e6edf3';
+  }
+
+  // Butonlar — approved ise yayınla aktif
+  const isApproved = p.status === 'approved' || p.status === 'published';
+  const regenBtn = document.getElementById('btnIgRegen');
+  if (regenBtn) regenBtn.disabled = false;
+  const appBtn = document.getElementById('btnIgApprove');
+  if (appBtn) {
+    appBtn.disabled = p.status === 'published';
+    if (p.status === 'published') {
+      appBtn.textContent = '✓ Yayınlandı';
+      appBtn.style.color = '#3dba8f';
+    } else {
+      appBtn.textContent = '✓ Onayla';
+      appBtn.style.color = '';
+    }
+  }
+  enablePublishBtns(isApproved);
+}
+
 async function approveIgPost() {
   if (!_selectedIgPostId) return;
   const p = _igPosts.find(x => x.id === _selectedIgPostId);
@@ -3969,6 +4059,7 @@ JSON formatında döndür:
   "hashtags": "#ykskoçu #özelkoç #yks2027 ... (6-9 hashtag)"
 }
 Sadece ham JSON döndür.`;
+  }
 
   try {
     const response = await fetch('/api/ai-chat', {
