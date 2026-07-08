@@ -37,3 +37,16 @@ CREATE POLICY "stories_public_read" ON storage.objects
 DROP POLICY IF EXISTS "stories_service_write" ON storage.objects;
 CREATE POLICY "stories_service_write" ON storage.objects
   FOR ALL USING (bucket_id = 'stories');
+
+-- Platform assets bucket (Instagram görsel + Reels video depolama)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('platform_assets', 'platform_assets', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "platform_assets_public_read" ON storage.objects;
+CREATE POLICY "platform_assets_public_read" ON storage.objects
+  FOR SELECT USING (bucket_id = 'platform_assets');
+
+DROP POLICY IF EXISTS "platform_assets_write" ON storage.objects;
+CREATE POLICY "platform_assets_write" ON storage.objects
+  FOR ALL USING (bucket_id = 'platform_assets');

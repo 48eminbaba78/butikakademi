@@ -91,10 +91,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Only POST allowed' });
   }
 
-  const { caption, imageBase64, isStory, slides, isCarousel } = req.body;
+  const { caption, imageBase64, isStory, slides, isCarousel, isReels, videoUrl } = req.body;
 
-  if (!imageBase64 && (!slides || slides.length === 0)) {
-    return res.status(400).json({ message: 'imageBase64 veya slides parametresi eksik.' });
+  if (!imageBase64 && !videoUrl && (!slides || slides.length === 0)) {
+    return res.status(400).json({ message: 'imageBase64, videoUrl veya slides parametresi eksik.' });
   }
 
   try {
@@ -125,6 +125,23 @@ export default async function handler(req, res) {
     } catch (tokenErr) {
       console.error('[API] Token doğrulama hatası:', tokenErr.message);
       return res.status(401).json({ message: tokenErr.message, tokenError: true });
+    }
+
+    // ── REELS (video URL) ──
+    if (isReels) {
+      if (!videoUrl) return res.status(400).json({ message: 'videoUrl gerekli' });
+      console.log('[API] Reels başlatılıyor, video URL:', videoUrl);
+      const containerId = await createMediaContainer(accountId, accessToken, {
+        media_type: 'REELS',
+        video_url: videoUrl,
+        caption: caption || '',
+        share_to_feed: true,
+      });
+      console.log('[API] Reels container:', containerId, '— işleniyor...');
+      await waitForContainer(containerId, accessToken, 30);
+      const publishedId = await publishContainer(accountId, accessToken, containerId);
+      console.log('[API] Reels yayınlandı! ID:', publishedId);
+      return res.status(200).json({ success: true, id: publishedId });
     }
 
     // ── HIKAYE (tek görsel) ──
