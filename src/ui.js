@@ -3906,7 +3906,7 @@ function chWeekS(d){S.weekOffset+=d;saveUI();renderSPortal();}
 // ── GÖREV GERİ BİLDİRİM YARDIMCI FONKSİYONLARI ──────────────────
 let _feedbackDraft = {};
 
-function _fbChip(field, val, el) {
+window._fbChip = function(field, val, el) {
   _feedbackDraft[field] = isNaN(val) ? val : Number(val);
   el.parentElement.querySelectorAll('[data-fb-val]').forEach(b => {
     const on = b.dataset.fbVal == val;
@@ -3919,15 +3919,15 @@ function _fbChip(field, val, el) {
     const s = document.getElementById('fbBlockerSection');
     if (s) s.style.display = val === 'completed' ? 'none' : 'block';
   }
-}
+};
 
-function _fbStar(n) {
+window._fbStar = function(n) {
   _feedbackDraft.focus = n;
   for (let i = 1; i <= 5; i++) {
     const el = document.getElementById('fbStar' + i);
     if (el) { el.textContent = i <= n ? '★' : '☆'; el.style.color = i <= n ? '#f0a500' : 'var(--text-dim)'; }
   }
-}
+};
 
 function _fbStudentHtml(t) {
   const fb  = t.student_feedback || {};
@@ -3963,7 +3963,7 @@ function _fbStudentHtml(t) {
     <div style="margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Tamamlanma Durumu</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-        ${STATUS.map(s=>`<button onclick="_fbChip('status','${s.v}',this)" data-fb-val="${s.v}" data-fb-color="${s.c}" data-fb-bg="${s.bg}"
+        ${STATUS.map(s=>`<button onclick="window._fbChip('status','${s.v}',this)" data-fb-val="${s.v}" data-fb-color="${s.c}" data-fb-bg="${s.bg}"
           style="padding:9px 4px;border-radius:9px;border:1.5px solid ${st===s.v?s.c:'var(--border)'};background:${st===s.v?s.bg:'var(--surface2)'};color:${st===s.v?s.c:'var(--text-mid)'};font-size:12px;font-weight:${st===s.v?'700':'600'};cursor:pointer;transition:all .15s">${esc(s.l)}</button>`).join('')}
       </div>
     </div>
@@ -3983,7 +3983,7 @@ function _fbStudentHtml(t) {
       <div>
         <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🎯 Odaklanma</div>
         <div style="display:flex;gap:2px;padding-top:2px">
-          ${[1,2,3,4,5].map(i=>`<span id="fbStar${i}" onclick="_fbStar(${i})" style="font-size:24px;cursor:pointer;color:${i<=fc?'#f0a500':'var(--text-dim)'};transition:color .1s">${i<=fc?'★':'☆'}</span>`).join('')}
+          ${[1,2,3,4,5].map(i=>`<span id="fbStar${i}" onclick="window._fbStar(${i})" style="font-size:24px;cursor:pointer;color:${i<=fc?'#f0a500':'var(--text-dim)'};transition:color .1s">${i<=fc?'★':'☆'}</span>`).join('')}
         </div>
       </div>
     </div>
@@ -3991,7 +3991,7 @@ function _fbStudentHtml(t) {
     <div style="margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📊 Zorluk</div>
       <div style="display:flex;gap:4px">
-        ${DIFF.map(d=>`<button onclick="_fbChip('difficulty',${d.v},this)" data-fb-val="${d.v}" data-fb-color="${d.c}" data-fb-bg="${d.bg}"
+        ${DIFF.map(d=>`<button onclick="window._fbChip('difficulty',${d.v},this)" data-fb-val="${d.v}" data-fb-color="${d.c}" data-fb-bg="${d.bg}"
           style="flex:1;padding:7px 3px;border-radius:8px;border:1.5px solid ${df===d.v?d.c:'var(--border)'};background:${df===d.v?d.bg:'var(--surface2)'};color:${df===d.v?d.c:'var(--text-mid)'};font-size:10px;font-weight:${df===d.v?'700':'600'};cursor:pointer;transition:all .15s;text-align:center">${esc(d.l)}</button>`).join('')}
       </div>
     </div>
@@ -3999,7 +3999,7 @@ function _fbStudentHtml(t) {
     <div id="fbBlockerSection" style="display:${st && st!=='completed'?'block':'none'}">
       <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Neden Yapamadın?</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${BLOCK.map(b=>`<button onclick="_fbChip('blocker','${b.v}',this)" data-fb-val="${b.v}" data-fb-color="#fb923c" data-fb-bg="rgba(251,146,60,.1)"
+        ${BLOCK.map(b=>`<button onclick="window._fbChip('blocker','${b.v}',this)" data-fb-val="${b.v}" data-fb-color="#fb923c" data-fb-bg="rgba(251,146,60,.1)"
           style="padding:6px 11px;border-radius:8px;border:1.5px solid ${bl===b.v?'#fb923c':'var(--border)'};background:${bl===b.v?'rgba(251,146,60,.1)':'var(--surface2)'};color:${bl===b.v?'#fb923c':'var(--text-mid)'};font-size:11px;font-weight:${bl===b.v?'700':'600'};cursor:pointer;transition:all .15s">${esc(b.l)}</button>`).join('')}
       </div>
     </div>
