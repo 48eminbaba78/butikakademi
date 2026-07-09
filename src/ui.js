@@ -3340,100 +3340,117 @@ function _refreshModalPuan() {
 // ═══════════════════════════════════════════════
 function _examChartHtml(exams, stu) {
   if (!exams.length) return '';
-  const sorted = [...exams].sort((a,b)=>a.date.localeCompare(b.date)).slice(-8);
-  const latest = sorted[sorted.length-1];
-  const prev   = sorted.length>=2 ? sorted[sorted.length-2] : null;
-  const fields = EXAM_DEFS[latest.type]||[];
-  const accent = stu?.color||'#f0a500';
-
-  const SC = {
-    'Türkçe':'#60b4ff','Matematik':'#f0a500','Fen':'#3ecf8e','Sosyal':'#c084fc',
-    'Fizik':'#fb7185','Kimya':'#fb923c','Biyoloji':'#4ade80',
-    'Edebiyat':'#a78bfa','Tarih':'#f87171','Tarih1':'#f87171','Tarih2':'#fb923c',
-    'Coğrafya':'#34d399','Coğrafya1':'#34d399','Coğrafya2':'#2dd4bf',
-    'Felsefe':'#818cf8','Din':'#fbbf24',
-  };
+  const sorted  = [...exams].sort((a,b)=>a.date.localeCompare(b.date)).slice(-8);
+  const latest  = sorted[sorted.length-1];
+  const prev    = sorted.length>=2 ? sorted[sorted.length-2] : null;
+  const fields  = EXAM_DEFS[latest.type]||[];
+  const accent  = stu?.color||'#f0a500';
 
   const latestTotal = fields.reduce((s,f)=>s+Number(latest.nets?.[f]||0),0);
   const prevTotal   = prev ? fields.reduce((s,f)=>s+Number(prev.nets?.[f]||0),0) : null;
   const delta       = prevTotal!==null ? latestTotal-prevTotal : null;
-  const bestF       = fields.length ? fields.reduce((b,f)=>Number(latest.nets?.[f]||0)>Number(latest.nets?.[b]||0)?f:b, fields[0]) : null;
+  const worstF      = fields.length ? fields.reduce((w,f)=>Number(latest.nets?.[f]||0)<Number(latest.nets?.[w]||0)?f:w, fields[0]) : null;
   const dColor      = delta===null?'var(--text-dim)':delta>=0?'#3ecf8e':'#ef4444';
   const dSign       = delta===null?'—':(delta>=0?'+':'')+delta.toFixed(1);
 
-  const statHtml=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
+  // ── Stat tiles ──
+  const statHtml=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
       <div style="font-size:9px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Son Deneme</div>
-      <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:900;color:${accent};line-height:1">${latestTotal.toFixed(1)}</div>
+      <div style="font-family:'Inter',sans-serif;font-size:26px;font-weight:900;color:${accent};line-height:1">${latestTotal.toFixed(1)}</div>
       <div style="font-size:9px;color:var(--text-dim);margin-top:3px">toplam net</div>
     </div>
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
       <div style="font-size:9px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Gelişim</div>
-      <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:900;line-height:1;color:${dColor}">${dSign}</div>
+      <div style="font-family:'Inter',sans-serif;font-size:26px;font-weight:900;line-height:1;color:${dColor}">${dSign}</div>
       <div style="font-size:9px;color:var(--text-dim);margin-top:3px">${prevTotal!==null?'önceki denemeden':'tek deneme'}</div>
     </div>
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
-      <div style="font-size:9px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">En Güçlü</div>
-      ${bestF?`<div style="font-size:15px;font-weight:900;line-height:1.2;color:${SC[bestF]||accent}">${esc(bestF)}</div>
-      <div style="font-size:11px;font-weight:700;color:var(--text-mid);margin-top:3px">${Number(latest.nets?.[bestF]||0).toFixed(1)} net</div>`:'<div style="font-size:12px;color:var(--text-dim)">—</div>'}
+      <div style="font-size:9px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Eksik Ders</div>
+      ${worstF?`<div style="font-size:15px;font-weight:900;line-height:1.2;color:#ef4444">${esc(worstF)}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text-mid);margin-top:3px">${Number(latest.nets?.[worstF]||0).toFixed(1)} net</div>`:'<div style="font-size:12px;color:var(--text-dim)">—</div>'}
     </div>
   </div>`;
 
+  // ── Ders bazlı horizontal bars (son deneme) ──
+  const subBarsHtml=fields.map(f=>{
+    const v=Number(latest.nets?.[f]||0);
+    const maxQ=(EXAM_SORU[latest.type]||{})[f]||40;
+    const pct=Math.min(100,Math.max(0,(v/maxQ)*100));
+    const col=v>=maxQ*0.6?'#3ecf8e':v>=maxQ*0.35?'#f0a500':'#ef4444';
+    return `<div style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span style="font-size:12px;font-weight:600;color:var(--text)">${esc(f)}</span>
+        <span style="font-size:14px;font-weight:800;color:${col};font-family:'Inter',sans-serif">${v.toFixed(1)}</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.07);border-radius:4px;height:7px;overflow:hidden">
+        <div style="width:${pct.toFixed(1)}%;height:100%;background:${col};border-radius:4px"></div>
+      </div>
+    </div>`;
+  }).join('');
+
   if (sorted.length<2) return `<div class="card cp" style="margin-bottom:16px">
     <div style="font-size:11px;font-weight:700;margin-bottom:12px;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px">📊 Deneme Özeti</div>
-    ${statHtml}</div>`;
+    ${statHtml}
+    <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Son Deneme · Derse Göre</div>
+    ${subBarsHtml}
+  </div>`;
 
-  const W=600,H=230,PL=34,PR=12,PT=14,PB=58;
-  const CW=W-PL-PR, CH=H-PT-PB;
-  const allVals=sorted.flatMap(e=>fields.map(f=>Number(e.nets?.[f]||0)));
-  const maxV=Math.max(...allVals,10);
-  const rawStep=maxV/4;
-  const step=rawStep<=5?5:rawStep<=10?10:rawStep<=20?20:25;
-  const gridVals=[];
-  for(let v=0;v<=maxV+step;v+=step){if(v<=maxV*1.15)gridVals.push(v);}
+  // ── Toplam net trend (alan grafiği, tek çizgi) ──
+  const totals=sorted.map(e=>{const f=EXAM_DEFS[e.type]||[];return f.reduce((s,fn)=>s+Number(e.nets?.[fn]||0),0);});
+  const maxTot=Math.max(...totals,10);
+  const W=600,H=160,PL=40,PR=16,PT=28,PB=30;
+  const CW=W-PL-PR,CH=H-PT-PB;
+  const n=sorted.length;
+  const xOf=i=>PL+(n<=1?CW/2:(i/(n-1))*CW);
+  const yOf=v=>PT+CH-(v/maxTot)*CH;
 
-  const xOf=i=>PL+(i/Math.max(sorted.length-1,1))*CW;
-  const yOf=v=>PT+CH-(v/maxV)*CH;
+  const rawStep=maxTot/4;
+  const gStep=rawStep<=10?10:rawStep<=20?20:rawStep<=25?25:50;
+  const gridVals=[];for(let v=0;v<=maxTot+gStep;v+=gStep){if(v<=maxTot*1.12)gridVals.push(v);}
 
   const gridSvg=gridVals.map(v=>{
     const y=yOf(v).toFixed(1);
-    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-<text x="${(PL-4).toFixed(0)}" y="${(yOf(v)+3.5).toFixed(1)}" text-anchor="end" font-size="9" fill="rgba(200,215,230,0.3)" font-family="system-ui,sans-serif">${v}</text>`;
+    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`+
+      `<text x="${PL-5}" y="${(yOf(v)+3.5).toFixed(1)}" text-anchor="end" font-size="9" fill="rgba(200,215,230,0.28)" font-family="system-ui,sans-serif">${v}</text>`;
   }).join('');
 
-  const xLabelsSvg=sorted.map((e,i)=>{
-    let lbl=e.name.replace(/Deneme\s+/,'#').replace(/^TYT\s+/,'').replace(/^AYT-SAY\s+/,'').replace(/^AYT-EA\s+/,'').replace(/^AYT-SOZ\s+/,'');
-    if(lbl.length>8)lbl=lbl.slice(0,7)+'…';
-    return `<text x="${xOf(i).toFixed(1)}" y="${(H-PB+14).toFixed(1)}" text-anchor="middle" font-size="9" fill="rgba(200,215,230,0.38)" font-family="system-ui,sans-serif">${esc(lbl)}</text>`;
+  const linePts=sorted.map((_,i)=>`${xOf(i).toFixed(1)},${yOf(totals[i]).toFixed(1)}`).join(' ');
+  const areaD=`M ${xOf(0).toFixed(1)},${yOf(totals[0]).toFixed(1)} `
+    +sorted.slice(1).map((_,i)=>`L ${xOf(i+1).toFixed(1)},${yOf(totals[i+1]).toFixed(1)}`).join(' ')
+    +` L ${xOf(n-1).toFixed(1)},${(PT+CH).toFixed(1)} L ${xOf(0).toFixed(1)},${(PT+CH).toFixed(1)} Z`;
+  const gid='ag'+Math.random().toString(36).slice(2,7);
+
+  const dotsSvg=sorted.map((e,i)=>{
+    const cx=xOf(i).toFixed(1),cy=yOf(totals[i]).toFixed(1);
+    return `<circle cx="${cx}" cy="${cy}" r="5" fill="${accent}" stroke="#0d0d0f" stroke-width="2.5"/>`
+      +`<text x="${cx}" y="${(yOf(totals[i])-10).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="${accent}" font-family="system-ui,sans-serif">${totals[i].toFixed(0)}</text>`;
   }).join('');
 
-  const linesSvg=fields.map(f=>{
-    const color=SC[f]||'#888';
-    const pts=sorted.map((e,i)=>`${xOf(i).toFixed(1)},${yOf(Number(e.nets?.[f]||0)).toFixed(1)}`).join(' ');
-    const dots=sorted.map((e,i)=>{
-      const v=Number(e.nets?.[f]||0);
-      const d=new Date(e.date+'T12:00').toLocaleDateString('tr-TR',{day:'numeric',month:'short'});
-      return `<circle cx="${xOf(i).toFixed(1)}" cy="${yOf(v).toFixed(1)}" r="4" fill="${color}" stroke="var(--surface,#0d0d0f)" stroke-width="2"><title>${esc(f)}: ${v} net · ${d}</title></circle>`;
-    }).join('');
-    return `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity=".9"/>
-${dots}`;
+  const xLabSvg=sorted.map((e,i)=>{
+    let l=e.name.replace(/Deneme\s+/,'#').replace(/^(TYT|AYT-SAY|AYT-EA|AYT-SOZ)\s+/,'');
+    if(l.length>7)l=l.slice(0,6)+'…';
+    return `<text x="${xOf(i).toFixed(1)}" y="${(H-PB+14).toFixed(1)}" text-anchor="middle" font-size="9" fill="rgba(200,215,230,0.35)" font-family="system-ui,sans-serif">${esc(l)}</text>`;
   }).join('');
 
-  const LITEM_W=Math.min(88,CW/Math.max(fields.length,1));
-  const legendSvg=fields.map((f,i)=>{
-    const color=SC[f]||'#888';
-    const lx=PL+i*LITEM_W;
-    const ly=H-PB+28;
-    return `<rect x="${lx}" y="${ly}" width="12" height="3" rx="1.5" fill="${color}"/>
-<text x="${lx+16}" y="${ly+5}" font-size="10" fill="rgba(200,215,230,0.55)" font-family="system-ui,sans-serif">${esc(f)}</text>`;
-  }).join('');
+  const trendSvg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="${accent}" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
+  </linearGradient></defs>
+  ${gridSvg}
+  <path d="${areaD}" fill="url(#${gid})"/>
+  <polyline points="${linePts}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  ${dotsSvg}${xLabSvg}
+</svg>`;
 
   return `<div class="card cp" style="margin-bottom:16px">
-    <div style="font-size:11px;font-weight:700;margin-bottom:12px;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px">📈 Net Gelişim · Son ${sorted.length} deneme</div>
+    <div style="font-size:11px;font-weight:700;margin-bottom:12px;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px">📊 Deneme Takibi</div>
     ${statHtml}
-    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;overflow:visible" xmlns="http://www.w3.org/2000/svg">
-      ${gridSvg}${linesSvg}${xLabelsSvg}${legendSvg}
-    </svg>
+    <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Toplam Net Trendi · Son ${n} Deneme</div>
+    ${trendSvg}
+    <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px">Son Deneme · Derse Göre</div>
+    ${subBarsHtml}
   </div>`;
 }
 
