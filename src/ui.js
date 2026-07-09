@@ -4009,59 +4009,30 @@ function _fbStudentHtml(t) {
 
 function _fbCoachHtml(t) {
   const fb = t.student_feedback || {};
-  const res = t.student_result;
+  const hasFb = fb.status || fb.focus || fb.difficulty || (fb.time_spent > 0) || fb.blocker;
+  if (!hasFb) return '';
 
   const SI = {
-    completed: { l:'Tamamladı',         c:'#3ecf8e', bg:'rgba(62,207,142,.1)' },
-    partial:   { l:'Kısmen Tamamladı',  c:'#f0a500', bg:'rgba(240,165,0,.1)'  },
-    failed:    { l:'Yapamadı',           c:'#ef4444', bg:'rgba(239,68,68,.1)'  },
+    completed: { l:'Tamamladı',        c:'#3ecf8e', bg:'rgba(62,207,142,.1)' },
+    partial:   { l:'Kısmen Tamamladı', c:'#f0a500', bg:'rgba(240,165,0,.1)'  },
+    failed:    { l:'Yapamadı',          c:'#ef4444', bg:'rgba(239,68,68,.1)'  },
   };
   const DL = {1:'Çok Kolay',2:'Kolay',3:'Orta',4:'Zor',5:'Çok Zor'};
   const BL = {time:'Zamanı yetmedi',topic:'Konuyu anlayamadı',hard:'Kaynak çok zordu',moti:'Motivasyon yok'};
-
-  // Gösterilecek bir şey yoksa hiç render etme
-  const hasFb  = fb.status || fb.focus || fb.difficulty || fb.time_spent > 0 || fb.blocker;
-  const hasRes = res && (res.dogru > 0 || res.yanlis > 0 || res.bos > 0);
-  const hasNote = !!t.student_note;
-  if (!hasFb && !hasRes && !hasNote) return '';
-
-  const si = SI[fb.status];
-  const t_s = fb.time_spent;
-  const timeStr = t_s > 0 ? (Math.floor(t_s/60)>0 ? Math.floor(t_s/60)+'sa ' : '') + (t_s%60>0 ? t_s%60+'dk' : '') : null;
+  const si      = SI[fb.status];
+  const t_s     = fb.time_spent;
+  const timeStr = t_s > 0 ? (Math.floor(t_s/60)>0?Math.floor(t_s/60)+'sa ':'') + (t_s%60>0?t_s%60+'dk':'') : null;
   const stars   = fb.focus ? '★'.repeat(fb.focus)+'☆'.repeat(5-fb.focus) : null;
-  const net     = hasRes ? (res.dogru - res.yanlis/4).toFixed(2) : null;
 
-  return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:14px">
-    <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">💬 Öğrenci Geri Bildirimi</div>
-
-    ${hasFb ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:${fb.blocker?'8px':'10px'}">
+  return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:12px 16px;margin-bottom:14px">
+    <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">💬 Geri Bildirim</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:${fb.blocker?'8px':'0'}">
       ${si?`<span style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;background:${si.bg};color:${si.c};border:1px solid ${si.c}33">${si.l}</span>`:''}
       ${timeStr?`<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text-mid)">⏱ ${timeStr}</span>`:''}
       ${stars?`<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:var(--surface);border:1px solid var(--border);color:#f0a500">${stars}</span>`:''}
       ${fb.difficulty?`<span style="padding:4px 12px;border-radius:20px;font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text-mid)">${DL[fb.difficulty]||''}</span>`:''}
     </div>
-    ${fb.blocker?`<div style="font-size:12px;color:var(--text-mid);margin-bottom:10px">Neden: <b style="color:#fb923c">${BL[fb.blocker]||fb.blocker}</b></div>`:''}` : ''}
-
-    ${hasRes ? `<div style="display:flex;gap:8px;margin-bottom:${hasNote?'10px':'0'}">
-      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;margin-bottom:3px">✓ Doğru</div>
-        <div style="font-size:18px;font-weight:800;color:var(--green)">${res.dogru}</div>
-      </div>
-      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;margin-bottom:3px">✗ Yanlış</div>
-        <div style="font-size:18px;font-weight:800;color:var(--red)">${res.yanlis}</div>
-      </div>
-      <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:9px;font-weight:700;color:var(--text-dim);text-transform:uppercase;margin-bottom:3px">— Boş</div>
-        <div style="font-size:18px;font-weight:800;color:var(--text-mid)">${res.bos}</div>
-      </div>
-      <div style="flex:1;background:var(--accent-dim);border:1px solid rgba(240,165,0,.3);border-radius:8px;padding:8px;text-align:center">
-        <div style="font-size:9px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:3px">Net</div>
-        <div style="font-size:18px;font-weight:800;color:var(--accent)">${net}</div>
-      </div>
-    </div>` : ''}
-
-    ${hasNote ? `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--text-mid);font-style:italic">"${esc(t.student_note)}"</div>` : ''}
+    ${fb.blocker?`<div style="font-size:12px;color:var(--text-mid)">Neden: <b style="color:#fb923c">${BL[fb.blocker]||fb.blocker}</b></div>`:''}
   </div>`;
 }
 
@@ -4136,8 +4107,8 @@ function openTaskDetail(ds, idx, role){
     <!-- Test/Video listesi -->
     ${itemsHtml}
 
-    <!-- Sonuç Gir (soru/deneme türleri için — sadece öğrenci) -->
-    ${(t.type==='soru'||t.type==='deneme') && role==='student' ? `
+    <!-- Sonuç Gir (soru/deneme türleri için) -->
+    ${(t.type==='soru'||t.type==='deneme') ? `
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:14px 16px;margin-bottom:14px">
       <div style="font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Sonucu Gir</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
@@ -4175,11 +4146,11 @@ function openTaskDetail(ds, idx, role){
     })()}
     ` : ''}
 
-    <!-- Not (sadece öğrenci girişi için — koç _fbCoachHtml'de görür) -->
-    ${role==='student' ? `<div class="field">
-      <label>Koçuma Not</label>
-      <textarea id="tdNote" placeholder="Koçuna iletmek istediğin bir şey var mı? (Örn: 5. soruyu anlamadım, bu konudan daha fazla soru çözmem lazım...)" style="min-height:60px">${t.student_note||''}</textarea>
-    </div>` : ''}
+    <!-- Not -->
+    <div class="field">
+      <label>${role==='student'?'Koçuma Not':'Öğrenci Notu'}</label>
+      <textarea id="tdNote" placeholder="${role==='student'?'Koçuna iletmek istediğin bir şey var mı?':'—'}" style="min-height:60px" ${role==='coach'?'disabled':''}>${t.student_note||''}</textarea>
+    </div>
 
     <div style="display:flex; gap:10px; margin-top:12px">
       ${role==='coach' 
