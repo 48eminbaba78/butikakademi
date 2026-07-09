@@ -3598,6 +3598,7 @@ function setManualType(t) {
   _mpType = t;
   const btnC = document.getElementById('mp-type-carousel');
   const btnR = document.getElementById('mp-type-reels');
+  const imgBtn = document.getElementById('mpGenerateFromImageBtn');
   
   if (t === 'carousel') {
     btnC.style.background = 'rgba(244,162,97,0.15)';
@@ -3613,6 +3614,7 @@ function setManualType(t) {
     document.getElementById('mp-reels-fields').style.display = 'none';
     document.getElementById('mp-carousel-nav').style.display = 'flex';
     document.getElementById('mpGenerateBtn').textContent = 'AI ile Carousel Oluştur →';
+    if (imgBtn) imgBtn.textContent = '🤖 Görseli Yapay Zeka ile Analiz Et & Carousel Üret →';
     
     document.getElementById('mpPublishPost').style.display = 'block';
     document.getElementById('mpPublishStory').style.display = 'block';
@@ -3630,6 +3632,7 @@ function setManualType(t) {
     document.getElementById('mp-reels-fields').style.display = 'block';
     document.getElementById('mp-carousel-nav').style.display = 'none';
     document.getElementById('mpGenerateBtn').textContent = 'AI ile Reels Senaryosu Oluştur →';
+    if (imgBtn) imgBtn.textContent = '🤖 Görseli Yapay Zeka ile Analiz Et & Reels Senaryosu Üret →';
     
     document.getElementById('mpPublishPost').style.display = 'none';
     document.getElementById('mpPublishStory').style.display = 'none';
@@ -3704,11 +3707,48 @@ async function generateCaptionFromImage() {
 
     // 2. Call Gemini Vision model directly
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
-    const prompt = `Görseldeki eğitim/öğretim içeriğini analiz et. Rostrum Akademi markasının YKS eğitim koçluğu hesabı için bu görselin altına gelecek ilgi çekici, bilgilendirici ve profesyonel bir Instagram post açıklaması (caption) ve en az 6 adet ilgili hashtag üret. Çıktı olarak sadece şu JSON formatını döndür, markdown içermesin:
+    
+    let prompt = '';
+    if (_mpType === 'reels') {
+      prompt = `Görseldeki eğitim/öğretim platformu ekran görüntüsünü/içeriğini analiz et. Rostrum Akademi markasının YKS eğitim koçluğu Instagram hesabı için bu görselden yararlanarak, platformun özelliklerini veya sunduğu faydalı ipuçlarını öne çıkaran, NÖROPAZARLAMA İLKELERİNE (korku tetikleyicisi/kayıp korkusu, dopamin/ödüllendirme döngüsü, kontrol hissi, merak uyandırıcı soru/kanca, net ve somut fayda) uygun, yüksek etkileşimli bir Reels videosu senaryosu üret.
+Çıktı olarak sadece şu JSON formatını döndür, markdown içermesin:
 {
-  "caption": "açıklama metni",
+  "reels_hook": "kanca metni (ekrana yazılacak, max 10 kelime, merak uyandırıcı/kayıp korkusu tetikleyen)",
+  "reels_music": "önerilen ses/müzik tarzı (örn: Hızlı tempo, merak uyandırıcı synthwave)",
+  "reels_scenes": [
+    { "visual": "sahne 1 görsel betimlemesi (nöropazarlama odaklı görsel tetikleyici detayları)", "text": "sahne 1 konuşma metni veya ekrandaki söz" },
+    { "visual": "...", "text": "..." },
+    { "visual": "...", "text": "..." }
+  ],
+  "caption": "Reels post açıklaması (3-5 paragraf, samimi, merak uyandırıcı, doğrudan faydaya odaklanan)",
   "hashtags": "#hashtag1 #hashtag2 ..."
 }`;
+    } else {
+      prompt = `Görseldeki platform ekran görüntüsünü/içeriğini analiz et. Rostrum Akademi markasının YKS eğitim koçluğu Instagram hesabı için bu görseli açıklayan, platform özelliklerini ve sunduğu faydaları öne çıkaran 5 slaytlık bir Carousel post içeriği üret.
+Çıktı olarak sadece şu JSON formatını döndür, markdown içermesin:
+{
+  "hook": "slayt 1 metni (kanca metni, tek cümle, max 12 kelime)",
+  "slide2": {
+    "headline": "slayt 2 başlığı (max 8 kelime)",
+    "points": [
+      {"title": "Madde 1 başlığı", "desc": "kısa açıklama"},
+      {"title": "Madde 2", "desc": "..."},
+      {"title": "Madde 3", "desc": "..."}
+    ]
+  },
+  "slide3": {
+    "headline": "slayt 3 başlığı",
+    "points": [
+      {"title": "...", "desc": "..."},
+      {"title": "...", "desc": "..."}
+    ]
+  },
+  "insight": "slayt 4 içgörüsü (tek cümle, alıntı formatında, max 15 kelime)",
+  "cta": "slayt 5 CTA metni (max 10 kelime)",
+  "caption": "Post açıklaması (3-5 paragraf, samimi ve fayda odaklı)",
+  "hashtags": "#hashtag1 #hashtag2 ..."
+}`;
+    }
 
     const resp = await fetch(url, {
       method: 'POST',
@@ -3743,19 +3783,56 @@ async function generateCaptionFromImage() {
     // Parse json
     const jsonMatch = textReply.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error('JSON bulunamadı');
-    const p = JSON.parse(jsonMatch[0]);
+    
+    let p;
+    try {
+      p = JSON.parse(jsonMatch[0]);
+    } catch(parseErr) {
+      // Bozuk JSON'u onar
+      const fixed = jsonMatch[0]
+        .replace(/[“”]/g, '\\"')
+        .replace(/[‘’]/g, "'");
+      p = JSON.parse(fixed);
+    }
 
-    // Fill form
-    const captionEl = document.getElementById('mpCaptionEdit');
-    const hashtagsEl = document.getElementById('mpHashtagEdit');
-    if (captionEl) captionEl.value = p.caption || '';
-    if (hashtagsEl) hashtagsEl.value = p.hashtags || '';
+    // Fill form fields
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+    if (_mpType === 'reels') {
+      setVal('mpReelsHook', p.reels_hook || '');
+      setVal('mpReelsMusic', p.reels_music || '');
+      const scenesText = (p.reels_scenes || []).map((s, idx) => `Sahne ${idx+1}:\nGörsel: ${s.visual || ''}\nSöz: ${s.text || ''}`).join('\n\n');
+      setVal('mpReelsScenes', scenesText);
+      setVal('mpCaptionEdit', p.caption || '');
+      setVal('mpHashtagEdit', p.hashtags || '');
+      if (document.getElementById('mpDesignNote')) {
+        document.getElementById('mpDesignNote').style.display = 'none';
+      }
+    } else {
+      setVal('mpSlide0', p.hook || '');
+      const fmtSlide = (s) => {
+        if (!s) return '';
+        let txt = s.headline || '';
+        if (s.points && s.points.length) {
+          txt += '\n' + s.points.map(pt => `• ${pt.title || pt}${pt.desc ? ': ' + pt.desc : ''}`).join('\n');
+        }
+        return txt;
+      };
+      setVal('mpSlide1', fmtSlide(p.slide2));
+      setVal('mpSlide2', fmtSlide(p.slide3));
+      setVal('mpSlide3', p.insight || '');
+      setVal('mpSlide4', p.cta || '');
+      setVal('mpCaptionEdit', p.caption || '');
+      setVal('mpHashtagEdit', p.hashtags || '');
+    }
 
     // Show generated section
     document.getElementById('mpGeneratedSection').style.display = 'flex';
-    showToast('✨ Açıklama ve hashtag\'ler üretildi! ✓');
+    _mpGenerated = true;
+    enableMpPublish(true);
+    updateManualPreview();
+    showToast('✨ Görsel başarıyla analiz edildi ve içerik üretildi! ✓');
   } catch (e) {
-    console.error('Image caption generation error:', e);
+    console.error('Image content generation error:', e);
     showToast('Hata: ' + e.message, false);
   } finally {
     btn.textContent = origText;
