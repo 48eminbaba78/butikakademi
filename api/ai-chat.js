@@ -19,8 +19,44 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { messages, context, userRole } = req.body;
+    const { messages, context, userRole, imageBase64, mimeType, text } = req.body;
 
+    // ── Görsel varsa Gemini Vision kullan ───────────────────
+    if (imageBase64) {
+      let GEMINI_KEY = process.env.GEMINI_API_KEY;
+      if (!GEMINI_KEY) {
+        try {
+          const { data } = await db.from('platform_settings').select('value').eq('key', 'ai_settings').maybeSingle();
+          GEMINI_KEY = data?.value?.gemini_api_key;
+        } catch(e) {}
+      }
+      if (!GEMINI_KEY) return res.status(500).json({ error: 'Gemini API anahtarı yapılandırılmamış.' });
+
+      const sysPrompt = buildVisionPrompt(context, userRole);
+      const userText = text || 'Bu soruyu çöz.';
+      const contents = [
+        { role: 'user', parts: [{ text: sysPrompt }] },
+        { role: 'model', parts: [{ text: 'Anladım, soruyu çözeceğim.' }] },
+        { role: 'user', parts: [
+          { inline_data: { mime_type: mimeType || 'image/jpeg', data: imageBase64 } },
+          { text: userText }
+        ]}
+      ];
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents, generationConfig: { temperature: 0.4, maxOutputTokens: 2048 } }) }
+      );
+      if (!geminiRes.ok) {
+        const e = await geminiRes.json().catch(() => ({}));
+        return res.status(502).json({ error: e?.error?.message || 'Gemini hatası' });
+      }
+      const gd = await geminiRes.json();
+      const reply = gd?.candidates?.[0]?.content?.parts?.[0]?.text || 'Yanıt üretilemedi.';
+      return res.status(200).json({ reply, model: 'gemini-1.5-flash' });
+    }
+
+    // ── Metin: Groq / LLaMA ─────────────────────────────────
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'Mesaj listesi boş olamaz.' });
     }
@@ -81,6 +117,18 @@ export default async function handler(req, res) {
     console.error('AI Chat error:', err);
     return res.status(500).json({ error: 'Sunucu hatası: ' + (err.message || 'Bilinmeyen hata') });
   }
+}
+
+// ── Vision Sistem Promptu ─────────────────────────────────
+function buildVisionPrompt(context, userRole) {
+  let base = `Sen Rostrum Akademi'nin uzman öğretmen yapay zekasısın. Türkiye eğitim sistemine (YKS/TYT/AYT, LGS) hakimsin.`;
+  if (userRole === 'student') {
+    base += `\n\nÖğrenci sana bir soru fotoğrafı gönderdi. O sorunun konusunun uzman öğretmenisin.\nKURALLAR:\n1. Soruyu dikkatlice incele, konusunu belirle ve kısaca belirt.\n2. Çözümü adım adım, net ve öğretici dille yaz. Her adımı numaralandır.\n3. Formül veya kural kullandıysan neden kullandığını açıkla.\n4. Varsa yanlış seçeneklerin neden yanlış olduğunu belirt.\n5. Sonunda cevabı net yaz.\n6. Türkçe yanıt ver.`;
+  } else {
+    base += `\nKullanıcıya görseli analiz ederek Türkçe yanıt ver.`;
+  }
+  if (context?.studentName) base += `\nÖğrenci: ${context.studentName}`;
+  return base;
 }
 
 // ── Sistem Promptu Oluşturucu ─────────────────────────────

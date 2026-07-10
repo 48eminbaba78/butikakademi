@@ -7969,9 +7969,9 @@ async function sendAIMessage(){
     const context = buildAIContext();
     const userRole = session.role || 'student';
 
-    // Fotoğraf varsa Groq desteklemiyor — server-side Gemini vision endpoint'i kullan
+    // Fotoğraf varsa Groq desteklemiyor — ai-chat'e imageBase64 gönder (Gemini branch)
     if (pendingImg) {
-      const visRes = await fetch('/api/ai-vision', {
+      const visRes = await fetch('/api/ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
