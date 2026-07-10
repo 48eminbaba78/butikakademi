@@ -495,6 +495,16 @@ export async function finishLogin(rows) {
       window.showOnboarding();
       return;
     }
+    // Öğrenci ilk girişte profil formu göster
+    if (session.role === 'student') {
+      const { data: existingProfile } = await db.from('student_profiles').select('id').eq('id', session.studentId || rows.id).maybeSingle();
+      if (!existingProfile) {
+        const hashTab = window.location.hash.substring(1);
+        const firstTab = (hashTab && document.getElementById('view-' + hashTab)) ? hashTab : 'portal';
+        setTimeout(() => { window.switchTab(firstTab); window.showStudentWelcome && window.showStudentWelcome(); }, 100);
+        return;
+      }
+    }
     const hashTab = window.location.hash.substring(1);
     const defaultTab = { coach: 'home', student: 'portal', developer: 'home', parent: 'parent-home' }[session.role] || 'portal';
     const firstTab = (hashTab && document.getElementById('view-' + hashTab)) ? hashTab : defaultTab;

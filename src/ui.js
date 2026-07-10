@@ -193,7 +193,7 @@ const stuTabs=[
   {id:'sexams',lbl:'📊',name:'Denemeler'},
   {id:'smessages',lbl:'💬',name:'Koçuma Yaz'},
   {id:'suyelik',lbl:'💳',name:'Üyeliğim'},
-  {id:'sprofil',lbl:'👤',name:'Profilim'},
+  {id:'sprofil',lbl:'🌟',name:'Yolculuğum'},
 ];
 const devTabs=[
   {id:'dev-dashboard',lbl:'🖥️',name:'Dev Panel'},
@@ -6336,6 +6336,157 @@ function showOnboarding() {
 }
 
 // ═══════════════════════════════════════════════
+// ÖĞRENCİ İLK GİRİŞ KARŞILAMA FORMU
+// ═══════════════════════════════════════════════
+let _swStep = 0;
+const _swData = {};
+
+function showStudentWelcome() {
+  const stu = S.students.find(s => s.id === session.studentId);
+  if (!stu) return;
+  const name = stu.name.split(' ')[0];
+  const color = stu.color || 'var(--accent)';
+
+  let modal = document.getElementById('stuWelcomeModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'stuWelcomeModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px)';
+    document.body.appendChild(modal);
+  }
+  _swStep = 0;
+  _renderSWStep(modal, name, color, stu);
+}
+
+function _renderSWStep(modal, name, color, stu) {
+  const steps = [
+    // Adım 0: Karşılama
+    () => `<div style="text-align:center">
+      <div style="font-size:52px;margin-bottom:14px">👋</div>
+      <h3 style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px">Merhaba, ${esc(name)}!</h3>
+      <p style="font-size:13px;color:var(--text-mid);line-height:1.7;margin-bottom:24px">
+        Koçun seni sisteme ekledi ve programın hazırlanıyor.<br>
+        Sana özel bir deneyim oluşturmak için <strong style="color:${color}">2 dakika</strong> ayır.
+      </p>
+      <button class="btn btn-accent" style="width:100%;padding:14px;font-size:15px;font-weight:800" onclick="window._swNext()">Hadi Başlayalım →</button>
+      <button onclick="window._swSkip()" style="margin-top:10px;background:none;border:none;color:var(--text-dim);font-size:12px;cursor:pointer;text-decoration:underline">Şimdi değil, sonra doldururum</button>
+    </div>`,
+
+    // Adım 1: Hedefler
+    () => `<div>
+      <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Adım 1/2 · Hedefiniz</div>
+      <h3 style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:16px">Nereye ulaşmak istiyorsunuz?</h3>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:var(--text-mid);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Hedef Üniversite</label>
+        <input id="sw_uni" type="text" value="${esc(stu.target?.split('·')[0]?.trim()||'')}" placeholder="Boğaziçi Üniversitesi"
+          style="width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;font-family:inherit;box-sizing:border-box"
+          onfocus="this.style.borderColor='${color}'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:var(--text-mid);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Hedef Bölüm</label>
+        <input id="sw_dept" type="text" placeholder="Bilgisayar Mühendisliği"
+          style="width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;font-family:inherit;box-sizing:border-box"
+          onfocus="this.style.borderColor='${color}'" onblur="this.style.borderColor='var(--border)'">
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="font-size:11px;font-weight:700;color:var(--text-mid);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">En Çok Zorlandığın Ders</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          ${['Matematik','Fizik','Kimya','Biyoloji','Türkçe','Tarih','Coğrafya','Felsefe','İngilizce'].map(d=>`
+            <button onclick="this.classList.toggle('sel');document.getElementById('sw_struggle').value=[...(document.getElementById('sw_struggle_btns')?.querySelectorAll('.sel')||[])].map(b=>b.dataset.v).join(', ')" data-v="${d}"
+              style="padding:6px 14px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s"
+              class="sw-chip">${d}</button>`).join('')}
+        </div>
+        <input id="sw_struggle" type="hidden" value="">
+      </div>
+      <button class="btn btn-accent" style="width:100%;padding:13px;font-weight:800" onclick="window._swNext()">Devam Et →</button>
+    </div>`,
+
+    // Adım 2: Motivasyon
+    () => `<div>
+      <div style="font-size:10px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Adım 2/2 · Motivasyonunuz</div>
+      <h3 style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:16px">Seni motive eden şey ne?</h3>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:var(--text-mid);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em">Neden bu üniversiteyi/bölümü istiyorsun?</label>
+        <textarea id="sw_motivation" rows="3" placeholder="Bu bölümü seçmemin nedeni..."
+          style="width:100%;padding:12px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;font-family:inherit;resize:vertical;box-sizing:border-box"
+          onfocus="this.style.borderColor='${color}'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="font-size:11px;font-weight:700;color:var(--text-mid);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Günlük Çalışma Hedefim</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${['2 saat','4 saat','6 saat','8 saat','8+ saat'].map(h=>`
+            <button onclick="document.querySelectorAll('.sw-hour').forEach(b=>b.classList.remove('sel'));this.classList.add('sel');document.getElementById('sw_hours').value=this.dataset.v" data-v="${h}"
+              style="padding:6px 16px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;font-weight:600;cursor:pointer"
+              class="sw-hour">${h}</button>`).join('')}
+        </div>
+        <input id="sw_hours" type="hidden" value="">
+      </div>
+      <button class="btn btn-accent" style="width:100%;padding:13px;font-weight:800" onclick="window._swSave()">Tamamla ve Başla →</button>
+    </div>`
+  ];
+
+  const progress = _swStep > 0 ? `<div style="height:3px;background:var(--border);border-radius:99px;margin-bottom:24px;overflow:hidden"><div style="height:100%;width:${Math.round((_swStep/2)*100)}%;background:${color};transition:width .4s"></div></div>` : '';
+
+  modal.innerHTML = `<div style="background:var(--surface);border:1px solid var(--border2);border-radius:24px;width:100%;max-width:460px;padding:32px;animation:fadeUp .3s ease;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)">
+    ${progress}
+    ${steps[_swStep]()}
+  </div>`;
+
+  // chip selected style
+  modal.querySelectorAll('.sw-chip').forEach(b => {
+    b.addEventListener('click', function() {
+      this.style.background = this.classList.contains('sel') ? color : 'var(--surface2)';
+      this.style.borderColor = this.classList.contains('sel') ? color : 'var(--border)';
+      this.style.color = this.classList.contains('sel') ? '#fff' : 'var(--text)';
+    });
+  });
+}
+
+window._swNext = function() {
+  const modal = document.getElementById('stuWelcomeModal');
+  if (!modal) return;
+  // Collect data from current step
+  if (_swStep === 1) {
+    _swData.target_university = document.getElementById('sw_uni')?.value?.trim() || '';
+    _swData.target_department = document.getElementById('sw_dept')?.value?.trim() || '';
+    _swData.struggling_subjects = document.getElementById('sw_struggle')?.value?.trim() || '';
+  }
+  _swStep++;
+  const stu = S.students.find(s => s.id === session.studentId);
+  _renderSWStep(modal, stu?.name?.split(' ')[0] || '', stu?.color || 'var(--accent)', stu);
+};
+
+window._swSkip = function() {
+  document.getElementById('stuWelcomeModal')?.remove();
+  // Save empty profile so this modal doesn't show again
+  db.from('student_profiles').upsert({ id: session.studentId }).then(() => {});
+};
+
+window._swSave = async function() {
+  const motivation = document.getElementById('sw_motivation')?.value?.trim() || '';
+  const daily_capacity = document.getElementById('sw_hours')?.value?.replace(/\D/g,'') || null;
+
+  const payload = {
+    id: session.studentId,
+    target_university: _swData.target_university || '',
+    target_department: _swData.target_department || '',
+    struggling_subjects: _swData.struggling_subjects || '',
+    bio: motivation,
+    daily_capacity: daily_capacity ? parseInt(daily_capacity) : null
+  };
+
+  showLoading(true, 'Kaydediliyor...');
+  try {
+    await db.from('student_profiles').upsert(payload);
+  } catch(e) { console.error(e); }
+  showLoading(false);
+
+  document.getElementById('stuWelcomeModal')?.remove();
+  showToast('Profilin kaydedildi! 🎉');
+  switchTab('sportal');
+};
+
+// ═══════════════════════════════════════════════
 // PWA — Telefona Yükle
 // ═══════════════════════════════════════════════
 let _pwaPrompt = null;
@@ -10012,6 +10163,7 @@ window.loadAnnouncements = loadAnnouncements;
 window.saveStudentDev = saveStudentDev;
 window.showOnboarding = showOnboarding;
 window.showOnboardingWidget = showOnboardingWidget;
+window.showStudentWelcome = showStudentWelcome;
 window.renderSProfil = renderSProfil;
 window.saveStudentProfile = saveStudentProfile;
 window.changePassword = changePassword;
