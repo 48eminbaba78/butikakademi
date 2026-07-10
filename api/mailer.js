@@ -10,7 +10,10 @@ const SB_URL = process.env.SUPABASE_URL || 'https://imyhenrwmsmyikpollur.supabas
 const SB_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const RESEND_KEY = process.env.RESEND_API_KEY;
 const FROM = `Rostrum Akademi <${process.env.SENDER_EMAIL || 'onboarding@resend.dev'}>`;
-const SITE_URL = process.env.SITE_URL || 'https://butik-akademi.vercel.app';
+const SITE_URL = process.env.SITE_URL || 'https://www.rostrumakademi.com';
+const GCAL_REDIRECT = `${SITE_URL}/app.html`;
+const G_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const G_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 async function sendEmail(to, subject, html) {
   if (!RESEND_KEY) {
@@ -223,6 +226,110 @@ export default async function handler(req, res) {
       const to = process.env.ADMIN_EMAIL || 'simkoc1@rostrumakademi.com';
       await sendEmail(to, `📋 Yeni şablon: ${data.template_name || 'İsimsiz'} — ${caller.full_name || 'Koç'}`, templateShareEmail({ ...data, coach_name: caller.full_name }));
       return res.status(200).json({ success: true });
+    }
+
+    if (type === 'google_oauth_exchange') {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) return res.status(401).json({ error: 'Token gerekli' });
+      if (!SB_SERVICE_KEY) return res.status(500).json({ error: 'Sunucu yapılandırma hatası' });
+      if (!G_CLIENT_ID || !G_CLIENT_SECRET) return res.status(500).json({ error: 'Google OAuth yapılandırılmamış' });
+
+      const admin = createClient(SB_URL, SB_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+      const { data: { user }, error: authErr } = await admin.auth.getUser(token);
+      if (authErr || !user) return res.status(401).json({ error: 'Yetkisiz' });
+      const { data: caller } = await admin.from('users').select('role').eq('id', user.id).single();
+      if (!caller || caller.role !== 'coach') return res.status(403).json({ error: 'Sadece koçlar Google Takvim bağlayabilir' });
+
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code: data.code,
+          client_id: G_CLIENT_ID,
+          client_secret: G_CLIENT_SECRET,
+          redirect_uri: GCAL_REDIRECT,
+          grant_type: 'authorization_code'
+        })
+      });
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok || !tokenData.refresh_token) {
+        console.error('[gcal oauth]', tokenData);
+        return res.status(400).json({ error: tokenData.error_description || 'Google token alınamadı' });
+      }
+
+      const { error: updateErr } = await admin
+        .from('workspaces')
+        .update({ google_refresh_token: tokenData.refresh_token, google_calendar_connected: true })
+        .eq('coach_id', user.id);
+      if (updateErr) throw new Error(updateErr.message);
+      return res.status(200).json({ success: true });
+    }
+
+    if (type === 'google_calendar_event') {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) return res.status(401).json({ error: 'Token gerekli' });
+      if (!SB_SERVICE_KEY) return res.status(500).json({ error: 'Sunucu yapılandırma hatası' });
+      if (!G_CLIENT_ID || !G_CLIENT_SECRET) return res.status(500).json({ error: 'Google OAuth yapılandırılmamış' });
+
+      const admin = createClient(SB_URL, SB_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+      const { data: { user }, error: authErr } = await admin.auth.getUser(token);
+      if (authErr || !user) return res.status(401).json({ error: 'Yetkisiz' });
+      const { data: caller } = await admin.from('users').select('role').eq('id', user.id).single();
+      if (!caller || caller.role !== 'coach') return res.status(403).json({ error: 'Sadece koçlar kullanabilir' });
+
+      const { data: workspace } = await admin.from('workspaces').select('google_refresh_token').eq('coach_id', user.id).single();
+      if (!workspace?.google_refresh_token) return res.status(400).json({ error: 'Google Takvim bağlı değil' });
+
+      const atRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          refresh_token: workspace.google_refresh_token,
+          client_id: G_CLIENT_ID,
+          client_secret: G_CLIENT_SECRET,
+          grant_type: 'refresh_token'
+        })
+      });
+      const atData = await atRes.json();
+      if (!atRes.ok || !atData.access_token) return res.status(500).json({ error: 'Google token yenilenemedi' });
+
+      const { action, appointment } = data;
+      const apptDate = appointment.date;
+      const apptHour = appointment.hour || '09:00';
+      const [hh, mm] = apptHour.split(':').map(Number);
+      const startDT = `${apptDate}T${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00+03:00`;
+      const endH = hh + 1;
+      const endDT = `${apptDate}T${String(endH).padStart(2,'0')}:${String(mm).padStart(2,'0')}:00+03:00`;
+
+      const gcalHeaders = { 'Authorization': `Bearer ${atData.access_token}`, 'Content-Type': 'application/json' };
+      const baseUrl = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+
+      if (action === 'delete') {
+        if (appointment.google_event_id) {
+          await fetch(`${baseUrl}/${appointment.google_event_id}`, { method: 'DELETE', headers: gcalHeaders });
+        }
+        return res.status(200).json({ success: true });
+      }
+
+      const eventBody = {
+        summary: `Koçluk Seansı${appointment.student_name ? ' — ' + appointment.student_name : ''}`,
+        description: appointment.notes || '',
+        start: { dateTime: startDT, timeZone: 'Europe/Istanbul' },
+        end: { dateTime: endDT, timeZone: 'Europe/Istanbul' }
+      };
+
+      if (action === 'update' && appointment.google_event_id) {
+        const upRes = await fetch(`${baseUrl}/${appointment.google_event_id}`, {
+          method: 'PUT', headers: gcalHeaders, body: JSON.stringify(eventBody)
+        });
+        const upData = await upRes.json();
+        return res.status(200).json({ success: true, google_event_id: upData.id });
+      }
+
+      const crRes = await fetch(baseUrl, { method: 'POST', headers: gcalHeaders, body: JSON.stringify(eventBody) });
+      const crData = await crRes.json();
+      if (!crRes.ok) return res.status(500).json({ error: crData.error?.message || 'Takvim etkinliği oluşturulamadı' });
+      return res.status(200).json({ success: true, google_event_id: crData.id });
     }
 
     return res.status(400).json({ error: 'Geçersiz tip: ' + type });

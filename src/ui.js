@@ -3163,11 +3163,24 @@ async function deleteStu(id){
 // ═══════════════════════════════════════════════
 // APPOINTMENTS
 // ═══════════════════════════════════════════════
+function connectGoogleCalendar() {
+  const clientId = '217851738834-1cp3fk66hfhm0mr2aklsk3jphqmub2s3.apps.googleusercontent.com';
+  const redirectUri = encodeURIComponent('https://www.rostrumakademi.com/app.html');
+  const scope = encodeURIComponent('https://www.googleapis.com/auth/calendar.events');
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}&access_type=offline&prompt=consent&state=google_calendar`;
+  window.location.href = url;
+}
+window.connectGoogleCalendar = connectGoogleCalendar;
+
 function renderAppointments(){
   const el=document.getElementById('view-appointments');
+  const gcalConnected = S.workspace?.google_calendar_connected;
+  const gcalBtn = gcalConnected
+    ? `<button class="btn btn-ghost btn-sm" style="color:var(--green)" onclick="showToast('Google Takvim zaten bağlı ✓')">✓ Google Takvim</button>`
+    : `<button class="btn btn-ghost btn-sm" onclick="connectGoogleCalendar()">🔗 Google Takvim Bağla</button>`;
   el.innerHTML=`
     <button class="back-link" onclick="switchTab('student-detail')">← ${S.students.find(s=>s.id===S.activeStuId)?.name||'Öğrenci'}</button>
-    <div class="sh"><h2>Randevular</h2><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="downloadICS()">📅 Takvime Aktar</button><button class="btn btn-accent" onclick="openApptModal()">+ Yeni Randevu</button></div></div>
+    <div class="sh"><h2>Randevular</h2><div style="display:flex;gap:8px">${gcalBtn}<button class="btn btn-ghost btn-sm" onclick="downloadICS()">📅 Takvime Aktar</button><button class="btn btn-accent" onclick="openApptModal()">+ Yeni Randevu</button></div></div>
     <div class="appts-layout">
       <div class="card cp">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -3262,18 +3275,45 @@ async function saveAppt(){
     const a=S.appointments.find(x=>x.id===id);
     if(a)Object.assign(a,{studentId:stuId,date,time,duration:payload.duration,type:payload.type,note:payload.note});
     showToast('Güncellendi ✓');
+    if(S.workspace?.google_calendar_connected && a?.google_event_id) {
+      const stu=S.students.find(s=>s.id===stuId);
+      gcalSync('update',{date,hour:time,notes:payload.note,student_name:stu?.name,google_event_id:a.google_event_id}).catch(()=>{});
+    }
   } else {
     const {data,error}=await db.from('appointments').insert(payload).select().single();
     if(error)return showToast('Hata: '+error.message);
-    S.appointments.push({id:data.id,studentId:data.student_id,date:data.date,time:data.time,duration:data.duration,type:data.type,note:data.note});
+    const newAppt={id:data.id,studentId:data.student_id,date:data.date,time:data.time,duration:data.duration,type:data.type,note:data.note,google_event_id:null};
+    S.appointments.push(newAppt);
     showToast('Randevu eklendi ✓');
+    if(S.workspace?.google_calendar_connected) {
+      const stu=S.students.find(s=>s.id===stuId);
+      gcalSync('create',{date,hour:time,notes:payload.note,student_name:stu?.name}).then(evtId=>{
+        if(evtId){
+          newAppt.google_event_id=evtId;
+          db.from('appointments').update({google_event_id:evtId}).eq('id',data.id).then(()=>{});
+        }
+      }).catch(()=>{});
+    }
   }
   cm('apptModal');
   if(currentTab === 'todolist') renderAgenda(); else if(document.getElementById('view-appointments')?.classList.contains('active')) renderAppointments();
 }
+
+async function gcalSync(action, appointment) {
+  const { data: { session: authSess } } = await db.auth.getSession();
+  if (!authSess?.access_token) return null;
+  const res = await fetch('/api/mailer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authSess.access_token}` },
+    body: JSON.stringify({ type: 'google_calendar_event', action, appointment })
+  });
+  const d = await res.json();
+  return d.google_event_id || null;
+}
 async function deleteAppt(id){
   if(!await customConfirm('Bu randevuyu silmek istediğinizden emin misiniz?'))return;
-  
+
+  const appt = S.appointments.find(a=>a.id===id);
   const rowEl = document.querySelector(`[data-appt-id="${id}"]`);
   if (rowEl) {
     rowEl.style.transition = 'all 0.3s ease';
@@ -3282,8 +3322,11 @@ async function deleteAppt(id){
     const nameEl = rowEl.querySelector('.appt-name');
     if (nameEl) nameEl.innerHTML = '<span style="color:var(--red); font-weight:700">🗑️ Siliniyor...</span>';
   }
-  
+
   await new Promise(resolve => setTimeout(resolve, 300));
+  if(S.workspace?.google_calendar_connected && appt?.google_event_id) {
+    gcalSync('delete', { google_event_id: appt.google_event_id }).catch(()=>{});
+  }
   await db.from('appointments').delete().eq('id',id);
   S.appointments=S.appointments.filter(a=>a.id!==id);
   renderAppointments();

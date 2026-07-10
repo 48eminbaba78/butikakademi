@@ -167,14 +167,15 @@ async function _fetchAll() {
   });
 
   S.appointments = (apptRes.data || []).map(a => ({
-    id:        a.id,
-    studentId: a.student_id,
-    date:      a.date,
-    time:      a.time,
-    duration:  a.duration,
-    type:      a.type,
-    note:      a.note,
-    meetLink:  a.meet_link
+    id:             a.id,
+    studentId:      a.student_id,
+    date:           a.date,
+    time:           a.time,
+    duration:       a.duration,
+    type:           a.type,
+    note:           a.note,
+    meetLink:       a.meet_link,
+    google_event_id: a.google_event_id || null
   }));
 
   S.exams = (examRes.data || []).map(e => ({
@@ -193,10 +194,11 @@ async function _fetchAll() {
   (msgRes.data || []).forEach(m => {
     if (!S.messages[m.student_id]) S.messages[m.student_id] = [];
     S.messages[m.student_id].push({
-      _id:  m.id,
-      from: m.from_role,
-      text: m.text,
-      read: m.read,
+      _id:       m.id,
+      from:      m.from_role,
+      text:      m.text || '',
+      image_url: m.image_url || null,
+      read:      m.read,
       time: new Date(m.created_at).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
     });
   });

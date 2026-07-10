@@ -488,7 +488,33 @@ export async function finishLogin(rows) {
       }
     }
     window.setupShell();
-    
+
+    // Google Calendar OAuth callback — detect ?code=...&state=google_calendar after consent redirect
+    const _urlParams = new URLSearchParams(window.location.search);
+    if (_urlParams.get('state') === 'google_calendar' && _urlParams.get('code') && session.role === 'coach') {
+      const _gcalCode = _urlParams.get('code');
+      window.history.replaceState({}, '', window.location.pathname + window.location.hash);
+      document.getElementById('aiChatBubble').style.display = 'flex';
+      setTimeout(() => window.switchTab('appointments'), 50);
+      db.auth.getSession().then(({ data: { session: authSess } }) => {
+        if (!authSess?.access_token) return;
+        fetch('/api/mailer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authSess.access_token}` },
+          body: JSON.stringify({ type: 'google_oauth_exchange', code: _gcalCode })
+        }).then(r => r.json()).then(result => {
+          if (result.success) {
+            if (S.workspace) S.workspace.google_calendar_connected = true;
+            showToast('Google Takvim bağlandı ✓');
+            window.renderAppointments && window.renderAppointments();
+          } else {
+            showToast('Google bağlanamadı: ' + (result.error || 'Bilinmeyen hata'));
+          }
+        }).catch(() => showToast('Google Takvim bağlanamadı'));
+      });
+      return;
+    }
+
     document.getElementById('aiChatBubble').style.display = 'flex';
     if ((session.role === 'coach' || session.role === 'developer') && (!S.workspace || !S.workspace.onboarding_done)) {
       window.switchTab('home');
