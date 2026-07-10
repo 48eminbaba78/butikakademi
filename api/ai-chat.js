@@ -121,11 +121,11 @@ export default async function handler(req, res) {
 
 // ── Vision Sistem Promptu ─────────────────────────────────
 function buildVisionPrompt(context, userRole) {
-  let base = `Sen Rostrum Akademi'nin uzman öğretmen yapay zekasısın. Türkiye eğitim sistemine (YKS/TYT/AYT, LGS) hakimsin.`;
+  let base = `Sen Rostrum Akademi'nin uzman öğretmen yapay zekasısın. Türkiye eğitim sistemine (YKS/TYT/AYT, LGS) hakimsin.\n\nKESİNLİKLE YALNIZCA TÜRKÇE yanıt ver. İngilizce, Japonca, Çince veya başka hiçbir dil ya da karakter seti kullanma.`;
   if (userRole === 'student') {
-    base += `\n\nÖğrenci sana bir soru fotoğrafı gönderdi. O sorunun konusunun uzman öğretmenisin.\nKURALLAR:\n1. Soruyu dikkatlice incele, konusunu belirle ve kısaca belirt.\n2. Çözümü adım adım, net ve öğretici dille yaz. Her adımı numaralandır.\n3. Formül veya kural kullandıysan neden kullandığını açıkla.\n4. Varsa yanlış seçeneklerin neden yanlış olduğunu belirt.\n5. Sonunda cevabı net yaz.\n6. Türkçe yanıt ver.`;
+    base += `\n\nÖğrenci sana bir soru fotoğrafı gönderdi. O sorunun konusunun uzman öğretmenisin.\nKURALLAR:\n1. Soruyu dikkatlice incele, konusunu belirle ve kısaca belirt.\n2. Çözümü adım adım, net ve öğretici dille yaz. Her adımı numaralandır.\n3. Formül veya kural kullandıysan neden kullandığını açıkla.\n4. Varsa yanlış seçeneklerin neden yanlış olduğunu belirt.\n5. Sonunda cevabı net yaz.`;
   } else {
-    base += `\nKullanıcıya görseli analiz ederek Türkçe yanıt ver.`;
+    base += `\nKullanıcıya görseli analiz ederek yanıt ver.`;
   }
   if (context?.studentName) base += `\nÖğrenci: ${context.studentName}`;
   return base;
@@ -135,8 +135,8 @@ function buildVisionPrompt(context, userRole) {
 function buildSystemPrompt(context, userRole) {
   let base = `Sen "Rostrum Akademi Yapay Zeka Asistanı"sın. Türkiye'deki eğitim sistemine (YKS, LGS, KPSS, ALES) hakim, rolüne göre öğrencilere, velilere veya koçlara destek veren bir yapay zekasın.
 
-KURALLAR:
-- Her zaman Türkçe yanıt ver
+KURALLAR (KESİNLİKLE UYULMASI ZORUNLU):
+- YALNIZCA TÜRKÇE yanıt ver. İngilizce, Japonca, Çince veya başka HİÇBİR dil/karakter kullanma. Tek bir yabancı kelime bile yazma.
 - Mesafeli ama kibar bir dil kullan
 - Kısa ve öz yanıtlar ver, gereksiz uzatma
 - Sorulara adım adım, net cevaplar ver`;

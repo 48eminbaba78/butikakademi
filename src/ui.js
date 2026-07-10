@@ -1521,22 +1521,20 @@ function renderSettings(){
         </div>
       </div>
       
+      ${session.role === 'developer' ? `
       <div class="settings-block" style="margin-top:20px">
-        <div class="settings-block-title">Yapay Zeka (AI) Ayarları</div>
+        <div class="settings-block-title">Yapay Zeka (AI) Geliştirici Ayarları</div>
         <div class="setting-item" style="flex-direction:column;align-items:flex-start;gap:10px">
           <div>
-            <div class="setting-item-lbl">Gemini API Anahtarı</div>
-            <div class="setting-item-sub" style="font-size:11px;line-height:1.5;margin-top:2px">Yerel olarak çalıştığınızda AI Asistanı kullanabilmek için kendi API anahtarınızı girmelisiniz. Bu anahtar tarayıcınızda güvenle saklanır.</div>
+            <div class="setting-item-lbl">Gemini API Anahtarı (Yerel Test)</div>
+            <div class="setting-item-sub" style="font-size:11px;line-height:1.5;margin-top:2px">Yalnızca yerel geliştirme ortamı için. Production'da Vercel env kullanılır.</div>
           </div>
           <div style="display:flex;gap:8px;width:100%">
             <input type="text" id="geminiApiKeyInput" value="${esc(localStorage.getItem('gemini_api_key')||'')}" placeholder="AIzaSy..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:12px;outline:none" autocomplete="off">
             <button class="btn btn-accent btn-sm" onclick="saveGeminiKey()">Kaydet</button>
           </div>
-          <div style="font-size:11px;color:var(--text-dim)">
-            API anahtarınız yok mu? <a href="https://aistudio.google.com/" target="_blank" style="color:var(--blue);text-decoration:none">Google AI Studio'dan ücretsiz alın →</a>
-          </div>
         </div>
-      </div>
+      </div>` : ''}
 
       <div class="settings-block" style="margin-top:20px">
         <div class="settings-block-title">Bildirim Ayarları</div>
@@ -8085,7 +8083,7 @@ async function callGeminiFallback(userText, context, userRole, pendingImg) {
     }
   }
   
-  let systemPrompt = `Sen "Rostrum Akademi Yapay Zeka Asistanı"sın. Türkiye eğitim sistemine (YKS, LGS) hakim, rolüne göre öğrencilere, velilere veya koçlara destek veren bir yapay zekasın.
+  let systemPrompt = `Sen "Rostrum Akademi Yapay Zeka Asistanı"sın. Türkiye eğitim sistemine (YKS, LGS) hakim, rolüne göre öğrencilere, velilere veya koçlara destek veren bir yapay zekasın.\n\nKESİNLİKLE YALNIZCA TÜRKÇE yanıt ver. İngilizce, Japonca, Çince veya başka hiçbir dil/karakter kullanma.
 
 Rostrum Akademi İşleyişi, Üyelik ve Fiyatlandırma Bilgileri:
 1. Kayıt olan tüm koçlara 14 gün ücretsiz deneme süresi tanımlanır. Bu süre bitiminde panel kilitlenir.
