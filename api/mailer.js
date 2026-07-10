@@ -99,6 +99,40 @@ function applicationEmail({ student_name, status, coach_name }) {
 </td></tr>`);
 }
 
+function newMessageEmail({ student_name, message_preview, login_url }) {
+  const url = login_url || `${SITE_URL}/app.html`;
+  const preview = message_preview || '';
+  return wrap(`
+<tr><td style="background:linear-gradient(135deg,#E8613A 0%,#d45025 100%);padding:40px;text-align:center">
+  <div style="font-size:48px;margin-bottom:12px">💬</div>
+  <h1 style="color:#fff;font-size:24px;font-weight:800;margin:0 0 8px">Yeni Mesaj</h1>
+  <p style="color:rgba(255,255,255,.85);margin:0;font-size:15px">${student_name ? `<strong>${student_name}</strong> sana yazdı` : 'Öğrenciniz sana yazdı'}</p>
+</td></tr>
+<tr><td style="padding:36px 40px">
+  <p style="margin:0 0 20px;font-size:15px;color:#444">Merhaba,</p>
+  ${preview ? `<div style="background:#fef7f5;border-left:4px solid #E8613A;padding:16px 20px;border-radius:0 10px 10px 0;margin-bottom:28px;font-size:14px;color:#555;line-height:1.65">${preview}</div>` : ''}
+  <div style="text-align:center">
+    <a href="${url}" style="display:inline-block;background:#E8613A;color:#fff;padding:15px 40px;border-radius:10px;font-size:15px;font-weight:800;text-decoration:none">Mesajı Gör →</a>
+  </div>
+</td></tr>`);
+}
+
+function templateShareEmail({ coach_name, template_name, task_count, tasks_json }) {
+  return wrap(`
+<tr><td style="background:linear-gradient(135deg,#6366f1 0%,#4f46e5 100%);padding:40px;text-align:center">
+  <div style="font-size:48px;margin-bottom:12px">📋</div>
+  <h1 style="color:#fff;font-size:24px;font-weight:800;margin:0">Yeni Şablon Paylaşıldı</h1>
+</td></tr>
+<tr><td style="padding:36px 40px">
+  <p style="margin:0 0 16px;font-size:15px;color:#444"><strong>${coach_name || 'Bir koç'}</strong> bir program şablonu paylaştı:</p>
+  <div style="background:#f8f8f8;border:1px solid #e8e8e8;border-radius:12px;padding:20px;margin-bottom:24px">
+    <div style="font-size:16px;font-weight:800;color:#111;margin-bottom:4px">${template_name || 'İsimsiz Şablon'}</div>
+    <div style="font-size:13px;color:#888">${task_count || 0} görev</div>
+  </div>
+  <pre style="background:#f8f8f8;border:1px solid #e8e8e8;border-radius:8px;padding:16px;font-size:11px;line-height:1.5;overflow:auto;max-height:400px;white-space:pre-wrap;word-break:break-all">${tasks_json || ''}</pre>
+</td></tr>`);
+}
+
 function passwordResetEmail({ action_link }) {
   return wrap(`
 <tr><td style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);padding:40px;text-align:center">
@@ -158,6 +192,36 @@ export default async function handler(req, res) {
       if (!action_link) throw new Error('Sıfırlama linki oluşturulamadı');
 
       await sendEmail(data.email, '🔐 Rostrum Akademi — Şifre Sıfırlama', passwordResetEmail({ action_link }));
+      return res.status(200).json({ success: true });
+    }
+
+    if (type === 'new_message') {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) return res.status(401).json({ error: 'Token gerekli' });
+      if (!SB_SERVICE_KEY) return res.status(500).json({ error: 'Sunucu yapılandırma hatası' });
+      const admin = createClient(SB_URL, SB_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+      const { data: { user }, error: authErr } = await admin.auth.getUser(token);
+      if (authErr || !user) return res.status(401).json({ error: 'Yetkisiz' });
+      const { data: sender } = await admin.from('users').select('role, coach_id').eq('id', user.id).single();
+      if (!sender || sender.role !== 'student') return res.status(403).json({ error: 'Sadece öğrenciler bildirim gönderebilir' });
+      if (sender.coach_id !== data.coach_id) return res.status(403).json({ error: 'Geçersiz koç ID' });
+      const { data: coach } = await admin.from('users').select('email').eq('id', data.coach_id).single();
+      if (!coach?.email) return res.status(404).json({ error: 'Koç bulunamadı' });
+      await sendEmail(coach.email, `💬 ${data.student_name || 'Öğrenciniz'} sana mesaj gönderdi`, newMessageEmail({ ...data, login_url: `${SITE_URL}/app.html` }));
+      return res.status(200).json({ success: true });
+    }
+
+    if (type === 'template_share') {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) return res.status(401).json({ error: 'Token gerekli' });
+      if (!SB_SERVICE_KEY) return res.status(500).json({ error: 'Sunucu yapılandırma hatası' });
+      const admin = createClient(SB_URL, SB_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+      const { data: { user }, error: authErr } = await admin.auth.getUser(token);
+      if (authErr || !user) return res.status(401).json({ error: 'Yetkisiz' });
+      const { data: caller } = await admin.from('users').select('role, full_name').eq('id', user.id).single();
+      if (!caller || !['coach', 'developer'].includes(caller.role)) return res.status(403).json({ error: 'Yetkisiz' });
+      const to = process.env.ADMIN_EMAIL || 'simkoc1@rostrumakademi.com';
+      await sendEmail(to, `📋 Yeni şablon: ${data.template_name || 'İsimsiz'} — ${caller.full_name || 'Koç'}`, templateShareEmail({ ...data, coach_name: caller.full_name }));
       return res.status(200).json({ success: true });
     }
 

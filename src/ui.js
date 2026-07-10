@@ -1703,8 +1703,8 @@ function renderProgram(){
         <p>${stu?esc(stu.target):'Program görüntülemek için öğrenci seçin'}</p>
       </div>
       <div class="prog-actions">
-        <button class="btn btn-ghost btn-sm" onclick="saveWeekAsTemplate()" style="display:none">Şablon Kaydet</button>
-        <button class="btn btn-ghost btn-sm" onclick="applyTemplateToWeek()" style="display:none">Şablon Uygula</button>
+        <button class="btn btn-ghost btn-sm" onclick="saveWeekAsTemplate()">Şablon Kaydet</button>
+        <button class="btn btn-ghost btn-sm" onclick="applyTemplateToWeek()">Şablon Uygula</button>
         <button class="btn btn-ghost btn-sm" onclick="openWeeklyPDFModal()">📄 PDF</button>
         <button class="btn btn-danger btn-sm" onclick="openClearWeekModal()">Temizle</button>
       </div>
@@ -3164,7 +3164,7 @@ function renderAppointments(){
   const el=document.getElementById('view-appointments');
   el.innerHTML=`
     <button class="back-link" onclick="switchTab('student-detail')">← ${S.students.find(s=>s.id===S.activeStuId)?.name||'Öğrenci'}</button>
-    <div class="sh"><h2>Randevular</h2><button class="btn btn-accent" onclick="openApptModal()">+ Yeni Randevu</button></div>
+    <div class="sh"><h2>Randevular</h2><div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" onclick="downloadICS()">📅 Takvime Aktar</button><button class="btn btn-accent" onclick="openApptModal()">+ Yeni Randevu</button></div></div>
     <div class="appts-layout">
       <div class="card cp">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -3285,6 +3285,44 @@ async function deleteAppt(id){
   S.appointments=S.appointments.filter(a=>a.id!==id);
   renderAppointments();
   showToast('Silindi');
+}
+
+function downloadICS() {
+  const ts = todayStr();
+  const upcoming = S.appointments.filter(a => a.date >= ts).sort((a, b) => a.date.localeCompare(b.date));
+  if (!upcoming.length) return showToast('Yaklaşan randevu bulunamadı.');
+  const pad = n => String(n).padStart(2, '0');
+  const lines = [
+    'BEGIN:VCALENDAR', 'VERSION:2.0',
+    'PRODID:-//Rostrum Akademi//TR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'BEGIN:VTIMEZONE', 'TZID:Europe/Istanbul',
+    'BEGIN:STANDARD', 'TZOFFSETFROM:+0300', 'TZOFFSETTO:+0300',
+    'TZNAME:TRT', 'DTSTART:19700101T000000', 'END:STANDARD',
+    'END:VTIMEZONE'
+  ];
+  upcoming.forEach(a => {
+    const stu = S.students.find(s => s.id === a.studentId);
+    const [y, mo, d] = a.date.split('-');
+    const [h, mi] = (a.time || '09:00').split(':');
+    const dtStart = `${y}${mo}${d}T${h}${mi}00`;
+    const endDate = new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi) + (a.duration || 45));
+    const dtEnd = `${endDate.getFullYear()}${pad(endDate.getMonth()+1)}${pad(endDate.getDate())}T${pad(endDate.getHours())}${pad(endDate.getMinutes())}00`;
+    lines.push('BEGIN:VEVENT');
+    lines.push(`UID:ra-appt-${a.id}@rostrumakademi.com`);
+    lines.push(`DTSTART;TZID=Europe/Istanbul:${dtStart}`);
+    lines.push(`DTEND;TZID=Europe/Istanbul:${dtEnd}`);
+    lines.push(`SUMMARY:${a.type}${stu ? ' — ' + stu.name : ''}`);
+    if (a.note) lines.push(`DESCRIPTION:${a.note.replace(/[\r\n]+/g, '\\n')}`);
+    if (a.meet_link) lines.push(`URL:${a.meet_link}`);
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  const blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url; link.download = 'rostrum-randevular.ics'; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast(`${upcoming.length} randevu takvim dosyasına aktarıldı ✓`);
 }
 
 // ═══════════════════════════════════════════════
@@ -3848,6 +3886,23 @@ async function sendMsg(stuId, role){
   inp.value = ''; inp.style.height = 'auto';
   if (currentTab==='messages')   { document.getElementById('msgMain').innerHTML=renderThreadHTML(stuId,'coach');   scrollMsgs(); }
   if (currentTab==='smessages')  { document.getElementById('msgMain').innerHTML=renderThreadHTML(stuId,'student'); scrollMsgs(); }
+
+  if (role === 'student' && coachId) {
+    db.auth.getSession().then(({ data: { session: authSess } }) => {
+      const token = authSess?.access_token;
+      if (!token) return;
+      fetch('/api/mailer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          type: 'new_message',
+          coach_id: coachId,
+          student_name: session.dbUser?.full_name || 'Öğrenciniz',
+          message_preview: text ? text.slice(0, 200) : '📷 Görsel gönderdi'
+        })
+      }).catch(() => {});
+    });
+  }
 }
 function scrollMsgs(){setTimeout(()=>{const b=document.getElementById('msgBody');if(b)b.scrollTop=b.scrollHeight;},60);}
 
@@ -9540,6 +9595,24 @@ async function saveWeekAsTemplate() {
   
   if(error) return showToast('Şablon kaydedilemedi: ' + error.message);
   showToast('Hafta şablon olarak kaydedildi ✓');
+
+  const wantShare = await customConfirm(`"${name}" şablonunu Rostrum Akademi ekibiyle paylaşmak ister misiniz?\n\nPaylaşılan şablonlar değerlendirilerek tüm koçlara önerilebilir.`);
+  if (wantShare) {
+    db.auth.getSession().then(({ data: { session: authSess } }) => {
+      const token = authSess?.access_token;
+      if (!token) return;
+      fetch('/api/mailer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          type: 'template_share',
+          template_name: name,
+          task_count: templateTasks.length,
+          tasks_json: JSON.stringify(templateTasks, null, 2)
+        })
+      }).then(() => showToast('Şablon Rostrum ekibiyle paylaşıldı ✓')).catch(() => showToast('Şablon kaydedildi, paylaşım gönderilemedi.'));
+    });
+  }
 }
 
 async function applyTemplateToWeek() {
@@ -10223,6 +10296,7 @@ window.getTestStatus = getTestStatus;
 window.openCoachTaskEdit = openCoachTaskEdit;
 window.saveWeekAsTemplate = saveWeekAsTemplate;
 window.applyTemplateToWeek = applyTemplateToWeek;
+window.downloadICS = downloadICS;
 window.confirmApplyTemplate = confirmApplyTemplate;
 window.copyTaskToClipboard = copyTaskToClipboard;
 window.pasteTaskFromClipboard = pasteTaskFromClipboard;
