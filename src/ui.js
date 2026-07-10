@@ -3741,7 +3741,8 @@ function renderThreadHTML(stuId, role){
     </label>
     <textarea class="msg-input" id="msgInput" placeholder="Mesaj yaz..." rows="1"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg('${stuId}','${role}');}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,110)+'px'"
+      onpaste="window._handleMsgPaste(event,'${stuId}','${role}')"></textarea>
     <button class="msg-send-btn" onclick="sendMsg('${stuId}','${role}')">
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
     </button>
@@ -3767,6 +3768,31 @@ window._pickMsgImg = function(inp, stuId, role) {
 window._cancelMsgImg = function() {
   _msgPendingImg = null;
   document.getElementById('msgImgPreview').style.display = 'none';
+};
+
+window._handleMsgPaste = function(event, stuId, role) {
+  const items = event.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      event.preventDefault();
+      const file = item.getAsFile();
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { showToast('Dosya max 5 MB olabilir'); return; }
+      _msgPendingImg = { file };
+      const reader = new FileReader();
+      reader.onload = e => {
+        const preview = document.getElementById('msgImgPreview');
+        const thumb = document.getElementById('msgImgThumb');
+        const name = document.getElementById('msgImgName');
+        thumb.src = e.target.result; thumb.style.display = 'block';
+        name.textContent = 'Yapıştırılan görsel';
+        if (preview) preview.style.display = 'flex';
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+  }
 };
 
 async function sendMsg(stuId, role){
