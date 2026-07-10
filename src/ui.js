@@ -4733,11 +4733,9 @@ async function renderSMessages(){
   if(unreadIds.length) await db.from('messages').update({read:true}).in('id',unreadIds);
   (S.messages[stu.id]||[]).forEach(m=>{if(m.from==='coach')m.read=true;});
   const el=document.getElementById('view-smessages');
-  el.innerHTML=`<div class="sh" style="margin-bottom:14px"><h2>💬 Koçuma Yaz</h2></div>
-    <div class="card" style="max-width:700px;overflow:hidden">
-      <div class="msg-main" id="msgMain" style="display:flex;flex-direction:column;min-height:420px">
-        ${renderThreadHTML(stu.id,'student')}
-      </div>
+  el.innerHTML=`<div class="sh" style="margin-bottom:12px"><h2>💬 Koçuma Yaz</h2></div>
+    <div class="smsg-wrap">
+      <div class="msg-main" id="msgMain">${renderThreadHTML(stu.id,'student')}</div>
     </div>`;
   scrollMsgs();
 }
