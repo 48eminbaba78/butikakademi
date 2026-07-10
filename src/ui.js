@@ -7544,15 +7544,14 @@ function printWeeklyProgramWithNote(stuId, coachNote){
   const wStart=getWeekStart(S.weekOffset,wsOff);
   const wEnd=addDays(wStart,6);
   const brandName=S.workspace?.brand_name||'Rostrum Akademi';
-  const bc=S.workspace?.brand_color||'#f0a500';
+  const bc=S.workspace?.brand_color||'#E8613A';
   const DAYS=['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
   const MONTHS=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
   const TC={deneme:'#f59e0b',soru:'#3b82f6',konu:'#10b981',diger:'#8b5cf6'};
-  const TBG={deneme:'#fffbeb',soru:'#eff6ff',konu:'#f0fdf4',diger:'#faf5ff'};
   const TL={deneme:'Deneme',soru:'Soru Bankası',konu:'Konu Anlatımı',diger:'Diğer'};
-  const today=fmtDate(new Date());
-  let totalTasks=0,doneTasks=0,totalMin=0,dayColumns='';
 
+  let totalTasks=0, doneTasks=0, totalMin=0;
+  const activeDays=[];
   for(let i=0;i<7;i++){
     const d=addDays(wStart,i);
     const ds=fmtDate(d);
@@ -7560,161 +7559,143 @@ function printWeeklyProgramWithNote(stuId, coachNote){
     totalTasks+=tasks.length;
     doneTasks+=tasks.filter(t=>t.done).length;
     totalMin+=tasks.reduce((s,t)=>s+Number(t.duration||0),0);
-    const isToday=ds===today;
-    const shortDay=DAYS[(wsOff+i)%7].slice(0,3).toUpperCase();
-    const dayMin=tasks.reduce((s,t)=>s+Number(t.duration||0),0);
-
-    const cards=tasks.map(t=>{
-      const color=TC[t.type]||'#94a3b8';
-      const bg=TBG[t.type]||'#f8fafc';
-      const lbl=TL[t.type]||'Diğer';
-      return `<div style="margin-bottom:5px;border-radius:7px;background:${bg};border:1px solid ${color}28;border-left:3px solid ${color}">
-        <div style="padding:6px 8px">
-          <div style="font-size:7.5px;font-weight:800;color:${color};text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">${lbl}${t.exam?` · ${t.exam}`:''}</div>
-          <div style="font-size:10px;font-weight:700;color:#111;line-height:1.3">${esc(t.subject)}</div>
-          ${t.note?`<div style="font-size:7.5px;color:#999;margin-top:2px;line-height:1.4;word-break:break-word">${esc(t.note)}</div>`:''}
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
-            <span style="display:inline-flex;align-items:center;gap:4px;font-size:8px;color:#bbb">
-              <span style="display:inline-block;width:11px;height:11px;border:1.5px solid #d0cec9;border-radius:3px;flex-shrink:0"></span>
-              ${t.duration} dk
-            </span>
-            ${t.done?`<span style="font-size:8px;font-weight:700;color:#22c55e">✓ Tamam</span>`:''}
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-
-    dayColumns+=`<div style="padding:0 5px;border-right:${i<6?`1px solid #ede9e3`:'none'}">
-      <div style="padding-bottom:7px;margin-bottom:7px;border-bottom:2px solid ${isToday?bc:'#ede9e3'}">
-        <div style="font-size:8px;font-weight:800;color:${isToday?bc:'#bbb'};text-transform:uppercase;letter-spacing:.8px">${shortDay}</div>
-        <div style="font-size:22px;font-weight:900;color:${isToday?bc:'#111'};line-height:1;margin-top:1px">${d.getDate()}</div>
-        ${dayMin>0?`<div style="font-size:7px;color:#ccc;margin-top:2px">${dayMin}dk · ${tasks.length}g</div>`:''}
-      </div>
-      ${tasks.length===0?`<div style="font-size:13px;color:#e8e4dc;text-align:center;padding:14px 0">—</div>`:cards}
-    </div>`;
+    if(tasks.length>0) activeDays.push({d,ds,tasks,dayName:DAYS[(wsOff+i)%7]});
   }
 
   const pct=totalTasks>0?Math.round((doneTasks/totalTasks)*100):0;
-  const pctColor=pct>=80?'#22c55e':pct>=50?bc:'#f59e0b';
-  const initials=stu.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const circ=163.36;
+  const ringOffset=(circ*(1-pct/100)).toFixed(1);
 
-  let detailedDaysList = '';
-  for(let i=0;i<7;i++){
-    const d=addDays(wStart,i);
-    const ds=fmtDate(d);
-    const tasks=S.tasks[`${stuId}_${ds}`]||[];
-    if (tasks.length === 0) continue;
+  const dots=(n,max=5)=>{
+    let h='';
+    for(let i=1;i<=max;i++) h+=`<span style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:2px;background:${i<=n?bc:'#E8E6DE'}"></span>`;
+    return h;
+  };
 
-    const dayName=DAYS[(wsOff+i)%7];
-    const taskRows = tasks.map((t, index) => {
+  const checkIcon=(done)=>done
+    ?`<span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#22C55E;flex-shrink:0"><svg width="8" height="6" viewBox="0 0 8 6"><path d="M1 3L3 5L7 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span>`
+    :`<span style="display:inline-block;width:15px;height:15px;border-radius:50%;border:1.5px solid #D1D0DC;flex-shrink:0"></span>`;
+
+  let dayHtml='';
+  for(const {d,tasks,dayName} of activeDays){
+    const dayMin=tasks.reduce((s,t)=>s+Number(t.duration||0),0);
+    const taskCards=tasks.map(t=>{
       const color=TC[t.type]||'#94a3b8';
       const lbl=TL[t.type]||'Diğer';
-      return `<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #eee">
-        <div style="display:flex;align-items:baseline;gap:8px">
-          <span style="font-size:12px;font-weight:800;color:${color}">${index + 1}. ${lbl}${t.exam?` (${t.exam})`:''}</span>
-          <span style="font-size:12px;font-weight:700;color:#111">${esc(t.subject)}</span>
-          <span style="font-size:11px;color:#666;margin-left:auto">${t.duration} dk</span>
+      const isDone=t.done;
+      const res=t.student_result||null;
+      const fb=t.student_feedback||null;
+      const dybHtml=res&&(res.dogru!=null||res.yanlis!=null||res.bos!=null)?`
+        <div style="display:flex;gap:4px;margin-top:5px;margin-left:21px">
+          <span style="display:inline-flex;align-items:center;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:700;background:#DCFCE7;color:#15803D">✓ ${res.dogru??0}</span>
+          <span style="display:inline-flex;align-items:center;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:700;background:#FEE2E2;color:#B91C1C">✗ ${res.yanlis??0}</span>
+          <span style="display:inline-flex;align-items:center;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:700;background:#F1F5F9;color:#64748B">— ${res.bos??0}</span>
+        </div>`:'';
+      const noteHtml=t.student_note?`<div style="font-size:9px;color:#9998AA;font-style:italic;margin-top:4px;margin-left:21px;line-height:1.4">"${esc(t.student_note)}"</div>`:'';
+      const fbHtml=fb&&(fb.difficulty||fb.focus)?`
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;margin-top:6px">
+          ${fb.difficulty?`<div style="white-space:nowrap"><span style="font-size:8px;color:#C4C3D0">Zorluk </span>${dots(fb.difficulty)}</div>`:''}
+          ${fb.focus?`<div style="white-space:nowrap"><span style="font-size:8px;color:#C4C3D0">Odak </span>${dots(fb.focus)}</div>`:''}
+        </div>`:'';
+      return `<div style="background:#fff;border-radius:8px;border:1px solid #E8E6DE;border-left:3px solid ${color};margin-bottom:6px;padding:10px 14px;display:flex;gap:10px;align-items:flex-start">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            ${checkIcon(isDone)}
+            <span style="font-size:11px;font-weight:800;color:${isDone?'#9998AA':'#111118'};${isDone?'text-decoration:line-through':''}">${esc(t.subject)}</span>
+            <span style="font-size:8px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.5px;margin-left:2px">${lbl}${t.exam?' · '+esc(t.exam):''}</span>
+          </div>
+          ${t.note?`<div style="font-size:9px;color:#6B6A7A;margin-left:21px;line-height:1.4;margin-bottom:2px">${esc(t.note)}</div>`:''}
+          ${dybHtml}
+          ${noteHtml}
         </div>
-        ${t.note ? `<div style="font-size:10px;color:#555;margin-top:4px;padding-left:14px;border-left:2px solid ${color}40;line-height:1.5">${esc(t.note).replace(/\n/g, '<br>')}</div>` : ''}
+        <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0">
+          <span style="font-size:10px;font-weight:600;color:#9998AA;background:#F7F6F2;padding:2px 8px;border-radius:99px;white-space:nowrap">${t.duration} dk</span>
+          ${fbHtml}
+        </div>
       </div>`;
     }).join('');
-
-    detailedDaysList += `<div style="margin-bottom:24px">
-      <h3 style="font-size:14px;font-weight:800;color:${bc};border-bottom:2px solid ${bc}40;padding-bottom:4px;margin-bottom:10px">${d.getDate()} ${MONTHS[d.getMonth()]} - ${dayName}</h3>
-      <div>${taskRows}</div>
+    dayHtml+=`<div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px">
+        <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#111118">${dayName}</span>
+        <span style="font-size:10px;color:#6B6A7A">${d.getDate()} ${MONTHS[d.getMonth()]}</span>
+        <div style="flex:1;height:1px;background:#E8E6DE"></div>
+        <span style="font-size:9px;color:#9998AA">${tasks.length} görev · ${dayMin} dk</span>
+      </div>
+      ${taskCards}
     </div>`;
   }
 
-  const html=`<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">
+  const statItems=[
+    {val:doneTasks,lbl:'Tamamlanan',col:'#22C55E'},
+    {val:totalTasks-doneTasks,lbl:'Bekleyen',col:'#C4C3D0'},
+    {val:Math.round(totalMin/60)+' sa',lbl:'Toplam Süre',col:bc},
+    {val:totalTasks,lbl:'Toplam Görev',col:'#C4C3D0'}
+  ];
+  const statsHtml=statItems.map((s,i)=>`<div style="flex:1;${i>0?'border-left:1px solid rgba(255,255,255,.06);padding-left:16px;':''}padding-right:16px">
+    <div style="font-size:18px;font-weight:800;color:${s.col};font-variant-numeric:tabular-nums">${s.val}</div>
+    <div style="font-size:8px;color:#6B6A7A;text-transform:uppercase;letter-spacing:.07em">${s.lbl}</div>
+  </div>`).join('');
+
+  const html=`<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"><title>${esc(stu.name)} — Haftalık Program</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Segoe UI',-apple-system,Arial,sans-serif;background:#fff;color:#111;}
+    body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;background:#1A1920;padding:32px 20px 60px;min-height:100vh;}
+    .page{background:#fff;max-width:780px;margin:0 auto;border-radius:8px;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,.6);}
     @media print{
+      body{background:#fff;padding:0;}
+      .page{box-shadow:none;max-width:none;border-radius:0;}
       .no-print{display:none!important;}
-      @page{size:A4 landscape;margin:5mm;}
-      .page-break{page-break-before:always;}
+      @page{size:A4 portrait;margin:8mm;}
     }
   </style>
   </head><body>
-
-  <!-- ACCENT BAR -->
-  <div style="height:5px;background:${bc}"></div>
-
-  <!-- HEADER -->
-  <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px 11px;border-bottom:1px solid #ede9e3">
-    <div>
-      <div style="font-size:18px;font-weight:900;color:${bc};letter-spacing:-.3px">${esc(brandName)}</div>
-      <div style="font-size:9.5px;color:#bbb;margin-top:2px;letter-spacing:.2px">Haftalık Çalışma Programı</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <div style="text-align:right">
-        <div style="font-size:14px;font-weight:800;color:#111">${esc(stu.name)}</div>
-        ${stu.target?`<div style="font-size:8.5px;color:#aaa;margin-top:1px">🎯 ${esc(stu.target)}</div>`:''}
-        <div style="font-size:8.5px;color:#bbb;margin-top:1px">${wStart.getDate()} ${MONTHS[wStart.getMonth()]} – ${wEnd.getDate()} ${MONTHS[wEnd.getMonth()]} ${wEnd.getFullYear()}</div>
-      </div>
-      <div style="width:40px;height:40px;border-radius:10px;background:${bc};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;letter-spacing:-.5px;flex-shrink:0">${initials}</div>
-    </div>
-  </div>
-
-  <!-- STATS BAR -->
-  <div style="display:flex;align-items:center;gap:0;padding:7px 18px;background:#faf9f8;border-bottom:1px solid #ede9e3">
-    <div style="display:flex;align-items:center;gap:18px">
-      <div style="text-align:center">
-        <div style="font-size:17px;font-weight:900;color:${bc};letter-spacing:-.5px">${totalTasks}</div>
-        <div style="font-size:7.5px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Görev</div>
-      </div>
-      <div style="width:1px;height:26px;background:#ede9e3"></div>
-      <div style="text-align:center">
-        <div style="font-size:17px;font-weight:900;color:#22c55e;letter-spacing:-.5px">${doneTasks}</div>
-        <div style="font-size:7.5px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Tamamlanan</div>
-      </div>
-      <div style="width:1px;height:26px;background:#ede9e3"></div>
-      <div style="text-align:center">
-        <div style="font-size:17px;font-weight:900;color:#3b82f6;letter-spacing:-.5px">${Math.round(totalMin/60)}<span style="font-size:10px">sa</span></div>
-        <div style="font-size:7.5px;color:#bbb;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Süre</div>
-      </div>
-      <div style="width:1px;height:26px;background:#ede9e3"></div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:90px;height:7px;background:#ede9e3;border-radius:99px;overflow:hidden">
-          <div style="height:100%;width:${pct}%;background:${pctColor};border-radius:99px"></div>
+  <div class="page">
+    <div style="background:#111118;padding:24px 28px 20px;position:relative;overflow:hidden">
+      <div style="position:absolute;right:-50px;top:-50px;width:180px;height:180px;border-radius:50%;background:${bc};opacity:.07;pointer-events:none"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px">
+        <div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${bc};margin-bottom:6px">${esc(brandName)} · Haftalık Program</div>
+          <div style="font-size:24px;font-weight:800;color:#F0EFF8;letter-spacing:-.5px;line-height:1.1">${esc(stu.name)}</div>
+          ${stu.target?`<div style="font-size:11px;color:#8B8A99;margin-top:4px">🎯 ${esc(stu.target)}</div>`:''}
         </div>
-        <div style="font-size:14px;font-weight:900;color:${pctColor};min-width:36px">%${pct}</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+          <div style="position:relative;width:64px;height:64px">
+            <svg width="64" height="64" viewBox="0 0 64 64" style="transform:rotate(-90deg)">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5"/>
+              <circle cx="32" cy="32" r="26" fill="none" stroke="${bc}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${ringOffset}"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:14px;font-weight:800;color:#F0EFF8;line-height:1">%${pct}</div>
+              <div style="font-size:7px;color:#6B6A7A;text-transform:uppercase;letter-spacing:.05em;margin-top:1px">hafta</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6B6A7A">Hafta</div>
+            <div style="font-size:12px;font-weight:700;color:#C4C3D0;margin-top:1px">${wStart.getDate()} – ${wEnd.getDate()} ${MONTHS[wEnd.getMonth()]} ${wEnd.getFullYear()}</div>
+          </div>
+        </div>
       </div>
+      <div style="display:flex;gap:0;margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">${statsHtml}</div>
+    </div>
+    <div style="background:#F7F6F2;padding:18px 24px 20px">
+      ${activeDays.length===0?'<div style="text-align:center;color:#9998AA;padding:40px 0;font-size:13px">Bu hafta için görev bulunmuyor.</div>':dayHtml}
+      ${coachNote?`<div style="background:#fff;border-radius:8px;border:1px solid #E8E6DE;border-left:3px solid ${bc};padding:10px 14px;margin-top:4px">
+        <div style="font-size:8px;font-weight:800;color:${bc};text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Koç Notu</div>
+        <div style="font-size:10px;color:#444;line-height:1.6">${esc(coachNote)}</div>
+      </div>`:''}
+    </div>
+    <div style="background:#111118;padding:14px 28px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:10px;font-style:italic;color:#6B6A7A;max-width:380px;line-height:1.5">"Bugün emek harcadığın her dakika, sınav gününde sana geri döner."</div>
+      <div style="font-size:9px;font-weight:700;color:#3D3C4A;text-align:right;text-transform:uppercase;letter-spacing:.08em">${esc(brandName)}</div>
+    </div>
+    <div class="no-print" style="padding:10px 14px;display:flex;align-items:center;gap:12px;background:#F7F6F2;border-top:1px solid #E8E6DE">
+      <button onclick="window.print()" style="background:${bc};color:#fff;border:none;padding:9px 24px;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer">🖨️ PDF İndir / Yazdır</button>
+      <span style="font-size:10px;color:#9998AA">Tarayıcı ayarlarından "Arka plan grafikleri"ni aktif edin</span>
     </div>
   </div>
-
-  <!-- WEEK GRID -->
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);padding:10px 8px 6px">${dayColumns}</div>
-
-  <!-- COACH NOTE -->
-  ${coachNote?`<div style="margin:2px 14px 10px;padding:10px 14px;background:${bc}0d;border-left:3px solid ${bc};border-radius:0 8px 8px 0">
-    <div style="font-size:8px;font-weight:800;color:${bc};text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px">Koç Notu</div>
-    <div style="font-size:10px;color:#444;line-height:1.6">${esc(coachNote)}</div>
-  </div>`:''}
-
-  <!-- FOOTER -->
-  <div style="display:flex;align-items:center;gap:14px;padding:7px 16px;border-top:1px solid #ede9e3;background:#faf9f8">
-    <span style="font-size:8px;color:#ccc;margin-right:4px;font-weight:600">TÜRLER:</span>
-    ${Object.entries(TL).map(([k,v])=>`<div style="display:flex;align-items:center;gap:4px;font-size:8.5px;color:#888"><div style="width:8px;height:8px;border-radius:2px;background:${TC[k]}"></div>${v}</div>`).join('')}
-    <div style="margin-left:auto;font-size:8px;color:#ccc">${esc(brandName)} · ${new Date().toLocaleDateString('tr-TR')}</div>
-  </div>
-
-  <!-- PRINT BUTTON -->
-  <div class="no-print" style="padding:12px 16px;display:flex;align-items:center;gap:12px;border-top:1px solid #ede9e3">
-    <button onclick="window.print()" style="background:${bc};color:#fff;border:none;padding:10px 28px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.2px">🖨️ PDF İndir / Yazdır</button>
-    <span style="font-size:11px;color:#bbb">Tarayıcı ayarlarından "Arka plan grafikleri"ni aktif edin</span>
-  </div>
-
-  <!-- PAGE 2: DETAILED LIST VIEW -->
-  ${detailedDaysList ? `
-  <div class="page-break" style="padding:40px 30px;max-width:1000px;margin:0 auto">
-    <div style="font-size:18px;font-weight:900;color:${bc};margin-bottom:20px;border-bottom:2px solid ${bc};padding-bottom:10px">📋 Günlük Detaylı Görev Açıklamaları</div>
-    ${detailedDaysList}
-  </div>` : ''}
-
   </body></html>`;
 
-  const win=window.open('','_blank','width=1200,height=850');
+  const win=window.open('','_blank','width=1000,height=850');
   win.document.write(html); win.document.close();
   setTimeout(()=>win.focus(),300);
 }
