@@ -6495,6 +6495,20 @@ function _renderSWStep(modal, name, color, stu) {
       this.style.color = this.classList.contains('sel') ? '#fff' : 'var(--text)';
     });
   });
+
+  // hour pill selected style
+  modal.querySelectorAll('.sw-hour').forEach(b => {
+    b.addEventListener('click', function() {
+      modal.querySelectorAll('.sw-hour').forEach(x => {
+        x.style.background = 'var(--surface2)';
+        x.style.borderColor = 'var(--border)';
+        x.style.color = 'var(--text)';
+      });
+      this.style.background = color;
+      this.style.borderColor = color;
+      this.style.color = '#fff';
+    });
+  });
 }
 
 window._swNext = function() {
