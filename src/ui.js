@@ -240,7 +240,7 @@ function setupShell(){
     ...tabs,
     {id:'student-detail'}, {id:'profile'}, {id:'settings'},
     {id:'coach-resources'}, {id:'coach-applications'}, {id:'coach-notes'}, {id:'coach-profile'},
-    {id:'messages'}, {id:'todolist'},
+    {id:'messages'}, {id:'todolist'}, {id:'suyelik'},
     // program ayrı view — student-detail'dan açılır
     {id:'program'},{id:'appointments'},{id:'exams'}
   ].map(t=>`<div class="view" id="view-${t.id}"></div>`).join('');
