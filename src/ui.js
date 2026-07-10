@@ -3805,7 +3805,8 @@ async function sendMsg(stuId, role){
   let image_url = null;
   if (_msgPendingImg) {
     const file = _msgPendingImg.file;
-    const ext = file.name.split('.').pop();
+    const extFromName = file.name?.includes('.') ? file.name.split('.').pop() : '';
+    const ext = extFromName || (file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg');
     const path = `${stuId}/${Date.now()}.${ext}`;
     const { error: upErr } = await db.storage.from('chat_images').upload(path, file, { upsert: true });
     if (upErr) { showToast('Görsel yüklenemedi: ' + upErr.message); return; }
