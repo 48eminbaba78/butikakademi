@@ -23,8 +23,8 @@ jobs:
           distribution: temurin
           java-version: '11'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
 
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
@@ -44,7 +44,7 @@ jobs:
         run: bubblewrap build
 
       - name: Find APK files
-        run: find . -name "*.apk" 2>/dev/null | grep -v node_modules || echo "No APK found yet"
+        run: find . -name "*.apk" 2>/dev/null | grep -v node_modules || echo "No APK found"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
