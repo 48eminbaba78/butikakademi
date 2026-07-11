@@ -3172,15 +3172,34 @@ function connectGoogleCalendar() {
 }
 window.connectGoogleCalendar = connectGoogleCalendar;
 
+function _gcalSyncLabel() {
+  try {
+    const raw = localStorage.getItem(`gcal_sync_${session.coachId}`);
+    if (!raw) return '';
+    const { time, mode } = JSON.parse(raw);
+    const dt = new Date(time);
+    const day = dt.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+    const hour = dt.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+    const modeStr = mode === 'auto' ? 'Otomatik' : 'Elle';
+    return `<div style="font-size:10px;color:var(--text-mid);text-align:right;margin-top:3px">${day} ${hour} · ${modeStr}</div>`;
+  } catch { return ''; }
+}
+
 function renderAppointments(){
   const el=document.getElementById('view-appointments');
   const gcalConnected = S.workspace?.google_calendar_connected;
   const gcalBtn = gcalConnected
-    ? `<button class="btn btn-ghost btn-sm" style="color:var(--green)" onclick="showToast('Google Takvim zaten bağlı ✓')">✓ Google Takvim</button>`
+    ? `<div style="display:flex;flex-direction:column;align-items:flex-end">
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:12px;color:var(--green);font-weight:600">✓ Google Takvim</span>
+          <button class="btn btn-ghost btn-sm" id="gcalSyncBtn" onclick="syncFromGoogle()">🔄 Senkronize Et</button>
+        </div>
+        ${_gcalSyncLabel()}
+      </div>`
     : `<button class="btn btn-ghost btn-sm" onclick="connectGoogleCalendar()">🔗 Google Takvim Bağla</button>`;
   el.innerHTML=`
     <button class="back-link" onclick="switchTab('student-detail')">← ${S.students.find(s=>s.id===S.activeStuId)?.name||'Öğrenci'}</button>
-    <div class="sh"><h2>Randevular</h2><div style="display:flex;gap:8px">${gcalBtn}<button class="btn btn-ghost btn-sm" onclick="downloadICS()">📅 Takvime Aktar</button><button class="btn btn-accent" onclick="openApptModal()">+ Yeni Randevu</button></div></div>
+    <div class="sh"><h2>Randevular</h2><div style="display:flex;gap:8px;align-items:flex-start">${gcalBtn}<button class="btn btn-ghost btn-sm" onclick="downloadICS()">📅 Takvime Aktar</button><button class="btn btn-accent" onclick="openApptModal()">+ Yeni Randevu</button></div></div>
     <div class="appts-layout">
       <div class="card cp">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -3301,6 +3320,37 @@ async function _doSaveAppt(){
   cm('apptModal');
   if(currentTab === 'todolist') renderAgenda(); else if(document.getElementById('view-appointments')?.classList.contains('active')) renderAppointments();
 }
+
+async function syncFromGoogle() {
+  const btn = document.getElementById('gcalSyncBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Senkronize ediliyor...'; }
+  try {
+    const { data: { session: authSess } } = await db.auth.getSession();
+    if (!authSess?.access_token) return showToast('Oturum hatası');
+    const res = await fetch('/api/mailer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authSess.access_token}` },
+      body: JSON.stringify({ type: 'google_calendar_sync' })
+    });
+    const result = await res.json();
+    if (!result.success) return showToast('Senkronizasyon hatası: ' + (result.error || 'Bilinmeyen'));
+    if (result.deletedIds?.length) S.appointments = S.appointments.filter(a => !result.deletedIds.includes(a.id));
+    result.updatedItems?.forEach(item => {
+      const a = S.appointments.find(x => x.id === item.id);
+      if (a) { a.date = item.date; a.time = item.time; }
+    });
+    localStorage.setItem(`gcal_sync_${session.coachId}`, JSON.stringify({ time: new Date().toISOString(), mode: 'manual' }));
+    const parts = [];
+    if (result.deleted > 0) parts.push(`${result.deleted} randevu silindi`);
+    if (result.updated > 0) parts.push(`${result.updated} randevu güncellendi`);
+    showToast(parts.length ? 'Senkronize edildi: ' + parts.join(', ') + ' ✓' : 'Senkronize edildi, değişiklik yok ✓');
+    renderAppointments();
+  } catch(e) {
+    showToast('Senkronizasyon hatası: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Senkronize Et'; }
+  }
+}
+window.syncFromGoogle = syncFromGoogle;
 
 async function gcalSync(action, appointment) {
   const { data: { session: authSess } } = await db.auth.getSession();

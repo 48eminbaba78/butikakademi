@@ -336,6 +336,68 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, google_event_id: crData.id });
     }
 
+    if (type === 'google_calendar_sync') {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) return res.status(401).json({ error: 'Token gerekli' });
+      if (!SB_SERVICE_KEY || !G_CLIENT_ID || !G_CLIENT_SECRET) return res.status(500).json({ error: 'Sunucu yapılandırma hatası' });
+
+      const admin = createClient(SB_URL, SB_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } });
+      const { data: { user }, error: authErr } = await admin.auth.getUser(token);
+      if (authErr || !user) return res.status(401).json({ error: 'Yetkisiz' });
+      const { data: caller } = await admin.from('users').select('role').eq('id', user.id).single();
+      if (!caller || !['coach', 'developer'].includes(caller.role)) return res.status(403).json({ error: 'Yetkisiz' });
+
+      const { data: workspace } = await admin.from('workspaces').select('google_refresh_token').eq('coach_id', user.id).single();
+      if (!workspace?.google_refresh_token) return res.status(400).json({ error: 'Google Takvim bağlı değil' });
+
+      const atRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ refresh_token: workspace.google_refresh_token, client_id: G_CLIENT_ID, client_secret: G_CLIENT_SECRET, grant_type: 'refresh_token' })
+      });
+      const atData = await atRes.json();
+      if (!atData.access_token) return res.status(500).json({ error: 'Google token yenilenemedi' });
+
+      const gcalHeaders = { 'Authorization': `Bearer ${atData.access_token}` };
+
+      const { data: appts } = await admin.from('appointments').select('id, google_event_id, date, time').eq('coach_id', user.id).not('google_event_id', 'is', null);
+      if (!appts?.length) return res.status(200).json({ success: true, deleted: 0, updated: 0, deletedIds: [], updatedItems: [] });
+
+      const dates = appts.map(a => a.date).sort();
+      const timeMin = encodeURIComponent(new Date(dates[0] + 'T00:00:00+03:00').toISOString());
+      const timeMax = encodeURIComponent(new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString());
+      const listRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&maxResults=2500`, { headers: gcalHeaders });
+      const listData = await listRes.json();
+      if (!listRes.ok) return res.status(500).json({ error: listData.error?.message || 'Google Calendar sorgu hatası' });
+
+      const gcalMap = {};
+      (listData.items || []).forEach(e => { gcalMap[e.id] = e; });
+
+      let deleted = 0, updated = 0;
+      const deletedIds = [], updatedItems = [];
+
+      for (const appt of appts) {
+        const evt = gcalMap[appt.google_event_id];
+        if (!evt || evt.status === 'cancelled') {
+          await admin.from('appointments').delete().eq('id', appt.id);
+          deletedIds.push(appt.id);
+          deleted++;
+        } else if (evt.start?.dateTime) {
+          const utcMs = new Date(evt.start.dateTime).getTime();
+          const istDt = new Date(utcMs + 3 * 60 * 60 * 1000);
+          const gcalDate = istDt.toISOString().substring(0, 10);
+          const gcalTime = istDt.toISOString().substring(11, 16);
+          if (gcalDate !== appt.date || gcalTime !== appt.time) {
+            await admin.from('appointments').update({ date: gcalDate, time: gcalTime }).eq('id', appt.id);
+            updatedItems.push({ id: appt.id, date: gcalDate, time: gcalTime });
+            updated++;
+          }
+        }
+      }
+
+      return res.status(200).json({ success: true, deleted, updated, deletedIds, updatedItems });
+    }
+
     return res.status(400).json({ error: 'Geçersiz tip: ' + type });
   } catch (e) {
     console.error('[mailer] type=' + type, e.message);
