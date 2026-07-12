@@ -52,8 +52,14 @@ jobs:
             -keypass rostrum2024 \
             -noprompt
 
+      - name: Generate Android project from twa-manifest
+        run: bubblewrap update
+
       - name: Build TWA APK
         run: bubblewrap build
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: rostrum2024
+          BUBBLEWRAP_KEY_PASSWORD: rostrum2024
 
       - name: Find APK
         run: find . -name "*.apk" 2>/dev/null | grep -v node_modules || echo "No APK found"
