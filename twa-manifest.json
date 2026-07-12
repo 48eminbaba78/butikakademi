@@ -33,7 +33,7 @@
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://rostrumakademi.com/",
-  "minSdkVersion": 19,
+  "minSdkVersion": 21,
   "orientation": "portrait",
   "shareTarget": null,
   "abis": ["x86", "x86_64", "arm64-v8a", "armeabi-v7a"],
